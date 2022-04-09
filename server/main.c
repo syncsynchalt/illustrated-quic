@@ -9,8 +9,8 @@
 #include <errno.h>
 #include "quiche.h"
 
-// xxx
-extern  void ERR_print_errors_fp(FILE *fp);
+typedef struct sockaddr sockaddr;
+
 void die(const char *str)
 {
     fprintf(stderr, "%s: %s\n", str, strerror(errno));
@@ -32,7 +32,7 @@ int create_listen(int port)
     if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
         die("SO_REUSEADDR failed");
     }
-    if (bind(s, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+    if (bind(s, (sockaddr *)&addr, sizeof(addr)) < 0) {
         die("Unable to bind to port");
     }
     printf("Listening on port %d\n", port);
@@ -49,6 +49,18 @@ size_t resolve_hostname(const char *host, const char *port, struct sockaddr_stor
     freeaddrinfo(res);
     return len;
 }
+
+void do_full_send(quiche_conn *conn, uint64_t stream, const char *data, size_t data_len)
+{
+    ssize_t wrote = quiche_conn_stream_send(conn, stream, (uint8_t *)data, data_len, true);
+    if (wrote < 0)
+        die("stream send error");
+    if (wrote != data_len)
+        die("short write");
+    printf("Wrote [%.*s] to stream %lld (final)\n", (int)wrote, data, stream);
+}
+
+bool replied = false;
 
 void handle_reads(quiche_conn *conn)
 {
@@ -70,6 +82,11 @@ void handle_reads(quiche_conn *conn)
         if (num_read < 0)
             die("stream recv failure");
         printf("Read [%.*s] from stream %lld%s\n", (int)num_read, buf, stream_id, is_final ? " (final)" : "");
+
+        if (strcmp((const char *)buf, "ping") == 0) {
+            do_full_send(conn, stream_id, "pong", 4);
+            replied = true;
+        }
     }
     quiche_stream_iter_free(iter);
 }
@@ -77,32 +94,27 @@ void handle_reads(quiche_conn *conn)
 void perform_recvs(quiche_conn *conn, int sock)
 {
     struct sockaddr_storage addr_storage = { 0 };
-    struct sockaddr *addr = (struct sockaddr *)&addr_storage;
+    sockaddr *addr = (sockaddr *)&addr_storage;
     char buf[10000];
-    for (;;) {
-        socklen_t addr_len = sizeof(addr_storage);
-        ssize_t rb = recvfrom(sock, buf, sizeof(buf), 0, addr, &addr_len);
-        if (rb < 0)
-            die("recv failure");
-        uint8_t *start = (uint8_t *)buf;
-        uint8_t *end = start + rb;
-        quiche_recv_info recv_info = { addr, addr_len };
-        while (end > start) {
-            ssize_t b = quiche_conn_recv(conn, start, end - start, &recv_info);
-            if (b < 0)
-{
-printf("xxx: %ld\n", b);
-ERR_print_errors_fp(stdout);
-                die("quiche recv failure");
-}
-            start += b;
+    socklen_t addr_len = sizeof(addr_storage);
 
-            handle_reads(conn);
-        }
+    ssize_t rb = recvfrom(sock, buf, sizeof(buf), 0, addr, &addr_len);
+    if (rb < 0)
+        die("recv failure");
+    uint8_t *start = (uint8_t *)buf;
+    uint8_t *end = start + rb;
+    quiche_recv_info recv_info = { addr, addr_len };
+    while (end > start) {
+        ssize_t b = quiche_conn_recv(conn, start, end - start, &recv_info);
+        if (b < 0)
+            die("quiche recv failure");
+        start += b;
+
+        handle_reads(conn);
     }
 }
 
-void perform_sends(quiche_conn *conn, int sock)
+void perform_sends(quiche_conn *conn, int sock, sockaddr *addr, size_t addr_len)
 {
     quiche_send_info send_info = {{ 0 }};
     char buf[10000];
@@ -112,40 +124,50 @@ void perform_sends(quiche_conn *conn, int sock)
             return;
         if (tosend < 0)
             die("quiche send failure");
-        ssize_t sent = send(sock, buf, tosend, 0);
+        ssize_t sent = sendto(sock, buf, tosend, 0, addr, addr_len);
         if (sent != tosend)
             die("send failure");
     }
 }
 
-void perform_recvs_and_sends(quiche_conn *conn, int sock)
+void perform_sends_and_recvs(quiche_conn *conn, int sock, sockaddr *addr, size_t addr_len)
 {
     quiche_conn_on_timeout(conn);
+    perform_sends(conn, sock, addr, addr_len);
     struct pollfd fds[1] = {{ sock, POLLIN, 0 }};
-    int poll_ret = poll(fds, 1, 1000);
+    int timeout = quiche_conn_timeout_as_millis(conn);
+    if (timeout <= 0)
+        timeout = 1;
+    if (timeout > 1000)
+        timeout = 1000;
+    int poll_ret = poll(fds, 1, timeout);
     if (poll_ret < 0)
         die("poll failure");
     if (poll_ret > 0) {
         if (fds[0].revents & POLLIN) {
             perform_recvs(conn, sock);
         }
-        perform_sends(conn, sock);
     }
+    perform_sends(conn, sock, addr, addr_len);
 }
 
-void do_full_send(quiche_conn *conn, uint64_t stream, const char *data, size_t data_len)
+sockaddr *peek_packet_addr(int sock, struct sockaddr_storage *storage, socklen_t *addr_len)
 {
-    // then reply with "pong" and close it from our end
-    ssize_t wrote = quiche_conn_stream_send(conn, stream, (uint8_t *)data, data_len, true);
-    if (wrote < 0)
-        die("stream send error");
-    if (wrote != data_len)
-        die("short write");
+    // wait for our first caller (and get their address)
+    sockaddr *addr = (sockaddr *)storage;
+    char buf[10000];
+    if (recvfrom(sock, buf, sizeof(buf), MSG_PEEK, addr, addr_len) < 0)
+        die("peek failure");
+    char host[NI_MAXHOST];
+    char port[NI_MAXSERV];
+    getnameinfo(addr, *addr_len, host, sizeof(host),
+        port, sizeof(port), NI_NUMERICHOST|NI_NUMERICSERV);
+    printf("Accepting connection from %s:%s\n", host, port);
+    return (sockaddr *)storage;
 }
 
 int main(int argc, char **argv)
 {
-    // xxx setenv("SERVER", "1", 1);
     quiche_config *config = quiche_config_new(QUICHE_PROTOCOL_VERSION);
     if (!config)
         die("new config failure");
@@ -156,18 +178,21 @@ int main(int argc, char **argv)
         die("set priv key");
     if (quiche_config_load_cert_chain_from_pem_file(config, "server.crt") < 0)
         die("set cert chain");
+    quiche_config_set_initial_max_data(config, 10*1024*1024);
+    quiche_config_set_initial_max_stream_data_bidi_local(config, 1024*1024);
+    quiche_config_set_initial_max_stream_data_bidi_remote(config, 1024*1024);
+    quiche_config_set_initial_max_stream_data_uni(config, 1024*1024);
+    quiche_config_set_initial_max_streams_bidi(config, 10);
+    quiche_config_set_initial_max_streams_uni(config, 10);
 
     int sock = create_listen(8400);
 
     // wait for our first caller (and get their address)
-    struct sockaddr_storage addr_storage = { 0 };
-    struct sockaddr *addr = (struct sockaddr *)&addr_storage;
-    socklen_t addr_len = sizeof(addr_storage);
-    char buf[10000];
-    if (recvfrom(sock, buf, sizeof(buf), MSG_PEEK, addr, &addr_len) < 0)
-        die("peek failure");
+    struct sockaddr_storage storage = { 0 };
+    socklen_t addr_len = sizeof(storage);
+    sockaddr *addr = peek_packet_addr(sock, &storage, &addr_len);
 
-    const char conn_id[] = "s_conn_id";
+    const char conn_id[] = "s_cid";
     quiche_conn *conn = quiche_accept((const uint8_t *)conn_id, strlen(conn_id),
             NULL, 0, addr, addr_len, config);
     if (!conn)
@@ -175,17 +200,14 @@ int main(int argc, char **argv)
     quiche_conn_set_keylog_fd(conn, STDOUT_FILENO);
 
     while (!quiche_conn_is_established(conn)) {
-        perform_recvs_and_sends(conn, sock);
+        perform_sends_and_recvs(conn, sock, addr, addr_len);
     }
 
-    // wait for client to send us everything on channel 0b0000
-    uint64_t client_stream_id = 0x00;
-    while (!quiche_conn_stream_finished(conn, client_stream_id)) {
-        perform_recvs_and_sends(conn, sock);
+    // wait for a "ping", reply "pong"
+    while (!replied) {
+        perform_sends_and_recvs(conn, sock, addr, addr_len);
     }
-
-    // then reply with "pong" and close it from our end
-    do_full_send(conn, client_stream_id, "pong", 4);
+    perform_sends_and_recvs(conn, sock, addr, addr_len);
 
     // write "done" on channel 0b0011 (first server-initiated
     // unidirectional stream) and close it
@@ -194,8 +216,16 @@ int main(int argc, char **argv)
 
     // keep looping until client finishes reading
     while (!quiche_conn_stream_finished(conn, server_stream_id)) {
-        perform_recvs_and_sends(conn, sock);
+        perform_sends_and_recvs(conn, sock, addr, addr_len);
     }
+
+    uint8_t reason[] = "graceful shutdown";
+    if (quiche_conn_close(conn, false, 0x00, reason, sizeof(reason)-1) < 0)
+        die("close error");
+    while (!quiche_conn_is_closed(conn)) {
+        perform_sends_and_recvs(conn, sock, addr, addr_len);
+    }
+    printf("Closed connection\n");
 
     quiche_conn_free(conn);
     quiche_config_free(config);

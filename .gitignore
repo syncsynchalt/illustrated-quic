@@ -3,3 +3,5 @@ server/server
 quiche/quiche
 quiche/include
 quiche/*.a
+*.dSYM
+*.stamp

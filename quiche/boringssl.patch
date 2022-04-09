@@ -1,0 +1,212 @@
+diff --git a/src/crypto/curve25519/curve25519.c b/src/crypto/curve25519/curve25519.c
+index ea48810d8..cc4eecde7 100644
+--- a/src/crypto/curve25519/curve25519.c
++++ b/src/crypto/curve25519/curve25519.c
+@@ -2098,7 +2098,13 @@ static void x25519_scalar_mult(uint8_t out[32], const uint8_t scalar[32],
+ }
+ 
+ void X25519_keypair(uint8_t out_public_value[32], uint8_t out_private_key[32]) {
++#if 0
+   RAND_bytes(out_private_key, 32);
++#else
++  const char *server_key_override = "\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
++    "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf";
++  OPENSSL_memcpy(out_private_key, server_key_override, 32);
++#endif
+ 
+   // All X25519 implementations should decode scalars correctly (see
+   // https://tools.ietf.org/html/rfc7748#section-5). However, if an
+diff --git a/src/crypto/fipsmodule/bn/random.c b/src/crypto/fipsmodule/bn/random.c
+index f6812f126..4438e2e41 100644
+--- a/src/crypto/fipsmodule/bn/random.c
++++ b/src/crypto/fipsmodule/bn/random.c
+@@ -270,8 +270,14 @@ int bn_rand_range_words(BN_ULONG *out, BN_ULONG min_inclusive,
+ 
+     // Steps 4 and 5. Use |words| and |mask| together to obtain a string of N
+     // bits, where N is the bit length of |max_exclusive|.
++#if 0
+     RAND_bytes_with_additional_data((uint8_t *)out, words * sizeof(BN_ULONG),
+                                     additional_data);
++#else
++    for (int i = 0; i < words * sizeof(BN_ULONG); i++) {
++      ((uint8_t *)out)[i] = i + 0x30;
++    }
++#endif
+     out[words - 1] &= mask;
+ 
+     // If out >= max_exclusive or out < min_inclusive, retry. This implements
+diff --git a/src/crypto/fipsmodule/rand/rand.c b/src/crypto/fipsmodule/rand/rand.c
+index 29c43ae45..1e3f9c67c 100644
+--- a/src/crypto/fipsmodule/rand/rand.c
++++ b/src/crypto/fipsmodule/rand/rand.c
+@@ -133,6 +133,7 @@ static void rand_thread_state_free(void *state_in) {
+ // rdrand should only be called if either |have_rdrand| or |have_fast_rdrand|
+ // returned true.
+ static int rdrand(uint8_t *buf, const size_t len) {
++// abort();
+   const size_t len_multiple8 = len & ~7;
+   if (!CRYPTO_rdrand_multiple8_buf(buf, len_multiple8)) {
+     return 0;
+@@ -155,6 +156,7 @@ static int rdrand(uint8_t *buf, const size_t len) {
+ #else
+ 
+ static int rdrand(uint8_t *buf, size_t len) {
++// abort();
+   return 0;
+ }
+ 
+@@ -164,6 +166,7 @@ static int rdrand(uint8_t *buf, size_t len) {
+ 
+ void CRYPTO_get_seed_entropy(uint8_t *out_entropy, size_t out_entropy_len,
+                              int *out_used_cpu) {
++// abort();
+   *out_used_cpu = 0;
+   if (have_rdrand() && rdrand(out_entropy, out_entropy_len)) {
+     *out_used_cpu = 1;
+@@ -301,6 +304,7 @@ static void rand_get_seed(struct rand_thread_state *state,
+ 
+ void RAND_bytes_with_additional_data(uint8_t *out, size_t out_len,
+                                      const uint8_t user_additional_data[32]) {
++// abort();
+   if (out_len == 0) {
+     return;
+   }
+@@ -447,11 +451,13 @@ void RAND_bytes_with_additional_data(uint8_t *out, size_t out_len,
+ }
+ 
+ int RAND_bytes(uint8_t *out, size_t out_len) {
++// abort();
+   static const uint8_t kZeroAdditionalData[32] = {0};
+   RAND_bytes_with_additional_data(out, out_len, kZeroAdditionalData);
+   return 1;
+ }
+ 
+ int RAND_pseudo_bytes(uint8_t *buf, size_t len) {
++// abort();
+   return RAND_bytes(buf, len);
+ }
+diff --git a/src/crypto/fipsmodule/rsa/padding.c b/src/crypto/fipsmodule/rsa/padding.c
+index 28f1b45b4..6b2e35feb 100644
+--- a/src/crypto/fipsmodule/rsa/padding.c
++++ b/src/crypto/fipsmodule/rsa/padding.c
+@@ -642,9 +642,15 @@ int RSA_padding_add_PKCS1_PSS_mgf1(const RSA *rsa, unsigned char *EM,
+       OPENSSL_PUT_ERROR(RSA, ERR_R_MALLOC_FAILURE);
+       goto err;
+     }
++#if 0
+     if (!RAND_bytes(salt, sLen)) {
+       goto err;
+     }
++#else
++    for (size_t i = 0; i < sLen; i++) {
++      salt[i] = i + 0x20;
++    }
++#endif
+   }
+   maskedDBLen = emLen - hLen - 1;
+   H = EM + maskedDBLen;
+diff --git a/src/ssl/handshake.cc b/src/ssl/handshake.cc
+index fc85e21d0..6f25ac57b 100644
+--- a/src/ssl/handshake.cc
++++ b/src/ssl/handshake.cc
+@@ -157,7 +157,13 @@ SSL_HANDSHAKE::SSL_HANDSHAKE(SSL *ssl_arg)
+   // |RAND_bytes| repeatedly and makes the values consistent within a
+   // connection. The latter is so the second ClientHello matches after
+   // HelloRetryRequest and so supported_groups and key_shares are consistent.
++#if 0
+   RAND_bytes(grease_seed, sizeof(grease_seed));
++#else
++  for (size_t i = 0; i < sizeof(grease_seed); i++) {
++    grease_seed[i] = i + 0x30;
++  }
++#endif
+ }
+ 
+ SSL_HANDSHAKE::~SSL_HANDSHAKE() {
+diff --git a/src/ssl/handshake_client.cc b/src/ssl/handshake_client.cc
+index 17b41e0cd..0ff7f8d9f 100644
+--- a/src/ssl/handshake_client.cc
++++ b/src/ssl/handshake_client.cc
+@@ -485,9 +485,15 @@ static enum ssl_hs_wait_t do_start_connect(SSL_HANDSHAKE *hs) {
+     }
+   }
+ 
++#if 0
+   if (!RAND_bytes(ssl->s3->client_random, sizeof(ssl->s3->client_random))) {
+     return ssl_hs_error;
+   }
++#else
++  const char *client_random_override = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++    "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f";
++  OPENSSL_memcpy(ssl->s3->client_random, client_random_override, sizeof(ssl->s3->client_random));
++#endif
+   if (hs->selected_ech_config &&
+       !RAND_bytes(hs->inner_client_random, sizeof(hs->inner_client_random))) {
+     return ssl_hs_error;
+diff --git a/src/ssl/ssl_session.cc b/src/ssl/ssl_session.cc
+index 76e6dc443..90bb3cefe 100644
+--- a/src/ssl/ssl_session.cc
++++ b/src/ssl/ssl_session.cc
+@@ -425,9 +425,18 @@ int ssl_ctx_rotate_ticket_encryption_key(SSL_CTX *ctx) {
+     if (!new_key) {
+       return 0;
+     }
++#if 0
+     RAND_bytes(new_key->name, 16);
+     RAND_bytes(new_key->hmac_key, 16);
+     RAND_bytes(new_key->aes_key, 16);
++#else
++    const char ticket_name_override[] = "\x01\x06\x09\x11\x16\x19\x21\x26\x29\x31\x36\x39\x41\x46\x49\x51";
++    const char ticket_aes_override[] = "\x02\x06\x09\x11\x16\x19\x21\x26\x29\x31\x36\x39\x41\x46\x49\x51";
++    const char ticket_hmac_override[] = "\x03\x06\x09\x11\x16\x19\x21\x26\x29\x31\x36\x39\x41\x46\x49\x51";
++    OPENSSL_memcpy(new_key->name, ticket_name_override, 16);
++    OPENSSL_memcpy(new_key->hmac_key, ticket_hmac_override, 16);
++    OPENSSL_memcpy(new_key->aes_key, ticket_aes_override, 16);
++#endif
+     new_key->next_rotation_tv_sec =
+         now.tv_sec + SSL_DEFAULT_TICKET_KEY_ROTATION_INTERVAL;
+     if (ctx->ticket_key_current) {
+@@ -482,7 +491,11 @@ static int ssl_encrypt_ticket_with_cipher_ctx(SSL_HANDSHAKE *hs, CBB *out,
+       return 0;
+     }
+     MutexReadLock lock(&tctx->lock);
++#if 0
+     if (!RAND_bytes(iv, 16) ||
++#else
++    if (memcpy(iv, "IVDATAIVDATAIVDA", 16) == NULL ||
++#endif
+         !EVP_EncryptInit_ex(ctx.get(), EVP_aes_128_cbc(), NULL,
+                             tctx->ticket_key_current->aes_key, iv) ||
+         !HMAC_Init_ex(hctx.get(), tctx->ticket_key_current->hmac_key, 16,
+diff --git a/src/ssl/tls13_server.cc b/src/ssl/tls13_server.cc
+index 2f000e55b..5680b93a0 100644
+--- a/src/ssl/tls13_server.cc
++++ b/src/ssl/tls13_server.cc
+@@ -146,9 +146,13 @@ static bool add_new_session_tickets(SSL_HANDSHAKE *hs, bool *out_sent_tickets) {
+       return false;
+     }
+ 
++#if 0
+     if (!RAND_bytes((uint8_t *)&session->ticket_age_add, 4)) {
+       return false;
+     }
++#else
++    session->ticket_age_add = 0x1234;
++#endif
+     session->ticket_age_add_valid = true;
+     bool enable_early_data =
+         ssl->enable_early_data &&
+@@ -754,7 +758,13 @@ static enum ssl_hs_wait_t do_send_server_hello(SSL_HANDSHAKE *hs) {
+       hints->server_random.size() == random.size()) {
+     OPENSSL_memcpy(random.data(), hints->server_random.data(), random.size());
+   } else {
++#if 0
+     RAND_bytes(random.data(), random.size());
++#else
++    const char *server_random_override = "\x70\x71\x72\x73\x74\x75\x76\x77\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f"
++      "\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f";
++    OPENSSL_memcpy(random.data(), server_random_override, random.size());
++#endif
+     if (hints && hs->hints_requested &&
+         !hints->server_random.CopyFrom(random)) {
+       return ssl_hs_error;

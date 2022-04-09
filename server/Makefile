@@ -1,4 +1,4 @@
-CFLAGS += -I../quiche/include -Wall
+CFLAGS += -I../quiche/include -Wall -g
 LDFLAGS += -L../quiche -lquiche
 # Needed on macos
 UNAME_S := $(shell uname -s)
@@ -10,4 +10,4 @@ server: main.c ../quiche/libquiche.a
 	$(CC) $(CFLAGS) -o server main.c -Wall $(LDFLAGS)
 
 clean:
-	rm -f server
+	rm -f server server.dSYM
