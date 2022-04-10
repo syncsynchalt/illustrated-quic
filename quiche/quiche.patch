@@ -1,5 +1,5 @@
 diff --git a/quiche/src/lib.rs b/quiche/src/lib.rs
-index 703eab0..a75f0f2 100644
+index 703eab0..a6b90ca 100644
 --- a/quiche/src/lib.rs
 +++ b/quiche/src/lib.rs
 @@ -1584,8 +1584,9 @@ impl Connection {
@@ -14,3 +14,35 @@ index 703eab0..a75f0f2 100644
  
              let (aead_open, aead_seal) = crypto::derive_initial_key_material(
                  &dcid,
+@@ -2772,12 +2773,31 @@ impl Connection {
+                 self.recovery.loss_probes[epoch] > 0) &&
+             !is_closing
+         {
++/*
+             let ack_delay =
+                 self.pkt_num_spaces[epoch].largest_rx_pkt_time.elapsed();
+ 
+             let ack_delay = ack_delay.as_micros() as u64 /
+                 2_u64
+                     .pow(self.local_transport_params.ack_delay_exponent as u32);
++*/
++
++            // overwrite with consistent ack delays (to make bytes identical in our demo)
++            let ack_delay = match (pkt_type, pn, self.is_server) {
++                // values taken from a sample run
++                (packet::Type::Initial, 1, false) => 129_u64,
++                (packet::Type::Handshake, 0, false) => 32_u64,
++                (packet::Type::Handshake, 1, false) => 70_u64,
++                (packet::Type::Short, 0, false) => 21_u64,
++                (packet::Type::Short, 1, false) => 11_u64,
++                (packet::Type::Short, 2, false) => 7_u64,
++
++                (packet::Type::Initial, 0, true) => 576_u64,
++                (packet::Type::Handshake, 2, true) => 28_u64,
++                (packet::Type::Short, 1, true) => 16_u64,
++
++                _ => 999
++            };
+ 
+             let frame = frame::Frame::ACK {
+                 ack_delay,

@@ -144,10 +144,10 @@ index 17b41e0cd..0ff7f8d9f 100644
        !RAND_bytes(hs->inner_client_random, sizeof(hs->inner_client_random))) {
      return ssl_hs_error;
 diff --git a/src/ssl/ssl_session.cc b/src/ssl/ssl_session.cc
-index 76e6dc443..90bb3cefe 100644
+index 76e6dc443..6ac73014a 100644
 --- a/src/ssl/ssl_session.cc
 +++ b/src/ssl/ssl_session.cc
-@@ -425,9 +425,18 @@ int ssl_ctx_rotate_ticket_encryption_key(SSL_CTX *ctx) {
+@@ -425,11 +425,21 @@ int ssl_ctx_rotate_ticket_encryption_key(SSL_CTX *ctx) {
      if (!new_key) {
        return 0;
      }
@@ -155,6 +155,8 @@ index 76e6dc443..90bb3cefe 100644
      RAND_bytes(new_key->name, 16);
      RAND_bytes(new_key->hmac_key, 16);
      RAND_bytes(new_key->aes_key, 16);
+     new_key->next_rotation_tv_sec =
+         now.tv_sec + SSL_DEFAULT_TICKET_KEY_ROTATION_INTERVAL;
 +#else
 +    const char ticket_name_override[] = "\x01\x06\x09\x11\x16\x19\x21\x26\x29\x31\x36\x39\x41\x46\x49\x51";
 +    const char ticket_aes_override[] = "\x02\x06\x09\x11\x16\x19\x21\x26\x29\x31\x36\x39\x41\x46\x49\x51";
@@ -162,11 +164,12 @@ index 76e6dc443..90bb3cefe 100644
 +    OPENSSL_memcpy(new_key->name, ticket_name_override, 16);
 +    OPENSSL_memcpy(new_key->hmac_key, ticket_hmac_override, 16);
 +    OPENSSL_memcpy(new_key->aes_key, ticket_aes_override, 16);
++    new_key->next_rotation_tv_sec = 1649017260;
 +#endif
-     new_key->next_rotation_tv_sec =
-         now.tv_sec + SSL_DEFAULT_TICKET_KEY_ROTATION_INTERVAL;
      if (ctx->ticket_key_current) {
-@@ -482,7 +491,11 @@ static int ssl_encrypt_ticket_with_cipher_ctx(SSL_HANDSHAKE *hs, CBB *out,
+       // The current key expired. Rotate it to prev and bump up its rotation
+       // timestamp. Note that even with the new rotation time it may still be
+@@ -482,7 +492,11 @@ static int ssl_encrypt_ticket_with_cipher_ctx(SSL_HANDSHAKE *hs, CBB *out,
        return 0;
      }
      MutexReadLock lock(&tctx->lock);
@@ -178,6 +181,23 @@ index 76e6dc443..90bb3cefe 100644
          !EVP_EncryptInit_ex(ctx.get(), EVP_aes_128_cbc(), NULL,
                              tctx->ticket_key_current->aes_key, iv) ||
          !HMAC_Init_ex(hctx.get(), tctx->ticket_key_current->hmac_key, 16,
+@@ -565,9 +579,16 @@ int ssl_encrypt_ticket(SSL_HANDSHAKE *hs, CBB *out,
+   // Serialize the SSL_SESSION to be encoded into the ticket.
+   uint8_t *session_buf = NULL;
+   size_t session_len;
++  #if 1
++  time_t orig = session->time;
++  ((SSL_SESSION *)session)->time = 1649621591;
++  #endif
+   if (!SSL_SESSION_to_bytes_for_ticket(session, &session_buf, &session_len)) {
+     return -1;
+   }
++  #if 1
++  ((SSL_SESSION *)session)->time = orig;
++  #endif
+ 
+   int ret = 0;
+   if (hs->ssl->session_ctx->ticket_aead_method) {
 diff --git a/src/ssl/tls13_server.cc b/src/ssl/tls13_server.cc
 index 2f000e55b..5680b93a0 100644
 --- a/src/ssl/tls13_server.cc

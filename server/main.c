@@ -148,7 +148,6 @@ void perform_sends_and_recvs(quiche_conn *conn, int sock, sockaddr *addr, size_t
             perform_recvs(conn, sock);
         }
     }
-    perform_sends(conn, sock, addr, addr_len);
 }
 
 sockaddr *peek_packet_addr(int sock, struct sockaddr_storage *storage, socklen_t *addr_len)

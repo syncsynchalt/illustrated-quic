@@ -108,7 +108,6 @@ void perform_sends_and_recvs(quiche_conn *conn, int sock)
             perform_recvs(conn, sock);
         }
     }
-    perform_sends(conn, sock);
 }
 
 void do_full_send(quiche_conn *conn, uint64_t stream, const char *data, size_t data_len)
@@ -169,6 +168,7 @@ int main(int argc, char **argv)
     while (!quiche_conn_is_closed(conn)) {
         perform_sends_and_recvs(conn, sock);
     }
+    perform_sends_and_recvs(conn, sock);
 
     bool is_app = false;
     uint64_t error_code = 0;
