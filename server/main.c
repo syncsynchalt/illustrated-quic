@@ -136,8 +136,8 @@ void perform_sends_and_recvs(quiche_conn *conn, int sock, sockaddr *addr, size_t
     perform_sends(conn, sock, addr, addr_len);
     struct pollfd fds[1] = {{ sock, POLLIN, 0 }};
     int timeout = quiche_conn_timeout_as_millis(conn);
-    if (timeout <= 0)
-        timeout = 1;
+    if (timeout <= 10)
+        timeout = 10;
     if (timeout > 1000)
         timeout = 1000;
     int poll_ret = poll(fds, 1, timeout);
@@ -183,6 +183,7 @@ int main(int argc, char **argv)
     quiche_config_set_initial_max_stream_data_uni(config, 512*1024);
     quiche_config_set_initial_max_streams_bidi(config, 2);
     quiche_config_set_initial_max_streams_uni(config, 2);
+    quiche_config_set_max_idle_timeout(config, 2*60*1000);
 
     int sock = create_listen(8400);
 
@@ -206,25 +207,25 @@ int main(int argc, char **argv)
     while (!replied) {
         perform_sends_and_recvs(conn, sock, addr, addr_len);
     }
-    perform_sends_and_recvs(conn, sock, addr, addr_len);
 
     // write "done" on channel 0b0011 (first server-initiated
     // unidirectional stream) and close it
     uint64_t server_stream_id = 0x03;
     do_full_send(conn, server_stream_id, "done", 4);
 
-    // keep looping until client finishes reading
-    while (!quiche_conn_stream_finished(conn, server_stream_id)) {
-        perform_sends_and_recvs(conn, sock, addr, addr_len);
-    }
-
-    uint8_t reason[] = "graceful shutdown";
-    if (quiche_conn_close(conn, false, 0x00, reason, sizeof(reason)-1) < 0)
-        die("close error");
+    // keep looping until client closes on us
     while (!quiche_conn_is_closed(conn)) {
         perform_sends_and_recvs(conn, sock, addr, addr_len);
     }
-    printf("Closed connection\n");
+
+    bool is_app = false;
+    uint64_t error_code = 0;
+    const uint8_t *reason = NULL;
+    size_t reason_len = 0;
+    if (quiche_conn_peer_error(conn, &is_app, &error_code, &reason, &reason_len)) {
+        printf("Peer closed connection (%.*s): %scode %lld\n",
+                (int)reason_len, reason, is_app ? "application " : "", error_code);
+    }
 
     quiche_conn_free(conn);
     quiche_config_free(config);

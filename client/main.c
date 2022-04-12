@@ -27,6 +27,8 @@ size_t resolve_hostname(const char *host, const char *port, struct sockaddr_stor
     return len;
 }
 
+bool got_done = false;
+
 void handle_reads(quiche_conn *conn)
 {
     quiche_stream_iter *iter = quiche_conn_readable(conn);
@@ -47,6 +49,10 @@ void handle_reads(quiche_conn *conn)
         if (num_read < 0)
             die("stream recv failure");
         printf("Read [%.*s] from stream %lld%s\n", (int)num_read, buf, stream_id, is_final ? " (final)" : "");
+
+        if (strcmp((const char *)buf, "done") == 0) {
+            got_done = true;
+        }
     }
     quiche_stream_iter_free(iter);
 }
@@ -96,8 +102,8 @@ void perform_sends_and_recvs(quiche_conn *conn, int sock)
     perform_sends(conn, sock);
     struct pollfd fds[1] = {{ sock, POLLIN, 0 }};
     int timeout = quiche_conn_timeout_as_millis(conn);
-    if (timeout <= 0)
-        timeout = 1;
+    if (timeout <= 10)
+        timeout = 10;
     if (timeout > 1000)
         timeout = 1000;
     int poll_ret = poll(fds, 1, timeout);
@@ -158,26 +164,23 @@ int main(int argc, char **argv)
     while (!quiche_conn_is_established(conn)) {
         perform_sends_and_recvs(conn, sock);
     }
-    perform_sends_and_recvs(conn, sock);
 
     // write "ping" on channel 0b0000 (first client-initiated
     // bidirectional stream) and close it
     do_full_send(conn, 0x0000, "ping", 4);
 
-    // read until closed
+    // read until we get a "done"
+    while (!got_done) {
+        perform_sends_and_recvs(conn, sock);
+    }
+
+    uint8_t reason[] = "graceful shutdown";
+    if (quiche_conn_close(conn, false, 0x00, reason, sizeof(reason)-1) < 0)
+        die("close error");
     while (!quiche_conn_is_closed(conn)) {
         perform_sends_and_recvs(conn, sock);
     }
-    perform_sends_and_recvs(conn, sock);
-
-    bool is_app = false;
-    uint64_t error_code = 0;
-    const uint8_t *reason = NULL;
-    size_t reason_len = 0;
-    if (quiche_conn_peer_error(conn, &is_app, &error_code, &reason, &reason_len)) {
-        printf("Peer closed connection (%.*s): %scode %lld\n",
-                (int)reason_len, reason, is_app ? "application " : "", error_code);
-    }
+    printf("Closed connection\n");
 
     quiche_conn_free(conn);
     quiche_config_free(config);
