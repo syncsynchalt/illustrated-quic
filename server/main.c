@@ -177,12 +177,12 @@ int main(int argc, char **argv)
         die("set priv key");
     if (quiche_config_load_cert_chain_from_pem_file(config, "server.crt") < 0)
         die("set cert chain");
-    quiche_config_set_initial_max_data(config, 10*1024*1024);
-    quiche_config_set_initial_max_stream_data_bidi_local(config, 1024*1024);
-    quiche_config_set_initial_max_stream_data_bidi_remote(config, 1024*1024);
-    quiche_config_set_initial_max_stream_data_uni(config, 1024*1024);
-    quiche_config_set_initial_max_streams_bidi(config, 10);
-    quiche_config_set_initial_max_streams_uni(config, 10);
+    quiche_config_set_initial_max_data(config, 5*1024*1024);
+    quiche_config_set_initial_max_stream_data_bidi_local(config, 512*1024);
+    quiche_config_set_initial_max_stream_data_bidi_remote(config, 512*1024);
+    quiche_config_set_initial_max_stream_data_uni(config, 512*1024);
+    quiche_config_set_initial_max_streams_bidi(config, 2);
+    quiche_config_set_initial_max_streams_uni(config, 2);
 
     int sock = create_listen(8400);
 
