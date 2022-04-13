@@ -120,6 +120,18 @@ void do_full_send(quiche_conn *conn, uint64_t stream, const char *data, size_t d
     printf("Wrote [%.*s] to stream %lld (final)\n", (int)wrote, data, stream);
 }
 
+int make_udp_socket(void)
+{
+    int sock = socket(PF_INET, SOCK_DGRAM, 0);
+    if (sock < 0)
+        die("Unable to create socket");
+    int enable = 1;
+    if (setsockopt(sock, IPPROTO_IP, IP_DONTFRAG, &enable, sizeof(enable)) < 0) {
+        die("IP_DONTFRAG failed");
+    }
+    return sock;
+}
+
 int main(int argc, char **argv)
 {
     quiche_config *config = quiche_config_new(QUICHE_PROTOCOL_VERSION);
@@ -135,9 +147,7 @@ int main(int argc, char **argv)
     quiche_config_set_initial_max_streams_bidi(config, 10);
     quiche_config_set_initial_max_streams_uni(config, 10);
 
-    int sock = socket(PF_INET, SOCK_DGRAM, 0);
-    if (sock < 0)
-        die("Unable to create socket");
+    int sock = make_udp_socket();
 
     // create connection to localhost:8400
     struct sockaddr_storage addr_storage;

@@ -29,8 +29,12 @@ int create_listen(int port)
         die("Unable to create socket");
     }
     int enable = 1;
-    if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0) {
+    if (setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable)) < 0) {
         die("SO_REUSEADDR failed");
+    }
+    enable = 1;
+    if (setsockopt(s, IPPROTO_IP, IP_DONTFRAG, &enable, sizeof(enable)) < 0) {
+        die("IP_DONTFRAG failed");
     }
     if (bind(s, (sockaddr *)&addr, sizeof(addr)) < 0) {
         die("Unable to bind to port");
