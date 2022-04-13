@@ -207,25 +207,18 @@ int main(int argc, char **argv)
     while (!replied) {
         perform_sends_and_recvs(conn, sock, addr, addr_len);
     }
+    perform_sends_and_recvs(conn, sock, addr, addr_len);
 
-    // write "done" on channel 0b0011 (first server-initiated
-    // unidirectional stream) and close it
-    uint64_t server_stream_id = 0x03;
-    do_full_send(conn, server_stream_id, "done", 4);
+    // shut down the connection
+    uint8_t reason[] = "graceful shutdown";
+    if (quiche_conn_close(conn, false, 0x00, reason, sizeof(reason)-1) < 0)
+        die("close error");
 
-    // keep looping until client closes on us
+    // keep looping while connection drains
     while (!quiche_conn_is_closed(conn)) {
         perform_sends_and_recvs(conn, sock, addr, addr_len);
     }
-
-    bool is_app = false;
-    uint64_t error_code = 0;
-    const uint8_t *reason = NULL;
-    size_t reason_len = 0;
-    if (quiche_conn_peer_error(conn, &is_app, &error_code, &reason, &reason_len)) {
-        printf("Peer closed connection (%.*s): %scode %lld\n",
-                (int)reason_len, reason, is_app ? "application " : "", error_code);
-    }
+    printf("Closed connection\n");
 
     quiche_conn_free(conn);
     quiche_config_free(config);
