@@ -1,5 +1,7 @@
 client/client
 server/server
+captures/caps/p??_*
+captures/caps/aes_256_gcm_decrypt*
 quiche/quiche
 quiche/include
 quiche/*.a
