@@ -1,34 +1,33 @@
-all: tools packets checksizes
+all: tools packets unprot checksizes
 
 TARGETS=serverextensions servercert servercertverify serverfinished clientfinished \
 	clientdata serverticket1 serverticket2 serverdata
 PACKETS=p01_cinit0 p02_sinit0 p03_shand0 p04_shand1 p05_cinit1 p06_chand0 p07_chand1 \
 	p08_cdata0 p09_shand2 p10_sdata0 p11_cdata1 p12_sdata1
+UNPROT_PACKETS=u01_cinit0 u02_sinit0
 
 # Must be version 1.1 or higher
-OPENSSL_DIR=/usr/local/Cellar/openssl@3/3.0.2/
+OPENSSL_DIR=/usr/local/Cellar/openssl@3/3.0.2
 packets: $(PACKETS)
-tools: aes_256_gcm_decrypt
+unprot: $(UNPROT_PACKETS)
+tools: aes_128_gcm_decrypt hp_removal
 
-aes_256_gcm_decrypt.c:
-	curl -sO https://tls13.ulfheim.net/files/aes_256_gcm_decrypt.c
+aes_128_gcm_decrypt.c:
+	curl -sO https://tls13.ulfheim.net/archive/files/aes_128_gcm_decrypt.c
 
-aes_256_gcm_decrypt: aes_256_gcm_decrypt.c
-	cc -I $(OPENSSL_DIR)/include \
-		-o aes_256_gcm_decrypt aes_256_gcm_decrypt.c \
-		-L $(OPENSSL_DIR)/lib -lssl -lcrypto
+aes_128_gcm_decrypt: aes_128_gcm_decrypt.c
+	cc -Wall -I $(OPENSSL_DIR)/include -o $@ $^ -L $(OPENSSL_DIR)/lib -lssl -lcrypto
 
-# xxx TBD
-S_HS_KEY=9f13575ce3f8cfc1df64a77ceaffe89700b492ad31b4fab01c4792be1b266b7f
-S_HS_IV=9563bc8b590f671f488d2da3
-C_HS_KEY=1135b4826a9a70257e5a391ad93093dfd7c4214812f493b3e3daae1eb2b1ac69
-C_HS_IV=4256d2e0e88babdd05eb2f27
+hp_removal: hp_removal.c
+	cc -Wall -I $(OPENSSL_DIR)/include -o $@ $^ -L $(OPENSSL_DIR)/lib -lssl -lcrypto
 
-# xxx TBD
-S_AP_KEY=01f78623f17e3edcc09e944027ba3218d57c8e0db93cd3ac419309274700ac27
-S_AP_IV=196a750b0c5049c0cc51a541
-C_AP_KEY=de2f4c7672723a692319873e5c227606691a32d1c59d8b9f51dbb9352e9ca9cc
-C_AP_IV=bb007956f474b25de902432f
+# key, iv, and header protection key
+C_INIT_KEY=b14b918124fda5c8d79847602fa3520b
+C_INIT_IV=ddbc15dea80925a55686a7df
+C_INIT_HP=6df4e9d737cdf714711d7c617ee82981
+S_INIT_KEY=d77fc4056fcfa32bd1302469ee6ebf90
+S_INIT_IV=fcb748e37ff79860faa07477
+S_INIT_HP=440b2725e91dc79b370711ef792faa3d
 
 p01_cinit0: d01_c01
 	START=0 LEN=1200; \
@@ -85,6 +84,12 @@ checksizes:
 	if test -z "$(SIZE1)" || test "$(SIZE1)" -ne "$(SIZE2)"; then echo failed; exit 1; fi
 	@echo "passed"
 
+u01_cinit0: p01_cinit0
+	./hp_removal $(C_INIT_HP) < $^ > $@
+
+u02_sinit0: p02_sinit0
+	./hp_removal $(S_INIT_HP) < $^ > $@
+
 clean:
-	rm -f aes_256_gcm_decrypt aes_256_gcm_decrypt.c
-	rm -f $(PACKETS)
+	rm -f aes_128_gcm_decrypt aes_128_gcm_decrypt.c hp_removal
+	rm -f $(PACKETS) $(UNPROT_PACKETS)
