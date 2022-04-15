@@ -1,16 +1,15 @@
-all: tools packets unprot checksizes handshake
+all: tools pkts unprot decrypt checksizes handshake
 
-TARGETS=serverextensions servercert servercertverify serverfinished clientfinished \
-	clientdata serverticket1 serverticket2 serverdata
-PACKETS=p01_cinit0 p02_sinit0 p03_shand0 p04_shand1 p05_cinit1 p06_chand0 p07_chand1 \
-	p08_cdata0 p09_shand2 p10_sdata0 p11_cdata1 p12_sdata1
-UNPROT_PACKETS=$(patsubst p%, u%, $(PACKETS))
-DECRYPT_PACKETS=$(patsubst p%, x%, $(PACKETS))
-HANDSHAKE=crypto_clienthello crypto_serverhello
+PACKETS=pkt01_cinit0 pkt02_sinit0 pkt03_shand0 pkt04_shand1 pkt05_cinit1 pkt06_chand0 pkt07_chand1 \
+	pkt08_cdata0 pkt09_shand2 pkt10_sdata0 pkt11_cdata1 pkt12_sdata1
+UNPROT_PACKETS=$(patsubst pkt%, pkt_unprot%, $(PACKETS))
+DECRYPT_PACKETS=$(patsubst pkt%, pkt_payload%, $(PACKETS))
+HANDSHAKE=crypto_clienthello crypto_serverhello crypto_extensions crypto_cert \
+	crypto_certverify crypto_s_finished crypto_c_finished
 
 # Must be version 1.1 or higher
 OPENSSL_DIR=/usr/local/Cellar/openssl@3/3.0.2
-packets: $(PACKETS)
+pkts: $(PACKETS)
 unprot: $(UNPROT_PACKETS)
 decrypt: $(DECRYPT_PACKETS)
 handshake: $(HANDSHAKE)
@@ -25,7 +24,7 @@ aes_128_gcm_decrypt: aes_128_gcm_decrypt.c
 hp_removal: hp_removal.c
 	cc -Wall -I $(OPENSSL_DIR)/include -o $@ $^ -L $(OPENSSL_DIR)/lib -lssl -lcrypto
 
-# key, iv, and header protection key
+# key, iv, and header protection keys
 C_INIT_KEY=b14b918124fda5c8d79847602fa3520b
 C_INIT_IV=ddbc15dea80925a55686a7df
 C_INIT_HP=6df4e9d737cdf714711d7c617ee82981
@@ -40,111 +39,172 @@ S_HAND_KEY=17abbf0a788f96c6986964660414e7ec
 S_HAND_IV=09597a2ea3b04c00487e71f3
 S_HAND_HP=2a18061c396c2828582b41b0910ed536
 
-### packets from datagrams
+C_DATA_KEY=e010a295f0c2864f186b2a7e8fdc9ed7
+C_DATA_IV=eb3fbc384a3199dcf6b4c808
+C_DATA_HP=8a6a38bc5cc40cb482a254dac68c9d2f
+S_DATA_KEY=fd8c7da9de1b2da4d2ef9fd5188922d0
+S_DATA_IV=02f6180e4f4aa456d7e8a602
+S_DATA_HP=b7f6f021453e52b58940e4bba72a35d4
 
-p01_cinit0: d01_c01
+### pkts from datagrams
+
+pkt01_cinit0: dgram01_c01
 	START=0 LEN=1200; \
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
-p02_sinit0: d02_s01
+pkt02_sinit0: dgram02_s01
 	START=0 LEN=137; \
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
-p03_shand0: d02_s01
+pkt03_shand0: dgram02_s01
 	START=137 LEN=1063; \
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
-p04_shand1: d03_s02
+pkt04_shand1: dgram03_s02
 	START=0 LEN=226; \
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
-p05_cinit1: d04_c02
+pkt05_cinit1: dgram04_c02
 	START=0 LEN=43; \
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
-p06_chand0: d04_c02
+pkt06_chand0: dgram04_c02
 	START=43 LEN=1157; \
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
-p07_chand1: d05_c03
+pkt07_chand1: dgram05_c03
 	START=0 LEN=82; \
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
-p08_cdata0: d05_c03
+pkt08_cdata0: dgram05_c03
 	START=82 LEN=32; \
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
-p09_shand2: d06_s03
+pkt09_shand2: dgram06_s03
 	START=0 LEN=41; \
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
-p10_sdata0: d06_s03
+pkt10_sdata0: dgram06_s03
 	START=41 LEN=438; \
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
-p11_cdata1: d07_c04
+pkt11_cdata1: dgram07_c04
 	START=0 LEN=28; \
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
-p12_sdata1: d08_s04
+pkt12_sdata1: dgram08_s04
 	START=0 LEN=44; \
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
 checksizes:
-	$(eval SIZE1 = $(shell wc -c d??_* | tail -n 1 | awk '{print $$1}'))
-	$(eval SIZE2 = $(shell wc -c p??_* | tail -n 1 | awk '{print $$1}'))
+	$(eval SIZE1 = $(shell wc -c dgram??_* | tail -n 1 | awk '{print $$1}'))
+	$(eval SIZE2 = $(shell wc -c pkt??_* | tail -n 1 | awk '{print $$1}'))
 	@echo "size check $(SIZE1) vs $(SIZE2)"; \
 	if test -z "$(SIZE1)" || test "$(SIZE1)" -ne "$(SIZE2)"; then echo failed; exit 1; fi
 	@echo "passed"
 
-### removal of packet header protection
+### removal of pkt header protection
 
-u01_cinit0: p01_cinit0
+pkt_unprot01_cinit0: pkt01_cinit0
 	./hp_removal $(C_INIT_HP) < $^ > $@
 
-u02_sinit0: p02_sinit0
+pkt_unprot02_sinit0: pkt02_sinit0
 	./hp_removal $(S_INIT_HP) < $^ > $@
 
-u03_shand0: p03_shand0
+pkt_unprot03_shand0: pkt03_shand0
 	./hp_removal $(S_HAND_HP) < $^ > $@
 
-u04_shand1: p04_shand1
+pkt_unprot04_shand1: pkt04_shand1
 	./hp_removal $(S_HAND_HP) < $^ > $@
 
-u05_cinit1: p05_cinit1
+pkt_unprot05_cinit1: pkt05_cinit1
 	./hp_removal $(C_INIT_HP) < $^ > $@
 
-u06_chand0: p06_chand0
+pkt_unprot06_chand0: pkt06_chand0
 	./hp_removal $(C_HAND_HP) < $^ > $@
 
-u07_chand1: p07_chand1
+pkt_unprot07_chand1: pkt07_chand1
 	./hp_removal $(C_HAND_HP) < $^ > $@
 
-u09_shand2: p09_shand2
+pkt_unprot08_cdata0: pkt08_cdata0
+	./hp_removal $(C_DATA_HP) < $^ > $@
+
+pkt_unprot09_shand2: pkt09_shand2
 	./hp_removal $(S_HAND_HP) < $^ > $@
 
-### decrypt the contents
+pkt_unprot10_sdata0: pkt10_sdata0
+	./hp_removal $(S_DATA_HP) < $^ > $@
 
-x01_cinit0: u01_cinit0
-	# 24 bytes of header to skip, recordnum 0
+pkt_unprot11_cdata1: pkt11_cdata1
+	./hp_removal $(C_DATA_HP) < $^ > $@
+
+pkt_unprot12_sdata1: pkt12_sdata1
+	./hp_removal $(S_DATA_HP) < $^ > $@
+
+### decrypt the contents (usage: key, iv, hdrlen, recordnum, infile, outfile)
+
+pkt_payload01_cinit0: pkt_unprot01_cinit0
 	./decrypt.sh $(C_INIT_KEY) $(C_INIT_IV) 24 0 $^ $@
 
-x02_sinit0: u02_sinit0
-	# 21 bytes of header to skip, recordnum 0
+pkt_payload02_sinit0: pkt_unprot02_sinit0
 	./decrypt.sh $(S_INIT_KEY) $(S_INIT_IV) 21 0 $^ $@
+
+pkt_payload03_shand0: pkt_unprot03_shand0
+	./decrypt.sh $(S_HAND_KEY) $(S_HAND_IV) 20 0 $^ $@
+
+pkt_payload04_shand1: pkt_unprot04_shand1
+	./decrypt.sh $(S_HAND_KEY) $(S_HAND_IV) 20 1 $^ $@
+
+pkt_payload05_cinit1: pkt_unprot05_cinit1
+	./decrypt.sh $(C_INIT_KEY) $(C_INIT_IV) 21 1 $^ $@
+
+pkt_payload06_chand0: pkt_unprot06_chand0
+	./decrypt.sh $(C_HAND_KEY) $(C_HAND_IV) 20 0 $^ $@
+
+pkt_payload07_chand1: pkt_unprot07_chand1
+	./decrypt.sh $(C_HAND_KEY) $(C_HAND_IV) 20 1 $^ $@
+
+pkt_payload08_cdata0: pkt_unprot08_cdata0
+	./decrypt.sh $(C_DATA_KEY) $(C_DATA_IV) 7 0 $^ $@
+
+pkt_payload09_shand2: pkt_unprot09_shand2
+	./decrypt.sh $(S_HAND_KEY) $(S_HAND_IV) 20 2 $^ $@
+
+pkt_payload10_sdata0: pkt_unprot10_sdata0
+	./decrypt.sh $(S_DATA_KEY) $(S_DATA_IV) 7 0 $^ $@
+
+pkt_payload11_cdata1: pkt_unprot11_cdata1
+	./decrypt.sh $(C_DATA_KEY) $(C_DATA_IV) 7 1 $^ $@
+
+pkt_payload12_sdata1: pkt_unprot12_sdata1
+	./decrypt.sh $(S_DATA_KEY) $(S_DATA_IV) 7 1 $^ $@
 
 ### pull out the frames
 
-crypto_clienthello: x01_cinit0
-	$(eval START = 0)
-	$(eval LEN = 242)
-	perl -p0777 -e 's/.{$(START)}(.{$(LEN)}).*/\1/s' < $^ > $@
+crypto_clienthello: pkt_payload01_cinit0
+	START=4 LEN=238; perl -p0777 -e 's/.{'$${START}'}(.{'$${LEN}'}).*/\1/s' < $^ > $@
 
-crypto_serverhello: x02_sinit0
-	$(eval START = 6)
-	$(eval LEN = 94)
-	perl -p0777 -e 's/.{$(START)}(.{$(LEN)}).*/\1/s' < $^ > $@
+crypto_serverhello: pkt_payload02_sinit0
+	START=10 LEN=90; perl -p0777 -e 's/.{'$${START}'}(.{'$${LEN}'}).*/\1/s' < $^ > $@
+
+crypto_extensions: pkt_payload03_shand0
+	START=4 LEN=90; perl -p0777 -e 's/.{'$${START}'}(.{'$${LEN}'}).*/\1/s' < $^ > $@
+
+crypto_cert: pkt_payload03_shand0
+	START=94 LEN=818; perl -p0777 -e 's/.{'$${START}'}(.{'$${LEN}'}).*/\1/s' < $^ > $@
+
+crypto_certverify: pkt_payload03_shand0 pkt_payload04_shand1
+	START=912 LEN=115; perl -p0777 -e 's/.{'$${START}'}(.{'$${LEN}'}).*/\1/s' < pkt_payload03_shand0 > $@
+	START=5 LEN=149; perl -p0777 -e 's/.{'$${START}'}(.{'$${LEN}'}).*/\1/s' < pkt_payload04_shand1 >> $@
+
+crypto_s_finished: pkt_payload04_shand1
+	START=154 LEN=36; perl -p0777 -e 's/.{'$${START}'}(.{'$${LEN}'}).*/\1/s' < pkt_payload04_shand1 >> $@
+
+crypto_c_finished: pkt_payload07_chand1
+	START=10 LEN=36; perl -p0777 -e 's/.{'$${START}'}(.{'$${LEN}'}).*/\1/s' < $^ > $@
 
 clean:
 	rm -f aes_128_gcm_decrypt aes_128_gcm_decrypt.c hp_removal
 	rm -f $(PACKETS) $(UNPROT_PACKETS) $(DECRYPT_PACKETS) $(HANDSHAKE)
+
+.PHONY: tools pkts unprot decrypt checksizes handshake clean

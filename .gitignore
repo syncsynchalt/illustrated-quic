@@ -1,8 +1,6 @@
 client/client
 server/server
-captures/caps/p??_*
-captures/caps/u??_*
-captures/caps/x??_*
+captures/caps/pkt*
 captures/caps/crypto_*
 captures/caps/aes_128_gcm_decrypt*
 captures/caps/hp_removal
