@@ -1,17 +1,23 @@
 diff --git a/src/crypto/curve25519/curve25519.c b/src/crypto/curve25519/curve25519.c
-index ea48810d8..cc4eecde7 100644
+index ea48810d8..31b1fef90 100644
 --- a/src/crypto/curve25519/curve25519.c
 +++ b/src/crypto/curve25519/curve25519.c
-@@ -2098,7 +2098,13 @@ static void x25519_scalar_mult(uint8_t out[32], const uint8_t scalar[32],
+@@ -2098,7 +2098,19 @@ static void x25519_scalar_mult(uint8_t out[32], const uint8_t scalar[32],
  }
  
  void X25519_keypair(uint8_t out_public_value[32], uint8_t out_private_key[32]) {
 +#if 0
    RAND_bytes(out_private_key, 32);
 +#else
-+  const char *server_key_override = "\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
-+    "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf";
-+  OPENSSL_memcpy(out_private_key, server_key_override, 32);
++  if (strcmp(getenv("SERVER") ?: "", "1") == 0) {
++    const char *server_key_override = "\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
++      "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf";
++    OPENSSL_memcpy(out_private_key, server_key_override, 32);
++  } else {
++    const char *client_key_override = "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++      "\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f";
++    OPENSSL_memcpy(out_private_key, client_key_override, 32);
++  }
 +#endif
  
    // All X25519 implementations should decode scalars correctly (see

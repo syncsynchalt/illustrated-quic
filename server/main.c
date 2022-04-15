@@ -172,6 +172,8 @@ sockaddr *peek_packet_addr(int sock, struct sockaddr_storage *storage, socklen_t
 
 int main(int argc, char **argv)
 {
+    setenv("SERVER", "1", 1);
+
     quiche_config *config = quiche_config_new(QUICHE_PROTOCOL_VERSION);
     if (!config)
         die("new config failure");

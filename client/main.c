@@ -135,6 +135,8 @@ int make_udp_socket(void)
 
 int main(int argc, char **argv)
 {
+    setenv("SERVER", "0", 1);
+
     quiche_config *config = quiche_config_new(QUICHE_PROTOCOL_VERSION);
     if (!config)
         die("new config failure");
