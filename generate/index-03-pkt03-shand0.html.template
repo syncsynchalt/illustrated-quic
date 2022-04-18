@@ -300,7 +300,7 @@ ddb7ce7613
         <div class="explanation">
             This data is encrypted using the server
             "Initial" traffic key and IV that were
-            generated during the "Initial Traffic Keys
+            generated during the "Initial Keys
             Calc" step.  The IV will be modified
             by XOR'ing it by the count of records that
             have already been encrypted with this key,

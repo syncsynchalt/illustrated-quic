@@ -335,7 +335,7 @@ ed9895bb15
     <span class="string encrypted">
         <span class="label">Encrypted Data</span>
         <span class="bytes">
-%next 242 
+%next 242
 %bytes
         </span>
         <div class="explanation">
@@ -362,7 +362,7 @@ ed9895bb15
         <div class="explanation">
             This data is encrypted using the client
             "Initial" traffic key and IV that were
-            generated during the "Initial Traffic Keys
+            generated during the "Initial Keys
             Calc" step.  The IV will be modified
             by XOR'ing it by the count of records that
             have already been encrypted with this key,

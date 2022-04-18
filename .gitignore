@@ -1,7 +1,5 @@
 client/client
 server/server
-captures/caps/pkt*
-captures/caps/crypto_*
 captures/caps/aes_128_gcm_decrypt*
 captures/caps/hp_removal
 quiche/quiche

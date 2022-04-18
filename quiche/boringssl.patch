@@ -150,7 +150,7 @@ index 17b41e0cd..0ff7f8d9f 100644
        !RAND_bytes(hs->inner_client_random, sizeof(hs->inner_client_random))) {
      return ssl_hs_error;
 diff --git a/src/ssl/ssl_session.cc b/src/ssl/ssl_session.cc
-index 76e6dc443..6ac73014a 100644
+index 76e6dc443..b6f498eaf 100644
 --- a/src/ssl/ssl_session.cc
 +++ b/src/ssl/ssl_session.cc
 @@ -425,11 +425,21 @@ int ssl_ctx_rotate_ticket_encryption_key(SSL_CTX *ctx) {
@@ -191,24 +191,37 @@ index 76e6dc443..6ac73014a 100644
    // Serialize the SSL_SESSION to be encoded into the ticket.
    uint8_t *session_buf = NULL;
    size_t session_len;
-+  #if 1
++#if 1
 +  time_t orig = session->time;
 +  ((SSL_SESSION *)session)->time = 1649621591;
-+  #endif
++#endif
    if (!SSL_SESSION_to_bytes_for_ticket(session, &session_buf, &session_len)) {
      return -1;
    }
-+  #if 1
++#if 1
 +  ((SSL_SESSION *)session)->time = orig;
-+  #endif
++#endif
  
    int ret = 0;
    if (hs->ssl->session_ctx->ticket_aead_method) {
 diff --git a/src/ssl/tls13_server.cc b/src/ssl/tls13_server.cc
-index 2f000e55b..5680b93a0 100644
+index 2f000e55b..06c3f8f19 100644
 --- a/src/ssl/tls13_server.cc
 +++ b/src/ssl/tls13_server.cc
-@@ -146,9 +146,13 @@ static bool add_new_session_tickets(SSL_HANDSHAKE *hs, bool *out_sent_tickets) {
+@@ -120,6 +120,12 @@ static const SSL_CIPHER *choose_tls13_cipher(
+ }
+ 
+ static bool add_new_session_tickets(SSL_HANDSHAKE *hs, bool *out_sent_tickets) {
++#if 1
++  if (hs) {
++    *out_sent_tickets = false;
++    return true;
++  }
++#endif
+   SSL *const ssl = hs->ssl;
+   if (// If the client doesn't accept resumption with PSK_DHE_KE, don't send a
+       // session ticket.
+@@ -146,9 +152,13 @@ static bool add_new_session_tickets(SSL_HANDSHAKE *hs, bool *out_sent_tickets) {
        return false;
      }
  
@@ -222,7 +235,7 @@ index 2f000e55b..5680b93a0 100644
      session->ticket_age_add_valid = true;
      bool enable_early_data =
          ssl->enable_early_data &&
-@@ -754,7 +758,13 @@ static enum ssl_hs_wait_t do_send_server_hello(SSL_HANDSHAKE *hs) {
+@@ -754,7 +764,13 @@ static enum ssl_hs_wait_t do_send_server_hello(SSL_HANDSHAKE *hs) {
        hints->server_random.size() == random.size()) {
      OPENSSL_memcpy(random.data(), hints->server_random.data(), random.size());
    } else {

@@ -85,7 +85,7 @@ pkt09_shand2: dgram06_s03
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
 pkt10_sdata0: dgram06_s03
-	START=41 LEN=438; \
+	START=41 LEN=38; \
 	perl -p0777 -e 's/.{'$$START'}(.{'$$LEN'}).*/\1/s' < $^ > $@
 
 pkt11_cdata1: dgram07_c04

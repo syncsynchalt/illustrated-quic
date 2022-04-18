@@ -1,11 +1,11 @@
 <div class="rec-outer">
-<div class="record client">
-<div class="rec-label">Client Handshake Packet</div>
+<div class="record server">
+<div class="rec-label">Server Application Packet</div>
 <div class="rec-explanation">
-    The client sends a "Handshake" packet, containing an ACK
-    for the server's last "Handshake" packet.
+    The server sends its first post-handshake packet, containing stream data
+    with the reply "pong".
 </div>
-%file ../captures/caps/pkt06_chand0
+%file ../captures/caps/pkt10_sdata0
 <span class="record-data">
     <span class="string">
         <span class="label">Packet Header Byte</span>
@@ -14,7 +14,7 @@
 %bytes
         </span>
         <span class="bytes unprotected">
-e0
+40
         </span>
         <div class="explanation">
             <button class="hp-toggle">Disable header protection</button><br>
@@ -24,37 +24,39 @@ e0
             <br><br>
             Header protection is applied by encrypting a sample of each packet's
             payload with the "header protection key", then XOR'ing certain bits
-            and bytes in each packet with the resulting data. For "long" format
-            packets such as this one, the protected sections are the lower 4 bits
+            and bytes in each packet with the resulting data. For "short" format
+            packets such as this one, the protected sections are the lower 5 bits
             of this byte, and the bytes of the Packet Number (seen later).
             <br><br>
             An example of how to compute header protection:
             <codesample>
-<pre><code>### "client header protection key" from handshake keys calc step above
-$ key=84b3c21cacaf9f54c885e9a506459079
+<pre><code>### "server header protection key" from application keys calc step above
+$ key=b7f6f021453e52b58940e4bba72a35d4
 ### sample is taken from 16 bytes of payload starting
 ### 4 bytes past the first byte of the packet number
-$ sample=c6cc12512d7eda141ec057b804d30feb
+$ sample=4057c883e94d9c296baa8ca0ea6e3a21
 $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
 
-5e8c3ee850
+09cd79a059
 
-### first byte of result is xor'd into lower 4 bits of this byte,
+### first byte of result is xor'd into lower 5 bits of this byte,
 ### remaining bytes are xor'd one-for-one into the bytes of
 ### the packet number (which in this packet is only one byte)
 </code></pre>
             </codesample>
-            The bits in the unprotected byte 0xE0 have the following meaning:
+            The bits in the unprotected byte 0x40 have the following meaning:
             <table class="bits">
             <thead><tr>
               <th></th>
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
+            <tr><td>MSB</td><td><tt>0</tt></td><td>Short header format</td></tr>
             <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>10</tt></td><td>Packet type: Handshake</td></tr>
+            <tr><td></td><td><tt>0</tt></td><td>"Spin" bit, optionally used to allow observers to measure RTT,
+                but unused by this library</td></tr>
             <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
+            <tr><td></td><td><tt>0</tt></td><td>Key phase bit, used to signal when key rotation occurs</td></tr>
             <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
@@ -62,20 +64,9 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
     </span>
 
     <span class="string">
-        <span class="label">QUIC Version</span>
-        <span class="bytes">
-%next 4
-%bytes
-        </span>
-        <div class="explanation">
-            The version of QUIC is given: version 1.
-        </div>
-    </span>
-
-    <span class="string">
         <span class="label">Destination Connection ID</span>
         <span class="bytes">
-%next 6
+%next 5
 %bytes
         </span>
         <div class="explanation">
@@ -84,43 +75,13 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             even if the sender's network address or NAT translation has
             changed, making it more resilient than the underlying network
             connection.
+            <br><br>
+            Note that the connection ID length is not given. The peer
+            must know the length, either by always using the same length,
+            or by embedding its own length encoding in the ID.
             <ul>
-            <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><tt>%0 %1 %2 %3 %4</tt> - the connection ID "<tt>c_cid</tt>"
             </ul>
-        </div>
-    </span>
-
-    <span class="string">
-        <span class="label">Source Connection ID</span>
-        <span class="bytes">
-%next 6
-%bytes
-        </span>
-        <div class="explanation">
-            The source connection ID is given.
-            <ul>
-            <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>c_cid</tt>"
-            </ul>
-        </div>
-    </span>
-
-    <span class="string">
-        <span class="label">Packet Length</span>
-        <span class="bytes">
-%next 2
-%bytes
-        </span>
-        <div class="explanation">
-            The client indicates how many bytes of encrypted payload
-            are in the packet.  This field is a variable length
-            integer - the first two bits of the first byte
-            indicate how many total bytes are in the integer.
-
-            The first byte starts with the two bits "0 1" (0x4), which
-            indicate two bytes.  The remaining bits give the number
-            0x16, or 22.
         </div>
     </span>
 
@@ -139,7 +100,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             details.
             <br><br>
             This byte has the unprotected value of 0x00, indicating it is packet
-            0, or the first "Handshake" packet sent by the client.
+            0, or the first "Application" packet sent by the client.
             <br><br>
 
             This data is also potentially truncated. The
@@ -165,11 +126,11 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
     <span class="string encrypted">
         <span class="label">Encrypted Data</span>
         <span class="bytes">
-%next 5
+%next 15
 %bytes
         </span>
         <div class="explanation">
-            This data is encrypted with the client "Handshake" traffic key.
+            This data is encrypted with the client "Application" traffic key.
         </div>
     </span>
     <span class="string">
@@ -184,20 +145,19 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             encrypted data and the packet header.
         </div>
     </span>
-%next 1116
 %empty
 
     <div class="decryption">
         <div class="label">Decryption</div>
         <div class="explanation">
             This data is encrypted using the client
-            "Handshake" traffic key and IV that were
-            generated during the "Handshake Keys
+            key and IV that were
+            generated during the "Application Keys
             Calc" step.  The IV will be modified
             by XOR'ing it by the count of records that
             have already been encrypted with this key,
             which in this case is 0.  The process
-            also takes as input the 20 bytes of header
+            also takes as input the 16 bytes of header
             that this packet begins with, as authenticated
             data that must match for decryption to
             succeed.
@@ -209,12 +169,12 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             and <a href="files/aes_128_gcm_encrypt.c" download="aes_128_gcm_encrypt.c">encrypt</a>
             this data.
             <codesample>
-<pre><code>### from the "Handshake Keys Calc" step
-$ key=30a7e816f6a1e1b3434cf39cf4b415e7
-$ iv=11e70a5d1361795d2bb04465
+<pre><code>### from the "Application Keys Calc" step
+$ key=fd8c7da9de1b2da4d2ef9fd5188922d0
+$ iv=02f6180e4f4aa456d7e8a602
 ### from this record
-$ recdata=e00000000105735f63696405635f636964401600
-$ authtag=12512d7eda141ec057b804d30feb515b
+$ recdata=40635f63696400
+$ authtag=ea6e3a21faaf99af2fe10321692057d2
 $ recordnum=0
 ### may need to add -I and -L flags for include and lib dirs
 $ cc -o aes_128_gcm_decrypt aes_128_gcm_decrypt.c -lssl -lcrypto
@@ -222,13 +182,13 @@ $ cat /tmp/msg1 \
   | ./aes_128_gcm_decrypt $iv $recordnum $key $recdata $authtag \
   | hexdump -C
 
-00000000  02 00 20 00 00                                    |.. ..|
+00000000  02 00 12 00 00 1e 0f 00  00 40 04 70 6f 6e 67     |.........@.pong|
 </code></pre>
             </codesample>
         </div>
     </div>
 
-%file ../captures/caps/pkt_payload06_chand0
+%file ../captures/caps/pkt_payload10_sdata0
     <span class="string decrypted">
         <span class="label">ACK frame</span>
         <span class="bytes">
@@ -236,85 +196,124 @@ $ cat /tmp/msg1 \
 %bytes
         </span>
         <div class="explanation">
-            The client acknowledges receipt of the server's Handshake packet 0.
+            The server acknowledges receipt of the client's Application packet 0.
             <ul>
             <li><tt>%0</tt> - frame type "ACK"
             <li><tt>%1</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>%2</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of %dd2 * 256 = 8,192 µseconds
+            <li><tt>%2</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of %dd2 * 256 = 4,608 µseconds
             <li><tt>%3</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (%d4) optionally provided below
             <li><tt>%4</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
             </ul>
         </div>
     </span>
-%empty
-</span>
-</div>
-</div>
 
-<div class="rec-outer">
-<div class="record client">
-<div class="rec-label">Padding</div>
-<div class="rec-explanation">
-    Any datagram sent by the client that contains an Initial packet
-    must be padded to a length of 1200 bytes.  This is done by adding
-    "Padding" frames, which start with a 0x00 byte and have a length of
-    one byte.
-</div>
-%file ../captures/caps/pkt06_chand0
-%next 41
-<span class="record-data">
-    <span class="string">
-        <span class="label">Padding Bytes</span>
+    <span class="string decrypted">
+        <span class="label">HANDSHAKE_DONE frame</span>
         <span class="bytes">
-
-%next 8
-%bytes
-%next 1100
-... snip ...
-%next 8
+%next 1
 %bytes
         </span>
         <div class="explanation">
-            Padding this packet to a size of 1200 bytes serves two purposes:
+            The server confirms to the client that the handshake is complete. This frame has no content other than its type.
             <ul>
-
-            <li><b>Path MTU validation</b> - Any IPv4 host or
-            router is allowed to drop packets
-            that exceed their MTU limit, to a minimum of
-            576 bytes. The vast majority of the internet
-            has a much higher MTU (typically 1500 bytes). A higher
-            packet size will increase throughput and
-            performance. Given these realities QUIC chooses
-            a minimum size constraint of 1200 bytes, which
-            should traverse the vast majority of real
-            networks (including tunneled networks)
-            without being dropped for size.
-            <br>
-            To prevent a scenario where a connection is established
-            successfully with smaller packets but then starts timing out
-            once larger packets are sent, the initial packets are
-            padded to a length of 1200 bytes to prove that the
-            end-to-end path will allow packets of that size.
-
-            <li><b>Amplification Attack Mitigation</b> - There is a class
-            of network attack in which an attacker
-            can send a small amount of traffic to an innocent third party
-            which replies with a much larger amount of traffic directed
-            at the target. In the case of QUIC this could be done with
-            IP address spoofing, and would cause QUIC servers to reply
-            to small Initial datagrams with much larger Handshake responses.
-            <br>
-            To help mitigate this, QUIC servers are forbidden from replying to a
-            client with more than 3 times the traffic that was sent to it,
-            until the server has received some proof from the client that
-            it's at the given address (such as round-trip data originally from the server).
-            Adding padding to this Initial datagram gives the server a "byte budget"
-            to perform handshake responses without exceeding this 3x limit.
+            <li><tt>%0</tt> - frame type "HANDSHAKE_DONE"
+            </ul>
         </div>
     </span>
+
+    <span class="string decrypted">
+        <span class="label">STREAM frame type and flags</span>
+        <span class="bytes">
+%next 1
+%bytes
+        </span>
+        <div class="explanation">
+            The server indicates it is sending data with a "STREAM" frame. Streams are the mechanism for
+            all application data sent in a QUIC connection, and are analogous to an individual TCP connection.
+            <br><br>
+            The frame type is a number
+            in the range 0x8 through 0xf (in binary: 0b00001xxx) with the variable bits acting as flags
+            that give additional information about the stream frame:
+            <table>
+            <thead>
+            <tr>
+                <th>Bitmask</th>
+                <th>Meaning</th>
+            </tr>
+            </thead>
+            <tr><td>0x4</td><td>OFF: An "Offset" field is present in this frame (otherwise the offset is 0)</td>
+            <tr><td>0x2</td><td>LEN: A "Length" field is present in this frame (otherwise consume all data in the frame)</td>
+            <tr><td>0x1</td><td>FIN: This frame contains the final data of this stream, and the sender is done writing to it</td>
+            </table>
+		    In this case, the sender indicates all three: there
+		    will be an offset field, a length field, and this
+		    is the final data for this stream.
+        </div>
+    </span>
+
+    <span class="string decrypted">
+        <span class="label">Stream ID</span>
+        <span class="bytes">
+%next 1
+%bytes
+        </span>
+        <div class="explanation">
+            The client gives the ID number of the stream.  ID numbers increase sequentially, with the last
+            two bits indicating the stream type and direction:
+            <table>
+            <thead>
+            <tr>
+                <th>Bitmask</th>
+                <th>Meaning</th>
+            </tr>
+            </thead>
+            <tr><td>0x2</td><td>Indicates whether the stream is bi-directional (<tt>0</tt>) or uni-directional (<tt>1</tt>).</td>
+            <tr><td>0x1</td><td>Indicates whether the stream was opened by client (<tt>0</tt>) or server (<tt>1</tt>).</td>
+            </table>
+            In this case, the stream ID of 0 indicates it is the first bi-directional stream opened by the client.
+        </div>
+    </span>
+
+    <span class="string decrypted">
+        <span class="label">Stream Offset</span>
+        <span class="bytes">
+%next 1
+%bytes
+        </span>
+        <div class="explanation">
+	        A variable-length integer indicating the offset of the
+	        stream data. In this case, a single-byte integer showing
+	        an offset of %n0.
+        </div>
+    </span>
+
+    <span class="string decrypted">
+        <span class="label">Stream Length</span>
+        <span class="bytes">
+%next 2
+%bytes
+        </span>
+        <div class="explanation">
+            A variable-length integer indicating the length of the
+            stream data. In this case, the first two bits (0 1) indicate
+            a two-byte integer, and the remaining bits give the length of
+            %n1 bytes.
+        </div>
+    </span>
+
+    <span class="string decrypted">
+        <span class="label">Stream Data</span>
+        <span class="bytes">
+%next 4
+%bytes
+        </span>
+        <div class="explanation">
+            The application data "<tt>pong</tt>".
+        </div>
+    </span>
+%empty
 </span>
 </div>
 </div>
-%empty
 
 </div> <!-- end of UDP datagram -->

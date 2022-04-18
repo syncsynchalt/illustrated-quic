@@ -509,10 +509,11 @@ span.bytes.protected.hp-disabled {
 
 /***** datagram borders *****/
 .datagram {
+    max-width: 800px;
     border-radius: 1.2em;
     border: 1px solid black;
     padding: 5px 15px;
-    margin: 0.8em 0;
+    margin: 0.8em auto;
 }
 
 .datagram > .label {
