@@ -1,0 +1,905 @@
+<div class="rec-outer">
+<div class="calculation client">
+<div class="rec-label">Client Key Exchange Generation</div>
+<div class="rec-explanation">
+    The connection begins with the client creating a private/public
+    keypair for key exchange.  Key exchange is a mathematic technique
+    by which two parties can agree on the same number without an
+    eavesdropper being able to tell what that number is.
+    <br/><br/>
+    The endpoints of this connection will do key exchange via an
+    elliptical curve method, using the x25519 curve.
+    <br/><br/>
+    The private key is chosen by selecting an integer between
+    0 and 2<sup>256</sup>-1.  It does this by generating 32
+    bytes (256 bits) of random data.  The
+    <a href="files/client-ephemeral-private.key" download="client-ephemeral-private.key">private key</a>
+    selected is:
+
+    <pre class="ind2"><tt class="longboi"
+    >202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f</tt></pre>
+
+    The <a href="files/client-ephemeral-public.key" download="client-ephemeral-public.key">public key</a>
+    is chosen by multiplying the point x=9 on the x25519 curve
+    by the private key.  The public key calculated is:
+
+    <pre class="ind2"><tt class="longboi"
+    >358072d6365880d1aeea329adf9121383851ed21a28e3b75e965d0d2cd166254</tt></pre>
+
+    The public key calculation can be confirmed at the command line:
+    <codesample>
+<pre><code>### requires openssl 1.1.0 or higher
+$ openssl pkey -noout -text &lt; client-ephemeral-private.key
+
+X25519 Private-Key:
+priv:
+    20:21:22:23:24:25:26:27:28:29:2a:2b:2c:2d:2e:
+    2f:30:31:32:33:34:35:36:37:38:39:3a:3b:3c:3d:
+    3e:3f
+pub:
+    35:80:72:d6:36:58:80:d1:ae:ea:32:9a:df:91:21:
+    38:38:51:ed:21:a2:8e:3b:75:e9:65:d0:d2:cd:16:
+    62:54
+</code></pre>
+    </codesample>
+</div>
+</div>
+</div>
+
+<div class="rec-outer">
+<div class="calculation client">
+<div class="rec-label">Client Initial Traffic Keys Calc</div>
+<div class="rec-explanation">
+    Next, the client will generate traffic keys for the Initial
+    packets.  Because key exchange between client and server has
+    not yet taken place there is limited security in these keys -
+    any observer can derive the same keys and read the traffic.
+    Encrypting the Initial packets prevents certain kinds of attacks
+    such as request forgery attacks.
+
+    <br><br>
+
+    The client begins by generating 8 bytes of random data,
+    in this case the bytes:
+    <pre class="ind2"><tt class="longboi">0001020304050607</tt></pre>
+    The client then derives encryption keys using the following process:
+
+    <processblock>
+<pre>initial_salt = 38762cf7f55934b34d179ae6a4c80cadccbb7f0a
+initial_random = (random bytes from client given above)
+initial_secret = HKDF-Extract(salt: initial_salt, key: initial_random)
+client_secret = HKDF-Expand-Label(key: initial_secret, label: "client in", context: "", length: 32)
+server_secret = HKDF-Expand-Label(key: initial_secret, label: "server in", context: "", length: 32)
+client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", context: "", length: 16)
+server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", context: "", length: 16)
+client_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", context: "", length: 12)
+server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", context: "", length: 12)
+client_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", context: "", length: 16)
+server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", context: "", length: 16)
+</pre>
+    </processblock>
+
+    The use of the magic constant "<tt>38762cf7f55934b34d179ae6a4c80cadccbb7f0a</tt>" as the initial
+    salt is interesting, as it is not derived from any mathemetical constants or cryptographic
+    principal. It's the value of the first SHA-1 collision ever publically discovered, to celebrate
+    this achievement of Google researchers (QUIC itself was initially created, sponsored, and deployed
+    by Google).
+
+    <br><br>
+
+    This has introduced two new cryptographic methods from TLS 1.3:
+    <ul>
+    <li><tt>HKDF-Extract</tt> - given a salt and some bytes of key material
+    create 256 bits (32 bytes) of new key material, with the
+    input key material's entropy evenly distributed in the
+    output.
+    <li><tt>HKDF-Expand-Label</tt> - given the inputs of key
+    material, label, and context data, create a new key of the
+    requested length.
+    </ul>
+
+    I've created <a href="files/hkdf.sh" download="hkdf">an HKDF tool</a>
+    to perform HKDF operations on the command line.
+    The key derivation process is reproduced at the command line below:
+    <codesample>
+<pre><code>$ init_salt=38762cf7f55934b34d179ae6a4c80cadccbb7f0a
+$ init_dcid=0001020304050607
+$ init_secret=$(./hkdf extract $init_salt $init_dcid)
+$ csecret=$(./hkdf expandlabel $init_secret "client in" "" 32)
+$ ssecret=$(./hkdf expandlabel $init_secret "server in" "" 32)
+$ client_init_key=$(./hkdf expandlabel $csecret "quic key" "" 16)
+$ server_init_key=$(./hkdf expandlabel $ssecret "quic key" "" 16)
+$ client_init_iv=$(./hkdf expandlabel $csecret "quic iv" "" 12)
+$ server_init_iv=$(./hkdf expandlabel $ssecret "quic iv" "" 12)
+$ client_init_hp=$(./hkdf expandlabel $csecret "quic hp" "" 16)
+$ server_init_hp=$(./hkdf expandlabel $ssecret "quic hp" "" 16)
+$ echo ckey: $client_init_key
+$ echo civ: $client_init_iv
+$ echo chp: $client_init_hp
+$ echo skey: $server_init_key
+$ echo siv: $server_init_iv
+$ echo shp: $server_init_hp
+
+ckey: b14b918124fda5c8d79847602fa3520b
+civ: ddbc15dea80925a55686a7df
+chp: 6df4e9d737cdf714711d7c617ee82981
+skey: d77fc4056fcfa32bd1302469ee6ebf90
+siv: fcb748e37ff79860faa07477
+shp: 440b2725e91dc79b370711ef792faa3d
+</code></pre>
+    </codesample>
+
+    From this we get the following encryption keys and IVs:
+    <ul>
+    <li>client initial key: <tt class="longboi">b14b918124fda5c8d79847602fa3520b</tt>
+    <li>client initial IV: <tt class="longboi">ddbc15dea80925a55686a7df</tt>
+    <li>server initial key: <tt class="longboi">d77fc4056fcfa32bd1302469ee6ebf90</tt>
+    <li>server initial IV: <tt class="longboi">fcb748e37ff79860faa07477</tt>
+    </ul>
+    We also get the following "header protection keys", which will be explained below:
+    <ul>
+    <li>client initial header protection key: <tt class="longboi">6df4e9d737cdf714711d7c617ee82981</tt>
+    <li>server initial header protection key: <tt class="longboi">440b2725e91dc79b370711ef792faa3d</tt>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="datagram"><span class="label">UDP Datagram 1</span>
+
+<div class="rec-outer">
+<div class="record client">
+<div class="rec-label">Client Initial Packet</div>
+<div class="rec-explanation">
+    The session begins with the client sending an "Initial" packet.
+    This packet contains the "ClientHello" TLS record, used to begin
+    the TLS 1.3 encrypted session.
+</div>
+%file ../captures/caps/pkt01_cinit0
+<span class="record-data">
+    <span class="string">
+        <span class="label">Packet Header Byte</span>
+        <span class="bytes protected">
+%next 1
+%bytes
+        </span>
+        <span class="bytes unprotected">
+c0
+        </span>
+        <div class="explanation">
+            <button class="hp-toggle">Disable header protection</button><br>
+            The packet begins with a header byte, which has header protection
+            applied.  Header protection is used to hide packet numbers and other
+            information from outside observers.
+            <br><br>
+            Header protection is applied by encrypting a sample of each packet's
+            payload with the "header protection key", then XOR'ing certain bits
+            and bytes in each packet with the resulting data. For "long" format
+            packets such as this one, the protected sections are the lower 4 bits
+            of this byte, and the bytes of the Packet Number (seen later).
+            <br><br>
+            An example of how to compute header protection:
+            <codesample>
+<pre><code>### "client header protection key" from calc step above
+$ key=6df4e9d737cdf714711d7c617ee82981
+### sample is taken from 16 bytes of payload starting
+### 4 bytes past the first byte of the packet number
+$ sample=ed78716be9711ba498b7ed868443bb2e
+$ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
+
+ed9895bb15
+
+### first byte of result is xor'd into lower 4 bits of this byte,
+### remaining bytes are xor'd one-for-one into the bytes of
+### the packet number (which in this packet is only one byte)
+</code></pre>
+            </codesample>
+            The bits in the unprotected byte 0xC0 have the following meaning:
+            <table class="bits">
+            <thead><tr>
+              <th></th>
+              <th>Bit</th>
+              <th>Meaning</th>
+            </tr></thead>
+            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
+            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><tt>00</tt></td><td>Packet type: Initial</td></tr>
+            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+                field below will have length of one byte)</td></tr>
+            </table>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">QUIC Version</span>
+        <span class="bytes">
+%next 4
+%bytes
+        </span>
+        <div class="explanation">
+            The version of QUIC is given: version 1.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Destination Connection ID</span>
+        <span class="bytes">
+%next 9
+%bytes
+        </span>
+        <div class="explanation">
+	        The client has not yet received a connection ID chosen
+	        by the server. Instead it uses this field to provide
+	        the 8 bytes of random data for deriving Initial encryption
+	        keys, as explained in "Initial Traffic Keys Calc"
+	        above.
+            <ul>
+            <li><tt>%0</tt> - %n0 bytes of connection ID follows
+            <li><tt>%1 %2 ... %-2 %-1</tt> - the connection ID
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Source Connection ID</span>
+        <span class="bytes">
+%next 6
+%bytes
+        </span>
+        <div class="explanation">
+            The client uses this field to indicate its
+            chosen connection ID to the server.
+            <ul>
+            <li><tt>%0</tt> - %n0 bytes of connection ID follows
+            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>c_cid</tt>"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Token</span>
+        <span class="bytes">
+%next 1
+%bytes
+        </span>
+        <div class="explanation">
+	        The client can use this field in some scenarios to
+	        provide a token requested by the server, such as to
+	        prove that its connection attempt is not spoofed. In
+	        this case, there is no token to provide, and the field
+	        is empty.
+
+            <ul>
+            <li><tt>%0</tt> - %n0 bytes of token data follows
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Packet Length</span>
+        <span class="bytes">
+%next 2
+%bytes
+        </span>
+        <div class="explanation">
+	        The client indicates how many bytes of encrypted payload
+	        are in the packet.  This field is a variable length
+	        integer - the first two bits of the first byte
+	        indicate how many total bytes are in the integer.
+
+            The first byte starts with the two bits "0 1" (0x4), which
+            indicate two bytes.  The remaining bits give the number
+            0x103, or 259.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Packet Number</span>
+        <span class="bytes protected">
+%next 1
+%bytes
+        </span>
+        <span class="bytes unprotected">
+        00
+        </span>
+        <div class="explanation">
+            <button class="hp-toggle">Disable header protection</button><br>
+            This byte has header protection applied, see Packet Header Byte for
+            details.
+            <br><br>
+            This byte has the unprotected value of 0x00, indicating it is packet
+            0, or the first "Initial" packet sent by the client.
+            <br><br>
+
+		    This data is also potentially truncated. The
+		    sending endpoint calculates the spread between
+		    the highest packet number sent and the lowest
+		    unacknowledged packet number, doubles that
+		    spread for safety, rounds up, then figures the
+		    number of bytes it can remove from the high
+		    bits of the packet number to unambiguously
+		    represent a number between those two ends. The
+		    encoded packet number is then truncated to that
+		    number of bytes, and the receiving endpoint
+		    fills in the full number based on the packet
+		    numbers it has most recently seen. Because our
+		    example conversation sends so few packets (fewer
+		    than 64), this truncation won't occur in this
+		    document.  See <a
+		    href="https://www.rfc-editor.org/rfc/rfc9000.html#section-17.1">RFC
+		    9000</a> for details.
+        </div>
+    </span>
+
+    <span class="string encrypted">
+        <span class="label">Encrypted Data</span>
+        <span class="bytes">
+%next 242 
+%bytes
+        </span>
+        <div class="explanation">
+            This data is encrypted with the client "Initial" traffic key.
+        </div>
+    </span>
+    <span class="string">
+        <span class="label">Auth Tag</span>
+        <span class="bytes">
+%next 16
+%bytes
+        </span>
+        <div class="explanation">
+            This is the AEAD authentication tag
+            that confirms the integrity of the
+            encrypted data and the packet header.
+        </div>
+    </span>
+%next 918
+%empty
+
+    <div class="decryption">
+        <div class="label">Decryption</div>
+        <div class="explanation">
+            This data is encrypted using the client
+            "Initial" traffic key and IV that were
+            generated during the "Initial Traffic Keys
+            Calc" step.  The IV will be modified
+            by XOR'ing it by the count of records that
+            have already been encrypted with this key,
+            which in this case is 0.  The process
+            also takes as input the 24 bytes of header
+            that this packet begins with, as authenticated
+            data that must match for decryption to
+            succeed.
+            <br/><br/>
+            Because the <tt>openssl</tt> command line
+            tool does not yet support AEAD ciphers,
+            I've written command line tools to both
+            <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
+            and <a href="files/aes_128_gcm_encrypt.c" download="aes_128_gcm_encrypt.c">encrypt</a>
+            this data.
+            <codesample>
+<pre><code>### from the "Initial Keys Calc" step
+$ key=b14b918124fda5c8d79847602fa3520b
+$ iv=ddbc15dea80925a55686a7df
+### from this record
+$ recdata=c00000000108000102030405060705635f63696400410300
+$ authtag=b3b7241ef6646a6c86e5c62ce08be099
+$ recordnum=0
+### may need to add -I and -L flags for include and lib dirs
+$ cc -o aes_128_gcm_decrypt aes_128_gcm_decrypt.c -lssl -lcrypto
+$ cat /tmp/msg1 \
+  | ./aes_128_gcm_decrypt $iv $recordnum $key $recdata $authtag \
+  | hexdump -C
+
+00000000  06 00 40 ee 01 00 00 ea  03 03 00 01 02 03 04 05  |..@.............|
+00000010  06 07 08 09 0a 0b 0c 0d  0e 0f 10 11 12 13 14 15  |................|
+... snip ...
+</code></pre>
+            </codesample>
+        </div>
+    </div>
+
+%file ../captures/caps/pkt_payload01_cinit0
+    <span class="string decrypted">
+        <span class="label">CRYPTO frame header</span>
+        <span class="bytes">
+%next 4
+%bytes
+        </span>
+        <div class="explanation">
+            Each QUIC packet contains a list of one or more
+            frames in its payload. This packet only contains
+            one frame, a <tt>CRYPTO</tt> frame.
+            <br>
+            <tt>CRYPTO</tt> frames create a single stream of bytes
+            used by TLS to establish a secure connection.
+            <ul>
+            <li><tt>%0</tt> - frame type "CRYPTO"
+            <li><tt>%1</tt> - offset of the crypto stream data being provided (%d0 bytes)
+            <li><tt>%2 %3</tt> - variable length integer (first two bits indicate 2-byte integer)
+                                 showing crypto stream data length of 238 bytes
+            </ul>
+        </div>
+    </span>
+    <span class="string decrypted">
+        <span class="label">ClientHello TLS Record</span>
+        <span class="bytes">
+%next 238
+%bytes
+        </span>
+        <div class="explanation">
+            This record is represented in detail below.
+        </div>
+    </span>
+%empty
+</span>
+</div>
+</div>
+
+
+<div class="rec-outer">
+<div class="record client embedded">
+<div class="rec-label">TLS: ClientHello</div>
+<div class="rec-explanation">
+    The encrypted session begins with the client saying "Hello".
+    The client provides information including the following:
+    <ul>
+    <li>client random data (used later in the handshake)
+    <li>a list of cipher suites that the client supports
+    <li>a public key for key exchange
+    <li>protocol versions that the client can support
+    </ul>
+</div>
+%file ../captures/caps/pkt_payload01_cinit0
+%next 4
+<span class="record-data">
+    <span class="string">
+        <span class="label">TLS Handshake Header</span>
+        <span class="bytes">
+%next 4
+%bytes
+        </span>
+        <div class="explanation">
+            Each TLS handshake message starts with a type and a length.
+            <ul>
+            <li><tt>%0</tt> - handshake message type 0x01 (client hello)
+            <li><tt>%1 %2 %3</tt> - %nnn1 bytes of client hello data follows
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Client Version</span>
+        <span class="bytes">
+%next 2
+%bytes
+        </span>
+        <div class="explanation">
+            A protocol version of "3,3" (meaning TLS 1.2)
+            is given.  Because middleboxes have been
+            created and widely deployed that do not
+            allow protocol versions that
+            they do not recognize, all TLS 1.3 sessions
+            indicate version TLS 1.2 in this field.
+            This field is no longer used, instead
+            version negotiation is performed using the
+            "Supported Versions" extension below.
+            <br/><br/>
+            The unusual version number ("3,3" representing
+            TLS 1.2) is due to TLS 1.0 being a minor
+            revision of the SSL 3.0 protocol.  Therefore
+            TLS 1.0 is represented by "3,1", TLS 1.1 is
+            "3,2", and so on.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Client Random</span>
+        <span class="bytes">
+%next 32
+%bytes
+        </span>
+        <div class="explanation">
+            The client provides 32 bytes of random data.  This data will be used later in the session.
+            In this example we've made the random data a predictable string.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Session ID</span>
+        <span class="bytes">
+%next 1
+%bytes
+        </span>
+        <div class="explanation">
+            This is a legacy field and is not used in QUIC.
+            <ul>
+            <li><tt>%0</tt> - %n0 bytes of session ID follow
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Cipher Suites</span>
+        <span class="bytes">
+%next 8
+%bytes
+        </span>
+        <div class="explanation">
+            The client provides an ordered list of which
+            cipher suites it will support for encryption.
+            The list is in the order preferred by the
+            client, with highest preference first.
+            <ul>
+            <li><tt>%0 %1</tt> - %nn0 bytes of cipher suite data
+            <li><tt>13 01</tt> - assigned value for <tt>TLS_AES_128_GCM_SHA256</tt>
+            <li><tt>13 02</tt> - assigned value for <tt>TLS_AES_256_GCM_SHA384</tt>
+            <li><tt>13 03</tt> - assigned value for <tt>TLS_CHACHA20_POLY1305_SHA256</tt>
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Compression Methods</span>
+        <span class="bytes">
+%next 2
+%bytes
+        </span>
+        <div class="explanation">
+            Previous versions of TLS supported
+            compression, which was found to leak
+            information about the encrypted data allowing
+            it to be read (see <a href="https://en.wikipedia.org/wiki/CRIME">CRIME</a>).
+            <br/><br/>
+            TLS 1.3 no longer allows compression, so
+            this field is always a single entry with
+            the "null" compression method which performs
+            no change to the data.
+            <ul>
+            <li><tt>%0</tt> - %n0 bytes of compression methods
+            <li><tt>00</tt> - assigned value for "null" compression
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Extensions Length</span>
+        <span class="bytes">
+%next 2
+%bytes
+        </span>
+        <div class="explanation">
+            The client has provided a list of optional
+            extensions which the server can use to
+            take action or enable new features.
+            <ul>
+            <li><tt>%0 %1</tt> - the extensions will take %nn0 bytes of data
+            </ul>
+            Each extension will start with two bytes
+            that indicate which extension it is, followed
+            by a two-byte content length field, followed
+            by the contents of the extension.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Extension - Server Name</span>
+        <span class="bytes">
+%next 28
+%bytes
+        </span>
+        <div class="explanation">
+            The client has provided the name of the
+            server it is contacting, also known as SNI
+            (Server Name Indication).
+            <br/><br/>
+            Without this extension a HTTPS server would
+            not be able to provide service for multiple
+            hostnames (virtual hosts) on a single IP address
+            because it couldn't know which
+            hostname's certificate to send until
+            after the TLS session was negotiated and the
+            HTTP request was made.
+            <ul>
+                <li><tt>00 00</tt> - assigned value for extension "server name"
+                <li><tt>%2 %3</tt> - %nn2 bytes of "server name" extension data follows
+                <li><tt>%4 %5</tt> - %nn4 bytes of first (and only) list entry follows
+                <li><tt>%6</tt> - list entry is type 0x00 "DNS hostname"
+                <li><tt>%7 %8</tt> - %nn7 bytes of hostname follows
+                <li><tt>%9 %10 %11 ... %-3 %-2 %-1</tt> - "example.ulfheim.net"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Extension - Supported Groups</span>
+        <span class="bytes">
+%next 12
+%bytes
+        </span>
+        <div class="explanation">
+            The client has indicated that it supports
+            elliptic curve (EC) cryptography for three curve types.
+            To make this extension more generic for
+            other cryptography types it calls these
+            "supported groups" instead of "supported
+            curves".
+            <br/><br/>
+            This list is presented in descending order
+            of the client's preference.
+            <ul>
+                <li><tt>00 0a</tt> - assigned value for extension "supported groups"
+                <li><tt>%2 %3</tt> - %nn2 bytes of "supported group" extension data follows
+                <li><tt>%4 %5</tt> - %nn4 bytes of data are in the curves list
+                <li><tt>00 1d</tt> - assigned value for the curve "x25519"
+                <li><tt>00 17</tt> - assigned value for the curve "secp256r1"
+                <li><tt>00 18</tt> - assigned value for the curve "secp384r1"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Extension - ALPN</span>
+        <span class="bytes">
+%next 15
+%bytes
+        </span>
+        <div class="explanation">
+            Application Layer Protocol Negotiation, or ALPN, is used by QUIC to negotiate
+            supported protocols and versions between server and client.
+            <br>
+            Some example applications might be "http/1.1", "h2" (HTTP/2), or "h3" (HTTP/3).
+            <ul>
+            <li><tt>%0 %1</tt> - assigned value for extension "Application Layer Protocol Negotiation"
+            <li><tt>%2 %3</tt> - %nn2 bytes of "ALPN" extension data follows
+            <li><tt>%4 %5</tt> - %nn2 bytes of "ALPN" protocol data follows
+            <li><tt>%6</tt> - %nn2 bytes of a protocol name follows
+            <li><tt>%7 %8 ... %-2 %-1</tt> - the string "<tt>ping/1.0</tt>"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Extension - Signature Algorithms</span>
+        <span class="bytes">
+%next 24
+%bytes
+        </span>
+        <div class="explanation">
+            This extension indicates which signature
+            algorithms the client supports.  This can
+            influence the certificate that the server
+            presents to the client, as well as the
+            signature that is sent by the server in
+            the CertificateVerify record.
+            <br/><br/>
+            This list is presented in descending order
+            of the client's preference.
+            <ul>
+                <li><tt>00 0d</tt> - assigned value for extension "Signature Algorithms"
+                <li><tt>%2 %3</tt> - %nn2 bytes of "Signature Algorithms" extension data follows
+                <li><tt>%4 %5</tt> - %nn4 bytes of data are in the following list of algorithms
+                <li><tt>04 03</tt> - assigned value for ECDSA-SECP256r1-SHA256
+                <li><tt>08 04</tt> - assigned value for RSA-PSS-RSAE-SHA256
+                <li><tt>04 01</tt> - assigned value for RSA-PKCS1-SHA256
+                <li><tt>05 03</tt> - assigned value for ECDSA-SECP384r1-SHA384
+                <li><tt>08 05</tt> - assigned value for RSA-PSS-RSAE-SHA384
+                <li><tt>05 01</tt> - assigned value for RSA-PKCS1-SHA384
+                <li><tt>08 06</tt> - assigned value for RSA-PSS-RSAE-SHA512
+                <li><tt>06 01</tt> - assigned value for RSA-PKCS1-SHA512
+                <li><tt>02 01</tt> - assigned value for RSA-PKCS1-SHA1
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Extension - Key Share</span>
+        <span class="bytes">
+%next 42
+%bytes
+        </span>
+        <div class="explanation">
+            The client sends one or more ephemeral public keys
+            using algorithm(s) that it thinks the server
+            will support.  This allows the
+            rest of the handshake after the ClientHello
+            and ServerHello messages to be encrypted,
+            unlike previous protocol versions where the
+            handshake was sent in the clear.
+            <ul>
+                <li><tt>00 33</tt> - assigned value for extension "Key Share"
+                <li><tt>%2 %3</tt> - %nn2 bytes of "Key Share" extension data follows
+                <li><tt>%4 %5</tt> - %nn4 bytes of key share data follows
+                <li><tt>00 1d</tt> - assigned value for x25519 (key exchange via curve25519)
+                <li><tt>%8 %9</tt> - %nn8 bytes of public key follows
+                <li><tt>%10 %11 ... %-2 %-1</tt></l> - public key from the step "Client Key Exchange Generation"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Extension - PSK Key Exchange Modes</span>
+        <span class="bytes">
+%next 6
+%bytes
+        </span>
+        <div class="explanation">
+            The client indicates the modes available
+            for establishing keys from pre-shared keys
+            (PSKs).  Since we do not use PSKs in this
+            session, this extension has no effect.
+            <ul>
+                <li><tt>00 2d</tt> - assigned value for extension "PSK Key Exchange Modes"
+                <li><tt>%2 %3</tt> - %nn2 bytes of "PSK Key Exchange Modes" extension data follows
+                <li><tt>%4</tt> - %n4 bytes of exchange modes follow
+                <li><tt>01</tt> - assigned value for "PSK with (EC)DHE key establishment"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Extension - Supported Versions</span>
+        <span class="bytes">
+%next 7
+%bytes
+        </span>
+        <div class="explanation">
+            The client indicates its support of TLS 1.3. This is the only indication in the
+            Client Hello record that hints the client supports TLS 1.3, since
+            for compatibility reasons it has otherwise pretended to be a TLS 1.2 connection
+            attempt.
+            <ul>
+                <li><tt>00 2b</tt> - assigned value for extension "Supported Versions"
+                <li><tt>%2 %3</tt> - %nn2 bytes of "Supported Versions" extension data follows
+                <li><tt>%4</tt> - %n4 bytes of TLS versions follow
+                <li><tt>03 04</tt> - assigned value for TLS 1.3
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Extension - QUIC Transport Parameters</span>
+        <span class="bytes">
+%next 53
+%bytes
+        </span>
+        <div class="explanation">
+            The client's configuration values for the QUIC connection are given here. They are put
+            into this record instead of the headers of the Initial packet because all
+            data in TLS records is protected from tampering by malicious actors.
+            <br>
+            The following QUIC parameters are set in the data below:
+            <ul>
+            <li>max_udp_payload_size: 65527
+            <li>initial_max_data: 10485760
+            <li>initial_max_stream_data_bidi_local: 1048576
+            <li>initial_max_stream_data_bidi_remote: 1048576
+            <li>initial_max_stream_data_uni: 1048576
+            <li>initial_max_streams_bidi: 10
+            <li>initial_max_streams_uni: 10
+            <li>ack_delay_exponent: 3
+            <li>initial_source_connection_id: "c_cid"
+            </ul>
+            A full listing and explanation of the bytes follows:
+            <ul>
+            <li><tt>%0 %1</tt> - assigned value for extension "QUIC Transport Parameters"
+            <li><tt>%2 %3</tt> - %nn2 bytes of "QUIC Transport Parameters" extension data follows
+
+            <li><tt>%4</tt> - assigned value for "max_udp_payload_size"
+            <li><tt>%5</tt> - %d5 bytes of "max_udp_payload_size" data follows
+            <li><tt>%6 %7 %8 %9</tt> - a variable length integer with value 0xfff7 (65527)
+
+            <li><tt>%10</tt> - assigned value for "initial_max_data"
+            <li><tt>%11</tt> - %d11 bytes of "initial_max_data" data follows
+            <li><tt>%12 %13 %14 %15</tt> - a variable length integer with value 0xa00000 (10485760)
+
+            <li><tt>%16</tt> - assigned value for "initial_max_stream_data_bidi_local"
+            <li><tt>%17</tt> - %d17 bytes of "initial_max_stream_data_bidi_local" data follows
+            <li><tt>%18 %19 %20 %21</tt> - a variable length integer with value 0x100000 (1048576)
+
+            <li><tt>%22</tt> - assigned value for "initial_max_stream_data_bidi_remote"
+            <li><tt>%23</tt> - %d23 bytes of "initial_max_stream_data_bidi_remote" data follows
+            <li><tt>%24 %25 %26 %27</tt> - a variable length integer with value 0x100000 (1048576)
+
+            <li><tt>%28</tt> - assigned value for "initial_max_stream_data_uni"
+            <li><tt>%29</tt> - %d29 bytes of "initial_max_stream_data_uni" data follows
+            <li><tt>%30 %31 %32 %33</tt> - a variable length integer with value 0x100000 (1048576)
+
+            <li><tt>%34</tt> - assigned value for "initial_max_streams_bidi"
+            <li><tt>%35</tt> - %d35 bytes of "initial_max_streams_bidi" data follows
+            <li><tt>%36</tt> - a variable length integer with value %n36
+
+            <li><tt>%37</tt> - assigned value for "initial_max_streams_uni"
+            <li><tt>%38</tt> - %d38 bytes of "initial_max_streams_uni" data follows
+            <li><tt>%39</tt> - a variable length integer with value %n39
+
+            <li><tt>%40</tt> - assigned value for "ack_delay_exponent"
+            <li><tt>%41</tt> - %d41 bytes of "ack_delay_exponent" data follows
+            <li><tt>%42</tt> - a variable length integer with value %n42
+
+            <li><tt>%43</tt> - assigned value for "GREASE", a technique for preventing
+            middleboxes from disallowing new extensions, by pre-reserving extension values
+            and injecting them randomly into connections
+            <li><tt>%44</tt> - %d44 bytes of "GREASE" data follows
+            <li><tt>%45</tt> - a variable length integer with value %n45
+
+            <li><tt>%46</tt> - assigned value for "initial_source_connection_id"
+            <li><tt>%47</tt> - %d47 bytes of "initial_source_connection_id" data follows
+            <li><tt>%48 %49 %50 %51 %52</tt> - a copy of the source connection ID from the packet header: "<tt>c_cid</tt>"
+            </ul>
+        </div>
+    </span>
+%empty
+</span>
+</div>
+</div>
+
+<div class="rec-outer">
+<div class="record client">
+<div class="rec-label">Padding</div>
+<div class="rec-explanation">
+    Any datagram sent by the client that contains an Initial packet
+    must be padded to a length of 1200 bytes.  This is done by adding
+    "Padding" frames, which start with a 0x00 byte and have a length of
+    one byte.
+</div>
+%file ../captures/caps/pkt01_cinit0
+%next 282
+<span class="record-data">
+    <span class="string">
+        <span class="label">Padding Bytes</span>
+        <span class="bytes">
+
+%next 8
+%bytes
+%next 902
+... snip ...
+%next 8
+%bytes
+        </span>
+        <div class="explanation">
+            Padding this packet to a size of 1200 bytes serves two purposes:
+            <ul>
+
+		    <li><b>Path MTU validation</b> - Any IPv4 host or
+		    router is allowed to drop packets
+		    that exceed their MTU limit, to a minimum of
+		    576 bytes. The vast majority of the internet
+		    has a much higher MTU (typically 1500 bytes). A higher
+		    packet size will increase throughput and
+		    performance. Given these realities QUIC chooses
+		    a minimum size constraint of 1200 bytes, which
+		    should traverse the vast majority of real
+		    networks (including tunneled networks)
+            without being dropped for size.
+            <br>
+            To prevent a scenario where a connection is established
+            successfully with smaller packets but then starts timing out
+            once larger packets are sent, the initial packets are
+            padded to a length of 1200 bytes to prove that the
+            end-to-end path will allow packets of that size.
+
+            <li><b>Amplification Attack Mitigation</b> - There is a class
+            of network attack in which an attacker
+            can send a small amount of traffic to an innocent third party
+            which replies with a much larger amount of traffic directed
+            at the target. In the case of QUIC this could be done with
+            IP address spoofing, and would cause QUIC servers to reply
+            to small Initial datagrams with much larger Handshake responses.
+            <br>
+            To help mitigate this, QUIC servers are forbidden from replying to a
+            client with more than 3 times the traffic that was sent to it,
+            until the server has received some proof from the client that
+            it's at the given address (such as round-trip data originally from the server).
+            Adding padding to this Initial datagram gives the server a "byte budget"
+            to perform handshake responses without exceeding this 3x limit.
+        </div>
+    </span>
+</span>
+</div>
+</div>
+%empty
+
+</div> <!-- end of UDP datagram -->
+

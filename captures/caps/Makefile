@@ -198,7 +198,7 @@ crypto_certverify: pkt_payload03_shand0 pkt_payload04_shand1
 	START=5 LEN=149; perl -p0777 -e 's/.{'$${START}'}(.{'$${LEN}'}).*/\1/s' < pkt_payload04_shand1 >> $@
 
 crypto_s_finished: pkt_payload04_shand1
-	START=154 LEN=36; perl -p0777 -e 's/.{'$${START}'}(.{'$${LEN}'}).*/\1/s' < pkt_payload04_shand1 >> $@
+	START=154 LEN=36; perl -p0777 -e 's/.{'$${START}'}(.{'$${LEN}'}).*/\1/s' < pkt_payload04_shand1 > $@
 
 crypto_c_finished: pkt_payload07_chand1
 	START=10 LEN=36; perl -p0777 -e 's/.{'$${START}'}(.{'$${LEN}'}).*/\1/s' < $^ > $@

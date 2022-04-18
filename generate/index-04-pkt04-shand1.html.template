@@ -1,0 +1,452 @@
+<div class="datagram"><span class="label">UDP Datagram 3</span>
+
+<div class="rec-outer">
+<div class="record server">
+<div class="rec-label">Server Handshake Packet</div>
+<div class="rec-explanation">
+    The server continues with another "Handshake" packet. This packet contains
+    the rest of the TLS 1.3 handshake records.
+</div>
+%file ../captures/caps/pkt04_shand1
+<span class="record-data">
+    <span class="string">
+        <span class="label">Packet Header Byte</span>
+        <span class="bytes protected">
+%next 1
+%bytes
+        </span>
+        <span class="bytes unprotected">
+e0
+        </span>
+        <div class="explanation">
+            <button class="hp-toggle">Disable header protection</button><br>
+            The packet begins with a header byte, which has header protection
+            applied.  Header protection is used to hide packet numbers and other
+            information from outside observers.
+            <br><br>
+            Header protection is applied by encrypting a sample of each packet's
+            payload with the "header protection key", then XOR'ing certain bits
+            and bytes in each packet with the resulting data. For "long" format
+            packets such as this one, the protected sections are the lower 4 bits
+            of this byte, and the bytes of the Packet Number (seen later).
+            <br><br>
+            An example of how to compute header protection:
+            <codesample>
+<pre><code>### "server header protection key" from calc step above
+$ key=2a18061c396c2828582b41b0910ed536
+### sample is taken from 16 bytes of payload starting
+### 4 bytes past the first byte of the packet number
+$ sample=19681c3f0f102a30f5e647a3399abf54
+$ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
+
+e54e8fcd38
+
+### first byte of result is xor'd into lower 4 bits of this byte,
+### remaining bytes are xor'd one-for-one into the bytes of
+### the packet number (which in this packet is only one byte)
+</code></pre>
+            </codesample>
+            The bits in the unprotected byte 0xE0 have the following meaning:
+            <table class="bits">
+            <thead><tr>
+              <th></th>
+              <th>Bit</th>
+              <th>Meaning</th>
+            </tr></thead>
+            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
+            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><tt>10</tt></td><td>Packet type: Handshake</td></tr>
+            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+                field below will have length of one byte)</td></tr>
+            </table>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">QUIC Version</span>
+        <span class="bytes">
+%next 4
+%bytes
+        </span>
+        <div class="explanation">
+            The version of QUIC is given: version 1.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Destination Connection ID</span>
+        <span class="bytes">
+%next 6
+%bytes
+        </span>
+        <div class="explanation">
+            The destination connection ID is given. This field
+            allows packets for a connection to be recognized by recipients
+            even if the sender's network address or NAT translation has
+            changed, making it more resilient than the underlying network
+            connection.
+            <ul>
+            <li><tt>%0</tt> - %n0 bytes of connection ID follows
+            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>c_cid</tt>"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Source Connection ID</span>
+        <span class="bytes">
+%next 6
+%bytes
+        </span>
+        <div class="explanation">
+            The source connection ID is given.
+            <ul>
+            <li><tt>%0</tt> - %n0 bytes of connection ID follows
+            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>c_cid</tt>"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Packet Length</span>
+        <span class="bytes">
+%next 2
+%bytes
+        </span>
+        <div class="explanation">
+            The server indicates how many bytes of encrypted payload
+            are in the packet.  This field is a variable length
+            integer - the first two bits of the first byte
+            indicate how many total bytes are in the integer.
+            <br><br>
+            The first byte starts with the two bits "0 1" (0x4), which
+            indicate two bytes.  The remaining bits give the number
+            0xcf, or 207.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Packet Number</span>
+        <span class="bytes protected">
+%next 1
+%bytes
+        </span>
+        <span class="bytes unprotected">
+        01
+        </span>
+        <div class="explanation">
+            <button class="hp-toggle">Disable header protection</button><br>
+            This byte has header protection applied, see Packet Header Byte for
+            details.
+            <br><br>
+            This byte has the unprotected value of 0x00, indicating it is packet
+            1, or the second "Handshake" packet sent by the server.
+            <br><br>
+
+            This data is also potentially truncated. The
+            sending endpoint calculates the spread between
+            the highest packet number sent and the lowest
+            unacknowledged packet number, doubles that
+            spread for safety, rounds up, then figures the
+            number of bytes it can remove from the high
+            bits of the packet number to unambiguously
+            represent a number between those two ends. The
+            encoded packet number is then truncated to that
+            number of bytes, and the receiving endpoint
+            fills in the full number based on the packet
+            numbers it has most recently seen. Because our
+            example conversation sends so few packets (fewer
+            than 64), this truncation won't occur in this
+            document.  See <a
+            href="https://www.rfc-editor.org/rfc/rfc9000.html#section-17.1">RFC
+            9000</a> for details.
+        </div>
+    </span>
+
+    <span class="string encrypted">
+        <span class="label">Encrypted Data</span>
+        <span class="bytes">
+%next 190
+%bytes
+        </span>
+        <div class="explanation">
+            This data is encrypted with the server "Handshake" traffic key.
+        </div>
+    </span>
+    <span class="string">
+        <span class="label">Auth Tag</span>
+        <span class="bytes">
+%next 16
+%bytes
+        </span>
+        <div class="explanation">
+            This is the AEAD authentication tag
+            that confirms the integrity of the
+            encrypted data and the packet header.
+        </div>
+    </span>
+%empty
+
+    <div class="decryption">
+        <div class="label">Decryption</div>
+        <div class="explanation">
+            This data is encrypted using the server
+            "Initial" traffic key and IV that were
+            generated during the "Initial Traffic Keys
+            Calc" step.  The IV will be modified
+            by XOR'ing it by the count of records that
+            have already been encrypted with this key,
+            which in this case is 0.  The process
+            also takes as input the 24 bytes of header
+            that this packet begins with, as authenticated
+            data that must match for decryption to
+            succeed.
+            <br/><br/>
+            Because the <tt>openssl</tt> command line
+            tool does not yet support AEAD ciphers,
+            I've written command line tools to both
+            <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
+            and <a href="files/aes_128_gcm_encrypt.c" download="aes_128_gcm_encrypt.c">encrypt</a>
+            this data.
+            <codesample>
+<pre><code>### From the "Handshake Keys Calc" step
+$ key=17abbf0a788f96c6986964660414e7ec
+$ iv=09597a2ea3b04c00487e71f3
+### from this record
+$ recdata=e00000000105635f63696405735f63696440cf01
+$ authtag=2ed1025f98fea6d6024998184687dc06
+$ recordnum=1
+### may need to add -I and -L flags for include and lib dirs
+$ cc -o aes_128_gcm_decrypt aes_128_gcm_decrypt.c -lssl -lcrypto
+$ cat /tmp/msg1 \
+  | ./aes_128_gcm_decrypt $iv $recordnum $key $recdata $authtag \
+  | hexdump -C
+
+00000000  06 43 ff 40 b9 46 1e 8a  23 40 58 98 8e 7f 26 4d  |.C.@.F..#@X...&M|
+00000010  7a b6 a5 1a 21 c6 29 79  b7 a6 79 f4 a0 87 70 85  |z...!.)y..y...p.|
+... snip ...
+</code></pre>
+            </codesample>
+        </div>
+    </div>
+
+%file ../captures/caps/pkt_payload04_shand1
+    <span class="string decrypted">
+        <span class="label">CRYPTO frame header</span>
+        <span class="bytes">
+%next 5
+%bytes
+        </span>
+        <div class="explanation">
+            <tt>CRYPTO</tt> frames create a single stream of bytes
+            used by TLS to establish a secure connection.
+            <br>
+            <ul>
+            <li><tt>%0</tt> - frame type "CRYPTO"
+            <li><tt>%1 %2</tt> - variable length integer (first two bits indicate 2-byte integer)
+                                 showing crypto stream data offset of 0x3ff (1023) bytes
+            <li><tt>%2 %3</tt> - variable length integer (first two bits indicate 2-byte integer)
+                                 showing crypto stream data length of 0xb9 (185) bytes
+            </ul>
+        </div>
+    </span>
+
+    <span class="string decrypted">
+        <span class="label">CertificateVerify TLS Record (fragment)</span>
+        <span class="bytes">
+%next 149
+%bytes
+        </span>
+        <div class="explanation">
+            This CRYPTO frame contains the remainder of this TLS record.
+            It is represented in detail below.
+        </div>
+    </span>
+
+    <span class="string decrypted">
+        <span class="label">Handshake Finished TLS Record</span>
+        <span class="bytes">
+%next 36
+%bytes
+        </span>
+        <div class="explanation">
+            This record is represented in detail below.
+        </div>
+    </span>
+%empty
+</span>
+</div>
+</div>
+
+<div class="rec-outer">
+<div class="record server embedded">
+<div class="rec-label">TLS: CertificateVerify</div>
+<div class="rec-explanation">
+    The server provides information that ties the ephemeral public key
+    generated during Server Key Exchange Generation to the
+    ownership of the certificate's private key.
+</div>
+%file ../captures/caps/crypto_certverify
+<span class="record-data">
+    <span class="string">
+        <span class="label">TLS Handshake Header</span>
+        <span class="bytes">
+%next 4
+%bytes
+        </span>
+        <div class="explanation">
+            Each TLS handshake message starts with a type and a length.
+            <ul>
+            <li><tt>%0</tt> - handshake message type 0x0f (certificate verify)
+            <li><tt>%1 %2 %3</tt> - %nnn1 bytes of handshake message data follows
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Signature</span>
+        <span class="bytes">
+%next 260
+%bytes
+        </span>
+        <div class="explanation">
+            Because the server is generating ephemeral
+            keys for each session the session is not
+            inherently tied to the certificate as it
+            was in previous versions of TLS.
+            <br/><br/>
+            To prove
+            that the server owns the server certificate
+            (giving the certificate validity in this
+            TLS session), it signs a hash of the handshake
+            messages using the certificate's private
+            key.  The signature can be proven valid by
+            the client by using the certificate's public
+            key.
+            <ul>
+            <li><tt>08 04</tt> - reserved value for RSA-PSS-RSAE-SHA256 signature
+            <li><tt>%2 %3</tt> - %nn2 bytes of signature data follows
+            <li><tt>%4 %5 %6 ... %-3 %-2 %-1</tt> - a signature over this handshake's hash
+            </ul>
+            The signing process can't be reproduced byte-for-byte
+            at the command line because the signing tool introduces
+            random or changing data into the signature.
+            <br/><br/>
+            We can verify the signature using the
+            <a href="files/server.crt" download="server.crt">server's certificate</a>
+            at the command line:
+            <codesample>
+<pre><code>### find the hash of the conversation to this point, excluding
+### 5-byte record headers or 1-byte wrapped record trailers
+$ handshake_hash=$(cat crypto_clienthello crypto_serverhello \
+  crypto_extensions crypto_cert | openssl sha256)
+
+### build the data that was signed:
+### 1. add 64 space characters
+$ echo -n '                                ' > /tmp/tosign
+$ echo -n '                                ' >> /tmp/tosign
+### 2. add this fixed string
+$ echo -n 'TLS 1.3, server CertificateVerify' >> /tmp/tosign
+### 3. add a single null character
+$ echo -en '\0' >> /tmp/tosign
+### 4. add hash of handshake to this point
+$ echo $handshake_hash | xxd -r -p >> /tmp/tosign
+
+### copy the signature that we want to verify
+$ echo "0a 99 af 32 a9 e4 06 d7 25 f9 a9 39 6d e5 af 37 56 b7 a8 f6
+  e4 da d5 85 ab c3 f8 7c 6d 1f c1 5f 5f 00 ab a8 dc a9 d0 5c db 51
+  d3 c9 35 43 36 56 d8 8b 74 32 00 5e e7 e0 48 03 b2 47 57 44 d7 55
+  5c f3 de 48 9c c2 16 a4 85 a7 28 b2 18 90 e8 7a a9 41 5d 19 e6 3a
+  6a 77 9b 9c db b1 28 a8 04 c4 28 b8 27 fa 65 df cd 95 2a ce 54 46
+  1e 8a 23 40 58 98 8e 7f 26 4d 7a b6 a5 1a 21 c6 29 79 b7 a6 79 f4
+  a0 87 70 85 6e 92 6d 37 1b 2e 89 16 9a a1 90 b8 03 63 6b b1 0c 0f
+  b9 05 98 3d 2b 50 0a ad 26 83 df be 15 6e cc f6 66 de 1a 5a d4 5d
+  77 38 d5 e7 8b d1 7b c3 e6 d2 5f 9a d4 af ba 8f 81 de 9f 4d 55 72
+  11 8e 08 55 1a 4b b9 4b 56 a9 70 e8 04 c6 82 67 45 4b 51 7f c8 38
+  6c 9b ae 3a 77 cc cb 7f 29 0f 6e 58 fb a1 26 f0 53 33 a1 1f 8a b0
+  89 2e 6e 7a 89 58 53 82 d3 6e ef 25 29 cf 5b 7b" | xxd -r -p > /tmp/sig
+### extract the public key from the certificate
+$ openssl x509 -pubkey -noout -in server.crt > server.pub
+
+### verify the signature
+$ cat /tmp/tosign | openssl dgst -verify server.pub -sha256 \
+    -sigopt rsa_padding_mode:pss -sigopt rsa_pss_saltlen:-1 -signature /tmp/sig
+
+Verified OK
+</code></pre>
+            </codesample>
+        </div>
+    </span>
+</span>
+</div>
+</div>
+%empty
+
+<div class="rec-outer">
+<div class="record server embedded">
+<div class="rec-label">TLS: Handshake Finished</div>
+<div class="rec-explanation">
+    To verify that the handshake was successful and not tampered
+    with, the server calculates verification data that client will
+    confirm.  The verification data is built from a hash of all
+    handshake messages.
+</div>
+%file ../captures/caps/crypto_s_finished
+<span class="record-data">
+    <span class="string">
+        <span class="label">TLS Handshake Header</span>
+        <span class="bytes">
+%next 4
+%bytes
+        </span>
+        <div class="explanation">
+            Each TLS handshake message starts with a type and a length.
+            <ul>
+            <li><tt>%0</tt> - handshake message type 0x14 (finished)
+            <li><tt>%1 %2 %3</tt> - %nnn1 bytes of handshake finished data follows
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Verify Data</span>
+        <span class="bytes">
+%next 32
+%bytes
+        </span>
+        <div class="explanation">
+            The verify_data is built using the
+            server_secret from the "Server Handshake Traffic Keys Calc"
+            step and a SHA256 hash of every handshake record
+            before this point (ClientHello to CertificateVerify).
+
+            <processblock class="notrunc">
+<pre>finished_key = HKDF-Expand-Label(key: server_handshake_traffic_secret, label: "finished", context: "", len: 32)
+finished_hash = SHA256(ClientHello ... CertificateVerify)
+verify_data = HMAC-SHA256(key: finished_key, msg: finished_hash)
+</pre>
+            </processblock>
+
+            We can use <a href="files/hkdf.sh" download="hkdf">the HKDF
+            tool</a> to reproduce this on the command line.
+            <codesample>
+<pre><code>### find the hash of the conversation to this point, excluding
+### QUIC frame headers
+$ fin_hash=$(cat crypto_clienthello crypto_serverhello \
+  crypto_extensions crypto_cert crypto_certverify | openssl sha256)
+$ sht_secret=88ad8d3b0986a71965a28d108b0f40ffffe629284a6028c80ddc5dc083b3f5d1
+$ fin_key=$(./hkdf expandlabel $sht_secret "finished" "" 32)
+$ echo $fin_hash | xxd -r -p \
+    | openssl dgst -sha256 -mac HMAC -macopt hexkey:$fin_key
+
+068fcb606aa1c8aa354d7b6064a3328cf376bcd9f3200e68ace3de2ee9fcaccb
+</code></pre>
+            </codesample>
+        </div>
+    </span>
+</div>
+</div>
+%empty
+
+</div> <!-- end of UDP datagram -->

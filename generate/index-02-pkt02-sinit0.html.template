@@ -1,0 +1,532 @@
+<div class="rec-outer">
+<div class="calculation server">
+<div class="rec-label">Server Key Exchange Generation</div>
+<div class="rec-explanation">
+    The server creates its own private/public keypair
+    for key exchange.  Key exchange is a mathematic technique
+    by which two parties can agree on the same number without
+    an eavesdropper being able to tell what that number is.
+    <br/><br/>
+    The endpoints of this connection will do key exchange via an
+    elliptical curve method, using the x25519 curve.
+    <br/><br/>
+    The private key is chosen by selecting an integer between
+    0 and 2<sup>256</sup>-1.  It does this by generating 32
+    bytes (256 bits) of random data.  The
+    <a href="files/server-ephemeral-private.key" download="server-ephemeral-private.key">private key</a>
+    selected is:
+
+    <pre class="ind2"><tt class="longboi"
+    >909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeaf</tt></pre>
+
+    The <a href="files/server-ephemeral-public.key" download="server-ephemeral-public.key">public key</a>
+    is chosen by multiplying the point x=9 on the x25519 curve
+    by the private key.  The public key calculated is:
+
+    <pre class="ind2"><tt class="longboi"
+    >9fd7ad6dcff4298dd3f96d5b1b2af910a0535b1488d7f8fabb349a982880b615</tt></pre>
+
+    The public key calculation can be confirmed with command line tools:
+    <codesample>
+<pre><code>### requires openssl 1.1.0 or higher
+$ openssl pkey -noout -text &lt; server-ephemeral-private.key
+
+X25519 Private-Key:
+priv:
+    90:91:92:93:94:95:96:97:98:99:9a:9b:9c:9d:9e:
+    9f:a0:a1:a2:a3:a4:a5:a6:a7:a8:a9:aa:ab:ac:ad:
+    ae:af
+pub:
+    9f:d7:ad:6d:cf:f4:29:8d:d3:f9:6d:5b:1b:2a:f9:
+    10:a0:53:5b:14:88:d7:f8:fa:bb:34:9a:98:28:80:
+    b6:15
+</code></pre>
+    </codesample>
+</div>
+</div>
+</div>
+
+<div class="rec-outer">
+<div class="calculation server">
+<div class="rec-label">Server Initial Traffic Keys Calc</div>
+<div class="rec-explanation">
+    Next, the server performs its own calculation of the Initial traffic keys.
+    It gets the 8 bytes of random data from the "Destination Connection ID" field
+    from the client:
+    <pre class="ind2"><tt class="longboi">0001020304050607</tt></pre>
+    and computes the same keys using the method shown in "Client Initial Traffic Keys Calc":
+    <ul>
+    <li>client initial key: <tt class="longboi">b14b918124fda5c8d79847602fa3520b</tt>
+    <li>client initial IV: <tt class="longboi">ddbc15dea80925a55686a7df</tt>
+    <li>client initial header protection key: <tt class="longboi">6df4e9d737cdf714711d7c617ee82981</tt>
+    <li>server initial key: <tt class="longboi">d77fc4056fcfa32bd1302469ee6ebf90</tt>
+    <li>server initial IV: <tt class="longboi">fcb748e37ff79860faa07477</tt>
+    <li>server initial header protection key: <tt class="longboi">440b2725e91dc79b370711ef792faa3d</tt>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="datagram"><span class="label">UDP Datagram 2</span>
+
+<div class="rec-outer">
+<div class="record server">
+<div class="rec-label">Server Initial Packet</div>
+<div class="rec-explanation">
+    The server responds with an "Initial" packet in return.  This
+    packet contains the "ServerHello" TLS record, used to continue
+    the TLS 1.3 encrypted session negotiation.
+</div>
+%file ../captures/caps/pkt02_sinit0
+<span class="record-data">
+    <span class="string">
+        <span class="label">Packet Header Byte</span>
+        <span class="bytes protected">
+%next 1
+%bytes
+        </span>
+        <span class="bytes unprotected">
+c0
+        </span>
+        <div class="explanation">
+            <button class="hp-toggle">Disable header protection</button><br>
+            The packet begins with a header byte, which has header protection
+            applied.  Header protection is used to hide packet numbers and other
+            information from outside observers.
+            <br><br>
+            Header protection is applied by encrypting a sample of each packet's
+            payload with the "header protection key", then XOR'ing certain bits
+            and bytes in each packet with the resulting data. For "long" format
+            packets such as this one, the protected sections are the lower 4 bits
+            of this byte, and the bytes of the Packet Number (seen later).
+            <br><br>
+            An example of how to compute header protection:
+            <codesample>
+<pre><code>### "server header protection key" from calc step above
+$ key=440b2725e91dc79b370711ef792faa3d
+### sample is taken from 16 bytes of payload starting
+### 4 bytes past the first byte of the packet number
+$ sample=d5d9c823d07c616882ca770279249864
+$ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
+
+4d3acc3988
+
+### first byte of result is xor'd into lower 4 bits of this byte,
+### remaining bytes are xor'd one-for-one into the bytes of
+### the packet number (which in this packet is only one byte)
+</code></pre>
+            </codesample>
+            The bits in the unprotected byte 0xC0 have the following meaning:
+            <table class="bits">
+            <thead><tr>
+              <th></th>
+              <th>Bit</th>
+              <th>Meaning</th>
+            </tr></thead>
+            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
+            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><tt>00</tt></td><td>Packet type: Initial</td></tr>
+            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+                field below will have length of one byte)</td></tr>
+            </table>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">QUIC Version</span>
+        <span class="bytes">
+%next 4
+%bytes
+        </span>
+        <div class="explanation">
+            The version of QUIC is given: version 1.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Destination Connection ID</span>
+        <span class="bytes">
+%next 6
+%bytes
+        </span>
+        <div class="explanation">
+            The server uses this field to indicate its
+            chosen connection ID to the server.
+            <ul>
+            <li><tt>%0</tt> - %n0 bytes of connection ID follows
+            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>s_cid</tt>"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Source Connection ID</span>
+        <span class="bytes">
+%next 6
+%bytes
+        </span>
+        <div class="explanation">
+            The client's chosen connection ID is repeated back to it.
+            <ul>
+            <li><tt>%0</tt> - %n0 bytes of connection ID follows
+            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>c_cid</tt>"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Token</span>
+        <span class="bytes">
+%next 1
+%bytes
+        </span>
+        <div class="explanation">
+            This field is unused in server responses.
+            <ul>
+            <li><tt>%0</tt> - %n0 bytes of token data follows
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Packet Length</span>
+        <span class="bytes">
+%next 2
+%bytes
+        </span>
+        <div class="explanation">
+            The server indicates how many bytes of encrypted payload
+            are in the packet.  This field is a variable length
+            integer - the first two bits of the first byte
+            indicate how many total bytes are in the integer.
+            <br><br>
+            The first byte starts with the two bits "0 1" (0x4), which
+            indicate two bytes.  The remaining bits give the number
+            0x75, or 117.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Packet Number</span>
+        <span class="bytes protected">
+%next 1
+%bytes
+        </span>
+        <span class="bytes unprotected">
+        00
+        </span>
+        <div class="explanation">
+            <button class="hp-toggle">Disable header protection</button><br>
+            This byte has header protection applied, see Packet Header Byte for
+            details.
+            <br><br>
+            This byte has the unprotected value of 0x00, indicating it is packet
+            0, or the first "Initial" packet sent by the server.
+            <br><br>
+
+            This data is also potentially truncated. The
+            sending endpoint calculates the spread between
+            the highest packet number sent and the lowest
+            unacknowledged packet number, doubles that
+            spread for safety, rounds up, then figures the
+            number of bytes it can remove from the high
+            bits of the packet number to unambiguously
+            represent a number between those two ends. The
+            encoded packet number is then truncated to that
+            number of bytes, and the receiving endpoint
+            fills in the full number based on the packet
+            numbers it has most recently seen. Because our
+            example conversation sends so few packets (fewer
+            than 64), this truncation won't occur in this
+            document.  See <a
+            href="https://www.rfc-editor.org/rfc/rfc9000.html#section-17.1">RFC
+            9000</a> for details.
+        </div>
+    </span>
+
+    <span class="string encrypted">
+        <span class="label">Encrypted Data</span>
+        <span class="bytes">
+%next 100
+%bytes
+        </span>
+        <div class="explanation">
+            This data is encrypted with the server "Initial" traffic key.
+        </div>
+    </span>
+    <span class="string">
+        <span class="label">Auth Tag</span>
+        <span class="bytes">
+%next 16
+%bytes
+        </span>
+        <div class="explanation">
+            This is the AEAD authentication tag
+            that confirms the integrity of the
+            encrypted data and the packet header.
+        </div>
+    </span>
+%empty
+
+    <div class="decryption">
+        <div class="label">Decryption</div>
+        <div class="explanation">
+            This data is encrypted using the server
+            "Initial" traffic key and IV that were
+            generated during the "Initial Traffic Keys
+            Calc" step.  The IV will be modified
+            by XOR'ing it by the count of records that
+            have already been encrypted with this key,
+            which in this case is 0.  The process
+            also takes as input the 24 bytes of header
+            that this packet begins with, as authenticated
+            data that must match for decryption to
+            succeed.
+            <br/><br/>
+            Because the <tt>openssl</tt> command line
+            tool does not yet support AEAD ciphers,
+            I've written command line tools to both
+            <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
+            and <a href="files/aes_128_gcm_encrypt.c" download="aes_128_gcm_encrypt.c">encrypt</a>
+            this data.
+            <codesample>
+<pre><code>### From the "Initial Keys Calc" step
+$ key=d77fc4056fcfa32bd1302469ee6ebf90
+$ iv=fcb748e37ff79860faa07477
+### from this record
+$ recdata=c00000000105635f63696405735f63696400407500
+$ authtag=f0b517a926d62a54a9294136b143b033
+$ recordnum=0
+### may need to add -I and -L flags for include and lib dirs
+$ cc -o aes_128_gcm_decrypt aes_128_gcm_decrypt.c -lssl -lcrypto
+$ cat /tmp/msg1 \
+  | ./aes_128_gcm_decrypt $iv $recordnum $key $recdata $authtag \
+  | hexdump -C
+
+00000000  02 00 42 40 00 00 06 00  40 5a 02 00 00 56 03 03  |..B@....@Z...V..|
+00000010  70 71 72 73 74 75 76 77  78 79 7a 7b 7c 7d 7e 7f  |pqrstuvwxyz{|}~.|
+... snip ...
+</code></pre>
+            </codesample>
+        </div>
+    </div>
+
+%file ../captures/caps/pkt_payload02_sinit0
+    <span class="string decrypted">
+        <span class="label">ACK frame</span>
+        <span class="bytes">
+%next 6
+%bytes
+        </span>
+        <div class="explanation">
+            The server acknowledges receipt of the client's Initial packet 0.
+            <ul>
+            <li><tt>%0</tt> - frame type "ACK"
+            <li><tt>%1</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
+            <li><tt>%2 %3</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of %dd2 * 256 = 147,456 µseconds
+            <li><tt>%4</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (%d4) optionally provided below
+            <li><tt>%5</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            </ul>
+        </div>
+    </span>
+
+    <span class="string decrypted">
+        <span class="label">CRYPTO frame header</span>
+        <span class="bytes">
+%next 4
+%bytes
+        </span>
+        <div class="explanation">
+            <tt>CRYPTO</tt> frames create a single stream of bytes
+            used by TLS to establish a secure connection.
+            <ul>
+            <li><tt>%0</tt> - frame type "CRYPTO"
+            <li><tt>%1</tt> - offset of the crypto stream data being provided (%d0 bytes)
+            <li><tt>%2 %3</tt> - variable length integer (first two bits indicate 2-byte integer)
+                                 showing crypto stream data length of 238 bytes
+            </ul>
+        </div>
+    </span>
+    <span class="string decrypted">
+        <span class="label">ClientHello TLS Record</span>
+        <span class="bytes">
+%next 90
+%bytes
+        </span>
+        <div class="explanation">
+            This record is represented in detail below.
+        </div>
+    </span>
+%empty
+</span>
+</div>
+</div>
+
+<div class="rec-outer">
+<div class="record server embedded">
+<div class="rec-label">TLS: ServerHello</div>
+<div class="rec-explanation">
+    The server says "Hello" back.  The server provides information including the following:
+    <ul>
+    <li>server random data (used later in the handshake)
+    <li>a selected cipher suite
+    <li>a public key for key exchange
+    <li>the negotiated protocol version
+    </ul>
+</div>
+%file ../captures/caps/pkt_payload02_sinit0
+%next 10
+<span class="record-data">
+    <span class="string">
+        <span class="label">TLS Handshake Header</span>
+        <span class="bytes">
+%next 4
+%bytes
+        </span>
+        <div class="explanation">
+            Each TLS handshake message starts with a type and a length.
+            <ul>
+            <li><tt>02</tt> - handshake message type 0x02 (server hello)
+            <li><tt>%1 %2 %3</tt> - %nnn1 bytes of server hello data follows
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Server Version</span>
+        <span class="bytes">
+%next 2
+%bytes
+        </span>
+        <div class="explanation">
+            A protocol version of "3,3" (meaning TLS 1.2)
+            is given.  Because middleboxes have been
+            created and widely deployed that do not
+            allow protocol versions that
+            they do not recognize, all TLS 1.3 sessions
+            indicate version TLS 1.2 in this field.
+            This field is no longer used, instead
+            version negotiation is performed using the
+            "Supported Versions" extension below.
+            <br/><br/>
+            The unusual version number ("3,3" representing
+            TLS 1.2) is due to TLS 1.0 being a minor
+            revision of the SSL 3.0 protocol.  Therefore
+            TLS 1.0 is represented by "3,1", TLS 1.1 is
+            "3,2", and so on.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Server Random</span>
+        <span class="bytes">
+%next 32
+%bytes
+        </span>
+        <div class="explanation">
+            The server provides 32 bytes of random data.  This data will be used later in the session.
+            In this example we've made the random data a predictable string.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Session ID</span>
+        <span class="bytes">
+%next 1
+%bytes
+        </span>
+        <div class="explanation">
+            This is a legacy field and is not used in QUIC.
+            <ul>
+            <li><tt>%0</tt> - %n0 bytes of session ID follow
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Cipher Suite</span>
+        <span class="bytes">
+%next 2
+%bytes
+        </span>
+        <div class="explanation">
+            The server has selected cipher suite 0x1301
+            (TLS_AES_128_GCM_SHA256) from the list of options given by the client.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Compression Method</span>
+        <span class="bytes">
+%next 1
+%bytes
+        </span>
+        <div class="explanation">
+            The server has selected compression method
+            0x00 ("Null", which performs no compression)
+            from the list of options given by the client.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Extensions Length</span>
+        <span class="bytes">
+%next 2
+%bytes
+        </span>
+        <div class="explanation">
+            The server has returned a list of extensions
+            to the client.  Because the server is
+            forbidden from replying with an extension
+            that the client did not send in its hello
+            message, the server knows that the client
+            will understand and support all extensions listed.
+            <ul>
+            <li><tt>%0 %1</tt> - the extensions will take %nn0 bytes of data
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Extension - Key Share</span>
+        <span class="bytes">
+%next 40
+%bytes
+        </span>
+        <div class="explanation">
+            The server sends a public key using the algorithm
+            of the public key sent by the client.  Once this is sent
+            encryption keys can be calculated and the rest of the
+            handshake will be encrypted,
+            unlike previous protocol versions where the
+            handshake was sent in the clear.
+            <ul>
+                <li><tt>00 33</tt> - assigned value for extension "Key Share"
+                <li><tt>%2 %3</tt> - %nn2 bytes of "Key Share" extension data follows
+                <li><tt>00 1d</tt> - assigned value for x25519 (key exchange via curve25519)
+                <li><tt>%6 %7</tt> - %nn6 bytes of public key follows
+                <li><tt>%8 %9 ... %-2 %-1</tt></l> - public key from the step "Server Key Exchange Generation"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Extension - Supported Versions</span>
+        <span class="bytes">
+%next 6
+%bytes
+        </span>
+        <div class="explanation">
+            The server indicates the negotiated TLS version of 1.3.
+            <ul>
+                <li><tt>00 2b</tt> - assigned value for extension "Supported Versions"
+                <li><tt>%2 %3</tt> - %nn2 bytes of "Supported Versions" extension data follows
+                <li><tt>03 04</tt> - assigned value for TLS 1.3
+            </ul>
+        </div>
+    </span>
+</span>
+</div>
+</div>
+%empty

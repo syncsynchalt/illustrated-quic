@@ -9,3 +9,8 @@ quiche/include
 quiche/*.a
 *.dSYM
 *.stamp
+generate/hkdf
+generate/ill-generator
+generate/ill12
+generate/ill13
+generate/index.html.template

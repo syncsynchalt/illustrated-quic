@@ -1,0 +1,33 @@
+    <div class="outerblock">
+    <p>The code for this project can be found
+    <a href="https://github.com/syncsynchalt/illustrated-tls13">on GitHub</a>.</p>
+    </div>
+
+    <div class="outerblock">
+    <p>You may also be interested in the
+    <a href="https://tls.ulfheim.net/">TLS 1.2</a> version of this document.</p>
+    </div>
+
+    <div class="outerblock">
+    <p>If you found this page useful or interesting let me know via Twitter
+    <a href="https://twitter.com/xargsnotbombs">@XargsNotBombs</a>.</p>
+    </div>
+
+</div>
+
+<div id="templates" style="display: none">
+    <div id="closeBtnTmpl">
+        <span class="close" onclick="ill.unselectAllStrings()">×</span>
+    </div>
+    <div id="showCodeTmpl">
+        <button class="show-code" onclick="ill.showCode(this, event)">Show Code</button>
+    </div>
+    <button id="annotateTmpl" class="annotate-toggle"
+        onclick="ill.toggleAnnotate(this.parentElement, event)">Annotations</button>
+</div>
+
+<a class="print-mode" href="#print" onclick="ill.printMode()">
+    [print]
+</a>
+</body>
+</html>
