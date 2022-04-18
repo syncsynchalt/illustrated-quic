@@ -48,7 +48,7 @@ pub:
 
 <div class="rec-outer">
 <div class="calculation client">
-<div class="rec-label">Client Initial Traffic Keys Calc</div>
+<div class="rec-label">Client Initial Keys Calc</div>
 <div class="rec-explanation">
     Next, the client will generate traffic keys for the Initial
     packets.  Because key exchange between client and server has
@@ -198,7 +198,7 @@ ed9895bb15
             <table class="bits">
             <thead><tr>
               <th></th>
-              <th>Bit</th>
+              <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
             <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
@@ -232,7 +232,7 @@ ed9895bb15
 	        The client has not yet received a connection ID chosen
 	        by the server. Instead it uses this field to provide
 	        the 8 bytes of random data for deriving Initial encryption
-	        keys, as explained in "Initial Traffic Keys Calc"
+	        keys, as explained in "Initial Keys Calc"
 	        above.
             <ul>
             <li><tt>%0</tt> - %n0 bytes of connection ID follows

@@ -48,13 +48,13 @@ pub:
 
 <div class="rec-outer">
 <div class="calculation server">
-<div class="rec-label">Server Initial Traffic Keys Calc</div>
+<div class="rec-label">Server Initial Keys Calc</div>
 <div class="rec-explanation">
     Next, the server performs its own calculation of the Initial traffic keys.
     It gets the 8 bytes of random data from the "Destination Connection ID" field
     from the client:
     <pre class="ind2"><tt class="longboi">0001020304050607</tt></pre>
-    and computes the same keys using the method shown in "Client Initial Traffic Keys Calc":
+    and computes the same keys using the method shown in "Client Initial Keys Calc":
     <ul>
     <li>client initial key: <tt class="longboi">b14b918124fda5c8d79847602fa3520b</tt>
     <li>client initial IV: <tt class="longboi">ddbc15dea80925a55686a7df</tt>
@@ -120,7 +120,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             <table class="bits">
             <thead><tr>
               <th></th>
-              <th>Bit</th>
+              <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
             <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
@@ -152,7 +152,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
         </span>
         <div class="explanation">
             The server uses this field to indicate its
-            chosen connection ID to the server.
+            chosen connection ID to the client.
             <ul>
             <li><tt>%0</tt> - %n0 bytes of connection ID follows
             <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>s_cid</tt>"
@@ -279,7 +279,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             by XOR'ing it by the count of records that
             have already been encrypted with this key,
             which in this case is 0.  The process
-            also takes as input the 24 bytes of header
+            also takes as input the 21 bytes of header
             that this packet begins with, as authenticated
             data that must match for decryption to
             succeed.

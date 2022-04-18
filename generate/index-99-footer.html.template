@@ -1,11 +1,11 @@
     <div class="outerblock">
     <p>The code for this project can be found
-    <a href="https://github.com/syncsynchalt/illustrated-tls13">on GitHub</a>.</p>
+    <a href="https://github.com/syncsynchalt/illustrated-quic">on GitHub</a>.</p>
     </div>
 
     <div class="outerblock">
-    <p>You may also be interested in the
-    <a href="https://tls.ulfheim.net/">TLS 1.2</a> version of this document.</p>
+    <p>You may also be interested in a breakdown of
+    <a href="https://tls13.ulfheim.net/">TLS 1.3</a>.</p>
     </div>
 
     <div class="outerblock">

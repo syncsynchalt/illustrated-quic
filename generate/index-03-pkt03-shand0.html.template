@@ -1,6 +1,6 @@
 <div class="rec-outer">
 <div class="calculation server">
-<div class="rec-label">Server Handshake Traffic Keys Calc</div>
+<div class="rec-label">Server Handshake Keys Calc</div>
 <div class="rec-explanation">
     The server now has the information needed to calculate the
     keys used to encrypt Handshake packets.  It uses the following
@@ -157,7 +157,7 @@ ddb7ce7613
             <table class="bits">
             <thead><tr>
               <th></th>
-              <th>Bit</th>
+              <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
             <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
@@ -305,7 +305,7 @@ ddb7ce7613
             by XOR'ing it by the count of records that
             have already been encrypted with this key,
             which in this case is 0.  The process
-            also takes as input the 24 bytes of header
+            also takes as input the 20 bytes of header
             that this packet begins with, as authenticated
             data that must match for decryption to
             succeed.

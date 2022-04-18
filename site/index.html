@@ -80,7 +80,7 @@ pub:
 
 <div class="rec-outer">
 <div class="calculation client">
-<div class="rec-label">Client Initial Traffic Keys Calc</div>
+<div class="rec-label">Client Initial Keys Calc</div>
 <div class="rec-explanation">
     Next, the client will generate traffic keys for the Initial
     packets.  Because key exchange between client and server has
@@ -228,7 +228,7 @@ ed9895bb15
             <table class="bits">
             <thead><tr>
               <th></th>
-              <th>Bit</th>
+              <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
             <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
@@ -260,7 +260,7 @@ ed9895bb15
 	        The client has not yet received a connection ID chosen
 	        by the server. Instead it uses this field to provide
 	        the 8 bytes of random data for deriving Initial encryption
-	        keys, as explained in "Initial Traffic Keys Calc"
+	        keys, as explained in "Initial Keys Calc"
 	        above.
             <ul>
             <li><tt>08</tt> - 8 bytes of connection ID follows
@@ -961,13 +961,13 @@ pub:
 
 <div class="rec-outer">
 <div class="calculation server">
-<div class="rec-label">Server Initial Traffic Keys Calc</div>
+<div class="rec-label">Server Initial Keys Calc</div>
 <div class="rec-explanation">
     Next, the server performs its own calculation of the Initial traffic keys.
     It gets the 8 bytes of random data from the "Destination Connection ID" field
     from the client:
     <pre class="ind2"><tt class="longboi">0001020304050607</tt></pre>
-    and computes the same keys using the method shown in "Client Initial Traffic Keys Calc":
+    and computes the same keys using the method shown in "Client Initial Keys Calc":
     <ul>
     <li>client initial key: <tt class="longboi">b14b918124fda5c8d79847602fa3520b</tt>
     <li>client initial IV: <tt class="longboi">ddbc15dea80925a55686a7df</tt>
@@ -1031,7 +1031,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             <table class="bits">
             <thead><tr>
               <th></th>
-              <th>Bit</th>
+              <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
             <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
@@ -1061,7 +1061,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
         </span>
         <div class="explanation">
             The server uses this field to indicate its
-            chosen connection ID to the server.
+            chosen connection ID to the client.
             <ul>
             <li><tt>05</tt> - 5 bytes of connection ID follows
             <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
@@ -1184,7 +1184,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             by XOR'ing it by the count of records that
             have already been encrypted with this key,
             which in this case is 0.  The process
-            also takes as input the 24 bytes of header
+            also takes as input the 21 bytes of header
             that this packet begins with, as authenticated
             data that must match for decryption to
             succeed.
@@ -1423,7 +1423,7 @@ $ cat /tmp/msg1 \
 </div>
 <div class="rec-outer">
 <div class="calculation server">
-<div class="rec-label">Server Handshake Traffic Keys Calc</div>
+<div class="rec-label">Server Handshake Keys Calc</div>
 <div class="rec-explanation">
     The server now has the information needed to calculate the
     keys used to encrypt Handshake packets.  It uses the following
@@ -1578,7 +1578,7 @@ ddb7ce7613
             <table class="bits">
             <thead><tr>
               <th></th>
-              <th>Bit</th>
+              <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
             <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
@@ -1750,7 +1750,7 @@ ddb7ce7613
             by XOR'ing it by the count of records that
             have already been encrypted with this key,
             which in this case is 0.  The process
-            also takes as input the 24 bytes of header
+            also takes as input the 20 bytes of header
             that this packet begins with, as authenticated
             data that must match for decryption to
             succeed.
@@ -2150,7 +2150,7 @@ $ cat /tmp/msg1 \
 <div class="rec-label">Server Handshake Packet</div>
 <div class="rec-explanation">
     The server continues with another "Handshake" packet. This packet contains
-    the rest of the TLS 1.3 handshake records.
+    the rest of the server's TLS 1.3 handshake records.
 </div>
 <span class="record-data">
     <span class="string">
@@ -2193,7 +2193,7 @@ e54e8fcd38
             <table class="bits">
             <thead><tr>
               <th></th>
-              <th>Bit</th>
+              <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
             <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
@@ -2337,8 +2337,8 @@ e54e8fcd38
             Calc" step.  The IV will be modified
             by XOR'ing it by the count of records that
             have already been encrypted with this key,
-            which in this case is 0.  The process
-            also takes as input the 24 bytes of header
+            which in this case is 1.  The process
+            also takes as input the 20 bytes of header
             that this packet begins with, as authenticated
             data that must match for decryption to
             succeed.
@@ -2532,7 +2532,7 @@ Verified OK
 <div class="rec-label">TLS: Handshake Finished</div>
 <div class="rec-explanation">
     To verify that the handshake was successful and not tampered
-    with, the server calculates verification data that client will
+    with, the server creates verification data that client will
     confirm.  The verification data is built from a hash of all
     handshake messages.
 </div>
@@ -2558,12 +2558,12 @@ Verified OK
         </span>
         <div class="explanation">
             The verify_data is built using the
-            server_secret from the "Server Handshake Traffic Keys Calc"
+            server_secret from the "Server Handshake Keys Calc"
             step and a SHA256 hash of every handshake record
             before this point (ClientHello to CertificateVerify).
 
             <processblock class="notrunc">
-<pre>finished_key = HKDF-Expand-Label(key: server_handshake_traffic_secret, label: "finished", context: "", len: 32)
+<pre>finished_key = HKDF-Expand-Label(key: server_secret, label: "finished", context: "", len: 32)
 finished_hash = SHA256(ClientHello ... CertificateVerify)
 verify_data = HMAC-SHA256(key: finished_key, msg: finished_hash)
 </pre>
@@ -2590,14 +2590,952 @@ $ echo $fin_hash | xxd -r -p \
 </div>
 
 </div> <!-- end of UDP datagram -->
+<div class="rec-outer">
+<div class="calculation client">
+<div class="rec-label">Client Handshake Keys Calc</div>
+<div class="rec-explanation">
+    The client now has the information to calculate the
+    keys that used to encrypt the rest of the handshake.  It uses the following
+    information in this calculation:
+    <ul>
+    <li><a href="files/server-ephemeral-public.key">server public key</a> (from Server Hello)
+    <li><a href="files/client-ephemeral-private.key">client private key</a> (from Client Key Exchange Generation)
+    <li>SHA256 hash of ClientHello and ServerHello</li>
+    </ul>
+    First, the client finds the shared secret, which is the
+    result of the key exchange that allows the client and server
+    to agree on a number.  The client multiplies the server's
+    public key with the client's private key using the curve25519()
+    algorithm. The properties of elliptical curve multiplication will
+    cause this to result in the same number found by the server in its
+    multiplication. The 32-byte result is found to be:
+    <pre class="ind2"><tt class="longboi"
+    >df4a291baa1eb7cfa6934b29b474baad2697e29f1f920dcc77c8a0a088447624</tt></pre>
+
+    I've provided <a href="files/curve25519-mult.c" download="curve25519-mult.c">a tool</a>
+    to perform this calculation:
+    <codesample>
+<pre><code>$ cc -o curve25519-mult curve25519-mult.c
+$ ./curve25519-mult client-ephemeral-private.key \
+                    server-ephemeral-public.key | hexdump
+
+0000000 df 4a 29 1b aa 1e b7 cf a6 93 4b 29 b4 74 ba ad
+0000010 26 97 e2 9f 1f 92 0d cc 77 c8 a0 a0 88 44 76 24
+</code></pre>
+    </codesample>
+    Since the shared secret above is the same number calculated by the
+    server in "Server Handshake Keys Calc", the rest of
+    the calculation is identical and the same values are found:
+    <ul>
+    <li>client handshake key: <tt class="longboi">30a7e816f6a1e1b3434cf39cf4b415e7</tt>
+    <li>client handshake IV: <tt class="longboi">11e70a5d1361795d2bb04465</tt>
+    <li>client handshake header protection key: <tt class="longboi">84b3c21cacaf9f54c885e9a506459079</tt>
+    <li>server handshake key: <tt class="longboi">17abbf0a788f96c6986964660414e7ec</tt>
+    <li>server handshake IV: <tt class="longboi">09597a2ea3b04c00487e71f3</tt>
+    <li>server handshake header protection key: <tt class="longboi">2a18061c396c2828582b41b0910ed536</tt>
+    </ul>
+</div>
+</div>
+</div>
+
+<div class="datagram"><span class="label">UDP Datagram 4</span>
+
+<div class="rec-outer">
+<div class="record client">
+<div class="rec-label">Client Initial Packet</div>
+<div class="rec-explanation">
+    The client sends one more "Initial" packet, containing an ACK
+    for the server's last "Initial" packet.
+</div>
+<span class="record-data">
+    <span class="string">
+        <span class="label">Packet Header Byte</span>
+        <span class="bytes protected">
+ cf
+        </span>
+        <span class="bytes unprotected">
+c0
+        </span>
+        <div class="explanation">
+            <button class="hp-toggle">Disable header protection</button><br>
+            The packet begins with a header byte, which has header protection
+            applied.  Header protection is used to hide packet numbers and other
+            information from outside observers.
+            <br><br>
+            Header protection is applied by encrypting a sample of each packet's
+            payload with the "header protection key", then XOR'ing certain bits
+            and bytes in each packet with the resulting data. For "long" format
+            packets such as this one, the protected sections are the lower 4 bits
+            of this byte, and the bytes of the Packet Number (seen later).
+            <br><br>
+            An example of how to compute header protection:
+            <codesample>
+<pre><code>### "client header protection key" from handshake keys calc step above
+$ key=6df4e9d737cdf714711d7c617ee82981
+### sample is taken from 16 bytes of payload starting
+### 4 bytes past the first byte of the packet number
+$ sample=ed1f7b0555cdb783fbdf5b52724b7d29
+$ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
+
+8f57c29e79
+
+### first byte of result is xor'd into lower 4 bits of this byte,
+### remaining bytes are xor'd one-for-one into the bytes of
+### the packet number (which in this packet is only one byte)
+</code></pre>
+            </codesample>
+            The bits in the unprotected byte 0xC0 have the following meaning:
+            <table class="bits">
+            <thead><tr>
+              <th></th>
+              <th>Val</th>
+              <th>Meaning</th>
+            </tr></thead>
+            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
+            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><tt>00</tt></td><td>Packet type: Initial</td></tr>
+            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+                field below will have length of one byte)</td></tr>
+            </table>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">QUIC Version</span>
+        <span class="bytes">
+ 00 00 00 01
+        </span>
+        <div class="explanation">
+            The version of QUIC is given: version 1.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Destination Connection ID</span>
+        <span class="bytes">
+ 05 73 5f 63 69 64
+        </span>
+        <div class="explanation">
+            The destination connection ID is given. This field
+            allows packets for a connection to be recognized by recipients
+            even if the sender's network address or NAT translation has
+            changed, making it more resilient than the underlying network
+            connection.
+            <ul>
+            <li><tt>05</tt> - 5 bytes of connection ID follows
+            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Source Connection ID</span>
+        <span class="bytes">
+ 05 63 5f 63 69 64
+        </span>
+        <div class="explanation">
+            The source connection ID is given.
+            <ul>
+            <li><tt>05</tt> - 5 bytes of connection ID follows
+            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Token</span>
+        <span class="bytes">
+ 00
+        </span>
+        <div class="explanation">
+            A token is not needed here, and is not sent.
+            <ul>
+            <li><tt>00</tt> - 0 bytes of token data follows
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Packet Length</span>
+        <span class="bytes">
+ 40 17
+        </span>
+        <div class="explanation">
+            The client indicates how many bytes of encrypted payload
+            are in the packet.  This field is a variable length
+            integer - the first two bits of the first byte
+            indicate how many total bytes are in the integer.
+
+            The first byte starts with the two bits "0 1" (0x4), which
+            indicate two bytes.  The remaining bits give the number
+            0x17, or 23.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Packet Number</span>
+        <span class="bytes protected">
+ 56
+        </span>
+        <span class="bytes unprotected">
+        01
+        </span>
+        <div class="explanation">
+            <button class="hp-toggle">Disable header protection</button><br>
+            This byte has header protection applied, see Packet Header Byte for
+            details.
+            <br><br>
+            This byte has the unprotected value of 0x01, indicating it is packet
+            1, or the second "Initial" packet sent by the client.
+            <br><br>
+
+            This data is also potentially truncated. The
+            sending endpoint calculates the spread between
+            the highest packet number sent and the lowest
+            unacknowledged packet number, doubles that
+            spread for safety, rounds up, then figures the
+            number of bytes it can remove from the high
+            bits of the packet number to unambiguously
+            represent a number between those two ends. The
+            encoded packet number is then truncated to that
+            number of bytes, and the receiving endpoint
+            fills in the full number based on the packet
+            numbers it has most recently seen. Because our
+            example conversation sends so few packets (fewer
+            than 64), this truncation won't occur in this
+            document.  See <a
+            href="https://www.rfc-editor.org/rfc/rfc9000.html#section-17.1">RFC
+            9000</a> for details.
+        </div>
+    </span>
+
+    <span class="string encrypted">
+        <span class="label">Encrypted Data</span>
+        <span class="bytes">
+ 6e 1f 98 ed 1f 7b
+        </span>
+        <div class="explanation">
+            This data is encrypted with the client "Initial" traffic key.
+        </div>
+    </span>
+    <span class="string">
+        <span class="label">Auth Tag</span>
+        <span class="bytes">
+ 05 55 cd b7 83 fb df 5b 52 72 4b 7d 29 f0 af e3
+        </span>
+        <div class="explanation">
+            This is the AEAD authentication tag
+            that confirms the integrity of the
+            encrypted data and the packet header.
+        </div>
+    </span>
+
+    <div class="decryption">
+        <div class="label">Decryption</div>
+        <div class="explanation">
+            This data is encrypted using the client
+            "Initial" traffic key and IV that were
+            generated during the "Initial Traffic Keys
+            Calc" step.  The IV will be modified
+            by XOR'ing it by the count of records that
+            have already been encrypted with this key,
+            which in this case is 1.  The process
+            also takes as input the 21 bytes of header
+            that this packet begins with, as authenticated
+            data that must match for decryption to
+            succeed.
+            <br/><br/>
+            Because the <tt>openssl</tt> command line
+            tool does not yet support AEAD ciphers,
+            I've written command line tools to both
+            <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
+            and <a href="files/aes_128_gcm_encrypt.c" download="aes_128_gcm_encrypt.c">encrypt</a>
+            this data.
+            <codesample>
+<pre><code>### from the "Initial Keys Calc" step
+$ key=b14b918124fda5c8d79847602fa3520b
+$ iv=ddbc15dea80925a55686a7df
+### from this record
+$ recdata=c00000000105735f63696405635f63696400401701
+$ authtag=0555cdb783fbdf5b52724b7d29f0afe3
+$ recordnum=1
+### may need to add -I and -L flags for include and lib dirs
+$ cc -o aes_128_gcm_decrypt aes_128_gcm_decrypt.c -lssl -lcrypto
+$ cat /tmp/msg1 \
+  | ./aes_128_gcm_decrypt $iv $recordnum $key $recdata $authtag \
+  | hexdump -C
+
+00000000  02 00 40 81 00 00                                 |..@...|
+</code></pre>
+            </codesample>
+        </div>
+    </div>
+
+    <span class="string decrypted">
+        <span class="label">ACK frame</span>
+        <span class="bytes">
+ 02 00 40 81 00 00
+        </span>
+        <div class="explanation">
+            The server acknowledges receipt of the client's Initial packet 0.
+            <ul>
+            <li><tt>02</tt> - frame type "ACK"
+            <li><tt>00</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
+            <li><tt>40 81</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of 16513 * 256 = 33,024 µseconds
+            <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
+            <li><tt>00</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            </ul>
+        </div>
+    </span>
+</span>
+</div>
+</div>
+<div class="rec-outer">
+<div class="record client">
+<div class="rec-label">Client Handshake Packet</div>
+<div class="rec-explanation">
+    The client sends a "Handshake" packet, containing an ACK
+    for the server's last "Handshake" packet.
+</div>
+<span class="record-data">
+    <span class="string">
+        <span class="label">Packet Header Byte</span>
+        <span class="bytes protected">
+ ee
+        </span>
+        <span class="bytes unprotected">
+e0
+        </span>
+        <div class="explanation">
+            <button class="hp-toggle">Disable header protection</button><br>
+            The packet begins with a header byte, which has header protection
+            applied.  Header protection is used to hide packet numbers and other
+            information from outside observers.
+            <br><br>
+            Header protection is applied by encrypting a sample of each packet's
+            payload with the "header protection key", then XOR'ing certain bits
+            and bytes in each packet with the resulting data. For "long" format
+            packets such as this one, the protected sections are the lower 4 bits
+            of this byte, and the bytes of the Packet Number (seen later).
+            <br><br>
+            An example of how to compute header protection:
+            <codesample>
+<pre><code>### "client header protection key" from handshake keys calc step above
+$ key=84b3c21cacaf9f54c885e9a506459079
+### sample is taken from 16 bytes of payload starting
+### 4 bytes past the first byte of the packet number
+$ sample=c6cc12512d7eda141ec057b804d30feb
+$ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
+
+5e8c3ee850
+
+### first byte of result is xor'd into lower 4 bits of this byte,
+### remaining bytes are xor'd one-for-one into the bytes of
+### the packet number (which in this packet is only one byte)
+</code></pre>
+            </codesample>
+            The bits in the unprotected byte 0xE0 have the following meaning:
+            <table class="bits">
+            <thead><tr>
+              <th></th>
+              <th>Val</th>
+              <th>Meaning</th>
+            </tr></thead>
+            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
+            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><tt>10</tt></td><td>Packet type: Handshake</td></tr>
+            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+                field below will have length of one byte)</td></tr>
+            </table>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">QUIC Version</span>
+        <span class="bytes">
+ 00 00 00 01
+        </span>
+        <div class="explanation">
+            The version of QUIC is given: version 1.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Destination Connection ID</span>
+        <span class="bytes">
+ 05 73 5f 63 69 64
+        </span>
+        <div class="explanation">
+            The destination connection ID is given. This field
+            allows packets for a connection to be recognized by recipients
+            even if the sender's network address or NAT translation has
+            changed, making it more resilient than the underlying network
+            connection.
+            <ul>
+            <li><tt>05</tt> - 5 bytes of connection ID follows
+            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Source Connection ID</span>
+        <span class="bytes">
+ 05 63 5f 63 69 64
+        </span>
+        <div class="explanation">
+            The source connection ID is given.
+            <ul>
+            <li><tt>05</tt> - 5 bytes of connection ID follows
+            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Packet Length</span>
+        <span class="bytes">
+ 40 16
+        </span>
+        <div class="explanation">
+            The client indicates how many bytes of encrypted payload
+            are in the packet.  This field is a variable length
+            integer - the first two bits of the first byte
+            indicate how many total bytes are in the integer.
+
+            The first byte starts with the two bits "0 1" (0x4), which
+            indicate two bytes.  The remaining bits give the number
+            0x16, or 22.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Packet Number</span>
+        <span class="bytes protected">
+ 8c
+        </span>
+        <span class="bytes unprotected">
+        00
+        </span>
+        <div class="explanation">
+            <button class="hp-toggle">Disable header protection</button><br>
+            This byte has header protection applied, see Packet Header Byte for
+            details.
+            <br><br>
+            This byte has the unprotected value of 0x00, indicating it is packet
+            0, or the first "Handshake" packet sent by the client.
+            <br><br>
+
+            This data is also potentially truncated. The
+            sending endpoint calculates the spread between
+            the highest packet number sent and the lowest
+            unacknowledged packet number, doubles that
+            spread for safety, rounds up, then figures the
+            number of bytes it can remove from the high
+            bits of the packet number to unambiguously
+            represent a number between those two ends. The
+            encoded packet number is then truncated to that
+            number of bytes, and the receiving endpoint
+            fills in the full number based on the packet
+            numbers it has most recently seen. Because our
+            example conversation sends so few packets (fewer
+            than 64), this truncation won't occur in this
+            document.  See <a
+            href="https://www.rfc-editor.org/rfc/rfc9000.html#section-17.1">RFC
+            9000</a> for details.
+        </div>
+    </span>
+
+    <span class="string encrypted">
+        <span class="label">Encrypted Data</span>
+        <span class="bytes">
+ b1 95 1f c6 cc
+        </span>
+        <div class="explanation">
+            This data is encrypted with the client "Handshake" traffic key.
+        </div>
+    </span>
+    <span class="string">
+        <span class="label">Auth Tag</span>
+        <span class="bytes">
+ 12 51 2d 7e da 14 1e c0 57 b8 04 d3 0f eb 51 5b
+        </span>
+        <div class="explanation">
+            This is the AEAD authentication tag
+            that confirms the integrity of the
+            encrypted data and the packet header.
+        </div>
+    </span>
+
+    <div class="decryption">
+        <div class="label">Decryption</div>
+        <div class="explanation">
+            This data is encrypted using the client
+            "Handshake" traffic key and IV that were
+            generated during the "Handshake Traffic Keys
+            Calc" step.  The IV will be modified
+            by XOR'ing it by the count of records that
+            have already been encrypted with this key,
+            which in this case is 0.  The process
+            also takes as input the 20 bytes of header
+            that this packet begins with, as authenticated
+            data that must match for decryption to
+            succeed.
+            <br/><br/>
+            Because the <tt>openssl</tt> command line
+            tool does not yet support AEAD ciphers,
+            I've written command line tools to both
+            <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
+            and <a href="files/aes_128_gcm_encrypt.c" download="aes_128_gcm_encrypt.c">encrypt</a>
+            this data.
+            <codesample>
+<pre><code>### from the "Handshake Keys Calc" step
+$ key=30a7e816f6a1e1b3434cf39cf4b415e7
+$ iv=11e70a5d1361795d2bb04465
+### from this record
+$ recdata=e00000000105735f63696405635f636964401600
+$ authtag=12512d7eda141ec057b804d30feb515b
+$ recordnum=0
+### may need to add -I and -L flags for include and lib dirs
+$ cc -o aes_128_gcm_decrypt aes_128_gcm_decrypt.c -lssl -lcrypto
+$ cat /tmp/msg1 \
+  | ./aes_128_gcm_decrypt $iv $recordnum $key $recdata $authtag \
+  | hexdump -C
+
+00000000  02 00 20 00 00                                    |.. ..|
+</code></pre>
+            </codesample>
+        </div>
+    </div>
+
+    <span class="string decrypted">
+        <span class="label">ACK frame</span>
+        <span class="bytes">
+ 02 00 20 00 00
+        </span>
+        <div class="explanation">
+            The client acknowledges receipt of the server's Handshake packet 0.
+            <ul>
+            <li><tt>02</tt> - frame type "ACK"
+            <li><tt>00</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
+            <li><tt>20</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of 8192 * 256 = 8,192 µseconds
+            <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
+            <li><tt>00</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            </ul>
+        </div>
+    </span>
+</span>
+</div>
+</div>
+
+<div class="rec-outer">
+<div class="record client">
+<div class="rec-label">Padding</div>
+<div class="rec-explanation">
+    Any datagram sent by the client that contains an Initial packet
+    must be padded to a length of 1200 bytes.  This is done by adding
+    "Padding" frames, which start with a 0x00 byte and have a length of
+    one byte.
+</div>
+<span class="record-data">
+    <span class="string">
+        <span class="label">Padding Bytes</span>
+        <span class="bytes">
+
+ 00 00 00 00 00 00 00 00
+... snip ...
+ 00 00 00 00 00 00 00 00
+        </span>
+        <div class="explanation">
+            Padding this packet to a size of 1200 bytes serves two purposes:
+            <ul>
+
+            <li><b>Path MTU validation</b> - Any IPv4 host or
+            router is allowed to drop packets
+            that exceed their MTU limit, to a minimum of
+            576 bytes. The vast majority of the internet
+            has a much higher MTU (typically 1500 bytes). A higher
+            packet size will increase throughput and
+            performance. Given these realities QUIC chooses
+            a minimum size constraint of 1200 bytes, which
+            should traverse the vast majority of real
+            networks (including tunneled networks)
+            without being dropped for size.
+            <br>
+            To prevent a scenario where a connection is established
+            successfully with smaller packets but then starts timing out
+            once larger packets are sent, the initial packets are
+            padded to a length of 1200 bytes to prove that the
+            end-to-end path will allow packets of that size.
+
+            <li><b>Amplification Attack Mitigation</b> - There is a class
+            of network attack in which an attacker
+            can send a small amount of traffic to an innocent third party
+            which replies with a much larger amount of traffic directed
+            at the target. In the case of QUIC this could be done with
+            IP address spoofing, and would cause QUIC servers to reply
+            to small Initial datagrams with much larger Handshake responses.
+            <br>
+            To help mitigate this, QUIC servers are forbidden from replying to a
+            client with more than 3 times the traffic that was sent to it,
+            until the server has received some proof from the client that
+            it's at the given address (such as round-trip data originally from the server).
+            Adding padding to this Initial datagram gives the server a "byte budget"
+            to perform handshake responses without exceeding this 3x limit.
+        </div>
+    </span>
+</span>
+</div>
+</div>
+
+</div> <!-- end of UDP datagram -->
+<div class="datagram"><span class="label">UDP Datagram 5</span>
+
+<div class="rec-outer">
+<div class="record client">
+<div class="rec-label">Client Handshake Packet</div>
+<div class="rec-explanation">
+    The client sends a "Handshake" packet, containing the client's
+    "Handshake Finished" TLS record, completing the handshake process.
+</div>
+<span class="record-data">
+    <span class="string">
+        <span class="label">Packet Header Byte</span>
+        <span class="bytes protected">
+ e0
+        </span>
+        <span class="bytes unprotected">
+e0
+        </span>
+        <div class="explanation">
+            <button class="hp-toggle">Disable header protection</button><br>
+            The packet begins with a header byte, which has header protection
+            applied.  Header protection is used to hide packet numbers and other
+            information from outside observers.
+            <br><br>
+            Header protection is applied by encrypting a sample of each packet's
+            payload with the "header protection key", then XOR'ing certain bits
+            and bytes in each packet with the resulting data. For "long" format
+            packets such as this one, the protected sections are the lower 4 bits
+            of this byte, and the bytes of the Packet Number (seen later).
+            <br><br>
+            An example of how to compute header protection:
+            <codesample>
+<pre><code>### "client header protection key" from handshake keys calc step above
+$ key=84b3c21cacaf9f54c885e9a506459079
+### sample is taken from 16 bytes of payload starting
+### 4 bytes past the first byte of the packet number
+$ sample=9da7e61daa07732aa10b5fbd11a00a62
+$ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
+
+b0b3b06690
+
+### first byte of result is xor'd into lower 4 bits of this byte,
+### remaining bytes are xor'd one-for-one into the bytes of
+### the packet number (which in this packet is only one byte)
+</code></pre>
+            </codesample>
+            The bits in the unprotected byte 0xE0 have the following meaning:
+            <table class="bits">
+            <thead><tr>
+              <th></th>
+              <th>Val</th>
+              <th>Meaning</th>
+            </tr></thead>
+            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
+            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><tt>10</tt></td><td>Packet type: Handshake</td></tr>
+            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+                field below will have length of one byte)</td></tr>
+            </table>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">QUIC Version</span>
+        <span class="bytes">
+ 00 00 00 01
+        </span>
+        <div class="explanation">
+            The version of QUIC is given: version 1.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Destination Connection ID</span>
+        <span class="bytes">
+ 05 73 5f 63 69 64
+        </span>
+        <div class="explanation">
+            The destination connection ID is given. This field
+            allows packets for a connection to be recognized by recipients
+            even if the sender's network address or NAT translation has
+            changed, making it more resilient than the underlying network
+            connection.
+            <ul>
+            <li><tt>05</tt> - 5 bytes of connection ID follows
+            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Source Connection ID</span>
+        <span class="bytes">
+ 05 63 5f 63 69 64
+        </span>
+        <div class="explanation">
+            The source connection ID is given.
+            <ul>
+            <li><tt>05</tt> - 5 bytes of connection ID follows
+            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Packet Length</span>
+        <span class="bytes">
+ 40 3f
+        </span>
+        <div class="explanation">
+            The client indicates how many bytes of encrypted payload
+            are in the packet.  This field is a variable length
+            integer - the first two bits of the first byte
+            indicate how many total bytes are in the integer.
+
+            The first byte starts with the two bits "0 1" (0x4), which
+            indicate two bytes.  The remaining bits give the number
+            0x3f, or 63.
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Packet Number</span>
+        <span class="bytes protected">
+ b2
+        </span>
+        <span class="bytes unprotected">
+        01
+        </span>
+        <div class="explanation">
+            <button class="hp-toggle">Disable header protection</button><br>
+            This byte has header protection applied, see Packet Header Byte for
+            details.
+            <br><br>
+            This byte has the unprotected value of 0x01, indicating it is packet
+            1, or the second "Handshake" packet sent by the client.
+            <br><br>
+
+            This data is also potentially truncated. The
+            sending endpoint calculates the spread between
+            the highest packet number sent and the lowest
+            unacknowledged packet number, doubles that
+            spread for safety, rounds up, then figures the
+            number of bytes it can remove from the high
+            bits of the packet number to unambiguously
+            represent a number between those two ends. The
+            encoded packet number is then truncated to that
+            number of bytes, and the receiving endpoint
+            fills in the full number based on the packet
+            numbers it has most recently seen. Because our
+            example conversation sends so few packets (fewer
+            than 64), this truncation won't occur in this
+            document.  See <a
+            href="https://www.rfc-editor.org/rfc/rfc9000.html#section-17.1">RFC
+            9000</a> for details.
+        </div>
+    </span>
+
+    <span class="string encrypted">
+        <span class="label">Encrypted Data</span>
+        <span class="bytes">
+ 5e 1e 45 9d a7 e6 1d aa 07 73 2a a1 0b 5f bd 11 a0 0a 62 0b f5 e1 27 e3 7b 81 bb 10 f1 1c 31 2e
+ 7f 9c 04 a4 3c d5 30 f3 d9 81 d5 02 3a bd
+        </span>
+        <div class="explanation">
+            This data is encrypted with the client "Handshake" traffic key.
+        </div>
+    </span>
+    <span class="string">
+        <span class="label">Auth Tag</span>
+        <span class="bytes">
+ 5e 98 f2 2d c6 f2 59 79 91 9b ad 30 2f 44 8c 0a
+        </span>
+        <div class="explanation">
+            This is the AEAD authentication tag
+            that confirms the integrity of the
+            encrypted data and the packet header.
+        </div>
+    </span>
+
+    <div class="decryption">
+        <div class="label">Decryption</div>
+        <div class="explanation">
+            This data is encrypted using the client
+            "Handshake" traffic key and IV that were
+            generated during the "Handshake Traffic Keys
+            Calc" step.  The IV will be modified
+            by XOR'ing it by the count of records that
+            have already been encrypted with this key,
+            which in this case is 0.  The process
+            also takes as input the 20 bytes of header
+            that this packet begins with, as authenticated
+            data that must match for decryption to
+            succeed.
+            <br/><br/>
+            Because the <tt>openssl</tt> command line
+            tool does not yet support AEAD ciphers,
+            I've written command line tools to both
+            <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
+            and <a href="files/aes_128_gcm_encrypt.c" download="aes_128_gcm_encrypt.c">encrypt</a>
+            this data.
+            <codesample>
+<pre><code>### from the "Handshake Keys Calc" step
+$ key=30a7e816f6a1e1b3434cf39cf4b415e7
+$ iv=11e70a5d1361795d2bb04465
+### from this record
+$ recdata=e00000000105735f63696405635f636964403f01
+$ authtag=5e98f22dc6f25979919bad302f448c0a
+$ recordnum=1
+### may need to add -I and -L flags for include and lib dirs
+$ cc -o aes_128_gcm_decrypt aes_128_gcm_decrypt.c -lssl -lcrypto
+$ cat /tmp/msg1 \
+  | ./aes_128_gcm_decrypt $iv $recordnum $key $recdata $authtag \
+  | hexdump -C
+
+00000000  02 01 40 46 00 01 06 00  40 24 14 00 00 20 50 ff  |..@F....@$... P.|
+00000010  b0 c1 a4 25 c6 41 89 1c  98 3d 12 67 26 02 6d 3d  |...%.A...=.g&.m=|
+00000020  b2 8e a3 51 0b dc 20 54  fc d6 37 ed ca cc        |...Q.. T..7...|
+</code></pre>
+            </codesample>
+        </div>
+    </div>
+
+    <span class="string decrypted">
+        <span class="label">ACK frame</span>
+        <span class="bytes">
+ 02 01 40 46 00 01
+        </span>
+        <div class="explanation">
+            The client acknowledges receipt of the server's Handshake packet 1.
+            <ul>
+            <li><tt>02</tt> - frame type "ACK"
+            <li><tt>01</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
+            <li><tt>40 46</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of 16454 * 256 = 17,920 µseconds
+            <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
+            <li><tt>01</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            </ul>
+        </div>
+    </span>
+
+    <span class="string decrypted">
+        <span class="label">CRYPTO frame header</span>
+        <span class="bytes">
+ 06 00 40 24
+        </span>
+        <div class="explanation">
+            Each QUIC packet contains a list of one or more
+            frames in its payload. This packet only contains
+            one frame, a <tt>CRYPTO</tt> frame.
+            <br>
+            <tt>CRYPTO</tt> frames create a single stream of bytes
+            used by TLS to establish a secure connection.
+            <ul>
+            <li><tt>06</tt> - frame type "CRYPTO"
+            <li><tt>00</tt> - offset of the crypto stream data being provided (6 bytes)
+            <li><tt>40 24</tt> - variable length integer (first two bits indicate 2-byte integer)
+                                 showing crypto stream data length of 36 bytes
+            </ul>
+        </div>
+    </span>
+    <span class="string decrypted">
+        <span class="label">ClientHello TLS Record</span>
+        <span class="bytes">
+ 14 00 00 20 50 ff b0 c1 a4 25 c6 41 89 1c 98 3d 12 67 26 02 6d 3d b2 8e a3 51 0b dc 20 54 fc d6
+ 37 ed ca cc
+        </span>
+        <div class="explanation">
+            This record is represented in detail below.
+        </div>
+    </span>
+</span>
+</div>
+</div>
+
+<div class="rec-outer">
+<div class="record client embedded">
+<div class="rec-label">TLS: Handshake Finished</div>
+<div class="rec-explanation">
+    To verify that the handshake was successful and not tampered
+    with, the client creates verification data that the
+    server will confirm. The verification data is built from a hash
+    of all handshake messages.
+</div>
+<span class="record-data">
+    <span class="string">
+        <span class="label">TLS Handshake Header</span>
+        <span class="bytes">
+ 14 00 00 20
+        </span>
+        <div class="explanation">
+            Each TLS handshake message starts with a type and a length.
+            <ul>
+            <li><tt>14</tt> - handshake message type 0x14 (finished)
+            <li><tt>00 00 20</tt> - 0x20 (32) bytes of handshake finished data follow
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Verify Data</span>
+        <span class="bytes">
+ 50 ff b0 c1 a4 25 c6 41 89 1c 98 3d 12 67 26 02 6d 3d b2 8e a3 51 0b dc 20 54 fc d6 37 ed ca cc
+        </span>
+        <div class="explanation">
+            The verify_data is built using the
+            client_secret from
+            the "Handshake Keys Calc" step and
+            a SHA256 hash of every handshake record
+            before this point (Client Hello to Server Finished).
+
+            <processblock class="notrunc">
+<pre>finished_key = HKDF-Expand-Label(key: client_secret, label: "finished", context: "", len: 32)
+finished_hash = SHA256(ClientHello ... ServerFinished)
+verify_data = HMAC-SHA256(key: finished_key, msg: finished_hash)
+</pre>
+            </processblock>
+
+            We can use <a href="files/hkdf.sh" download="hkdf">the HKDF
+            tool</a> to reproduce this on the command line.
+            <codesample>
+<pre><code>### find the hash of the conversation to this point, excluding
+### QUIC frame headers
+$ fin_hash=$(cat crypto_clienthello crypto_serverhello crypto_extensions \
+  crypto_cert crypto_certverify crypto_s_finished | openssl sha256)
+$ cht_secret=b8902ab5f9fe52fdec3aea54e9293e4b8eabf955fcd88536bf44b8b584f14982
+$ fin_key=$(./hkdf expandlabel $cht_secret "finished" "" 32)
+$ echo $fin_hash | xxd -r -p \
+    | openssl dgst -sha256 -mac HMAC -macopt hexkey:$fin_key
+
+50ffb0c1a425c641891c983d126726026d3db28ea3510bdc2054fcd637edcacc
+</code></pre>
+            </codesample>
+        </div>
+    </span>
+</div>
+</div>
     <div class="outerblock">
     <p>The code for this project can be found
-    <a href="https://github.com/syncsynchalt/illustrated-tls13">on GitHub</a>.</p>
+    <a href="https://github.com/syncsynchalt/illustrated-quic">on GitHub</a>.</p>
     </div>
 
     <div class="outerblock">
-    <p>You may also be interested in the
-    <a href="https://tls.ulfheim.net/">TLS 1.2</a> version of this document.</p>
+    <p>You may also be interested in a breakdown of
+    <a href="https://tls13.ulfheim.net/">TLS 1.3</a>.</p>
     </div>
 
     <div class="outerblock">
