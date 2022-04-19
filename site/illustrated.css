@@ -310,10 +310,12 @@ tt.longboi {
 
 .record .decryption > .label:before {
     content: "⬇ ";
+    font-weight: bold;
     color: #888;
 }
 .record .decryption > .label:after {
     content: " ⬇";
+    font-weight: bold;
     color: #888;
 }
 

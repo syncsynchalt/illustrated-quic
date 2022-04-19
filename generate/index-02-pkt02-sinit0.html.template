@@ -3,7 +3,7 @@
 <div class="rec-label">Server Key Exchange Generation</div>
 <div class="rec-explanation">
     The server creates its own private/public keypair
-    for key exchange.  Key exchange is a mathematic technique
+    for key exchange.  Key exchange is a mathematical technique
     by which two parties can agree on the same number without
     an eavesdropper being able to tell what that number is.
     <br/><br/>

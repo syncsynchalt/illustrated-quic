@@ -16,7 +16,7 @@ ill13:
 site: ill-generator hkdf ill12 ill13
 	mkdir -p ../site/
 	/bin/echo -n '' > ../site/index.html
-	for i in index-*; do \
+	for i in index-*.template; do \
 		./ill-generator < $$i >> ../site/index.html || exit 1; \
 	done
 	./ill-generator < certificate.html.template > ../site/certificate.html

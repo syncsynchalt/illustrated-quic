@@ -541,7 +541,6 @@ $ cat /tmp/msg1 \
 <div class="rec-outer">
 <div class="record server embedded">
 <div class="rec-label">TLS: Certificate</div>
-<img class="illustration" src="images/key3.png" width="130" height="250"/>
 <div class="rec-explanation">
     The server sends one or more certificates:
     <ul>
