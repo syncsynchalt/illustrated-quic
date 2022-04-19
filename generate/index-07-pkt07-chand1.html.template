@@ -1,6 +1,7 @@
 <div class="rec-outer">
 <div class="calculation server">
 <div class="rec-label">Server Application Keys Calc</div>
+<img class="illustration" src="images/key7.png" width="116" height="250"/>
 <div class="rec-explanation">
     The server now has the information to calculate the
     keys used to encrypt application traffic.
@@ -90,6 +91,7 @@ chp: 8a6a38bc5cc40cb482a254dac68c9d2f
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Application Keys Calc</div>
+<img class="illustration" src="images/key8.png" width="97" height="250"/>
 <div class="rec-explanation">
     The client has the information to calculate the
     keys used to encrypt application traffic.

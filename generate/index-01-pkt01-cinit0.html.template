@@ -1,6 +1,7 @@
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Key Exchange Generation</div>
+<img class="illustration" src="images/key1.png" width="135" height="250"/>
 <div class="rec-explanation">
     The connection begins with the client creating a private/public
     keypair for key exchange.  Key exchange is a mathematical technique
@@ -49,6 +50,7 @@ pub:
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Initial Keys Calc</div>
+<img class="illustration" src="images/key2.png" width="124" height="250"/>
 <div class="rec-explanation">
     Next, the client will generate traffic keys for the Initial
     packets.  Because key exchange between client and server has

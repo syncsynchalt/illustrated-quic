@@ -33,6 +33,7 @@
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Key Exchange Generation</div>
+<img class="illustration" src="images/key1.png" width="135" height="250"/>
 <div class="rec-explanation">
     The connection begins with the client creating a private/public
     keypair for key exchange.  Key exchange is a mathematical technique
@@ -81,6 +82,7 @@ pub:
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Initial Keys Calc</div>
+<img class="illustration" src="images/key2.png" width="124" height="250"/>
 <div class="rec-explanation">
     Next, the client will generate traffic keys for the Initial
     packets.  Because key exchange between client and server has
@@ -914,6 +916,7 @@ $ cat /tmp/msg1 \
 <div class="rec-outer">
 <div class="calculation server">
 <div class="rec-label">Server Key Exchange Generation</div>
+<img class="illustration" src="images/key3.png" width="130" height="250"/>
 <div class="rec-explanation">
     The server creates its own private/public keypair
     for key exchange.  Key exchange is a mathematical technique
@@ -962,6 +965,7 @@ pub:
 <div class="rec-outer">
 <div class="calculation server">
 <div class="rec-label">Server Initial Keys Calc</div>
+<img class="illustration" src="images/key4.png" width="106" height="250"/>
 <div class="rec-explanation">
     Next, the server performs its own calculation of the Initial traffic keys.
     It gets the 8 bytes of random data from the "Destination Connection ID" field
@@ -1424,6 +1428,7 @@ $ cat /tmp/msg1 \
 <div class="rec-outer">
 <div class="calculation server">
 <div class="rec-label">Server Handshake Keys Calc</div>
+<img class="illustration" src="images/key5.png" width="124" height="250"/>
 <div class="rec-explanation">
     The server now has the information needed to calculate the
     keys used to encrypt Handshake packets.  It uses the following
@@ -2592,6 +2597,7 @@ $ echo $fin_hash | xxd -r -p \
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Handshake Keys Calc</div>
+<img class="illustration" src="images/key6.png" width="105" height="250"/>
 <div class="rec-explanation">
     The client now has the information to calculate the
     keys that used to encrypt the rest of the handshake.  It uses the following
@@ -3193,6 +3199,7 @@ $ cat /tmp/msg1 \
 <div class="rec-outer">
 <div class="calculation server">
 <div class="rec-label">Server Application Keys Calc</div>
+<img class="illustration" src="images/key7.png" width="116" height="250"/>
 <div class="rec-explanation">
     The server now has the information to calculate the
     keys used to encrypt application traffic.
@@ -3282,6 +3289,7 @@ chp: 8a6a38bc5cc40cb482a254dac68c9d2f
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Application Keys Calc</div>
+<img class="illustration" src="images/key8.png" width="97" height="250"/>
 <div class="rec-explanation">
     The client has the information to calculate the
     keys used to encrypt application traffic.

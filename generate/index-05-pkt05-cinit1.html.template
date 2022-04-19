@@ -1,6 +1,7 @@
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Handshake Keys Calc</div>
+<img class="illustration" src="images/key6.png" width="105" height="250"/>
 <div class="rec-explanation">
     The client now has the information to calculate the
     keys that used to encrypt the rest of the handshake.  It uses the following

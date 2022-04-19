@@ -1,6 +1,7 @@
 <div class="rec-outer">
 <div class="calculation server">
 <div class="rec-label">Server Key Exchange Generation</div>
+<img class="illustration" src="images/key3.png" width="130" height="250"/>
 <div class="rec-explanation">
     The server creates its own private/public keypair
     for key exchange.  Key exchange is a mathematical technique
@@ -49,6 +50,7 @@ pub:
 <div class="rec-outer">
 <div class="calculation server">
 <div class="rec-label">Server Initial Keys Calc</div>
+<img class="illustration" src="images/key4.png" width="106" height="250"/>
 <div class="rec-explanation">
     Next, the server performs its own calculation of the Initial traffic keys.
     It gets the 8 bytes of random data from the "Destination Connection ID" field
