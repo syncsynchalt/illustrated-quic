@@ -11,6 +11,21 @@
     <link rel="stylesheet" href="frombootstrap.css"/>
     <link rel="stylesheet" href="illustrated.css"/>
     <script src="illustrated.js"></script>
+
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="https://quic.ulfheim.net/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="The Illustrated QUIC Connection">
+    <meta property="og:description" content="Every byte of a QUIC connection explained and reproduced">
+    <meta property="og:image" content="https://quic.ulfheim.net/images/og.png">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="quic.ulfheim.net">
+    <meta property="twitter:url" content="https://quic.ulfheim.net/">
+    <meta name="twitter:title" content="The Illustrated QUIC Connection">
+    <meta name="twitter:description" content="Every byte of a QUIC connection explained and reproduced">
+    <meta name="twitter:image" content="https://quic.ulfheim.net/images/og.png">
 </head>
 
 <body class="illustrated">
@@ -435,7 +450,7 @@ $ cat /tmp/msg1 \
         </span>
         <div class="explanation">
             Each QUIC packet contains a list of one or more
-            frames in its payload. This packet contains only0:w
+            frames in its payload. This packet contains only
             one frame, a <tt>CRYPTO</tt> frame.
             <br><br>
             <tt>CRYPTO</tt> frames create a single stream of bytes

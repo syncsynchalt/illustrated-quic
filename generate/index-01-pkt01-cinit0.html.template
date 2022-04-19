@@ -410,7 +410,7 @@ $ cat /tmp/msg1 \
         </span>
         <div class="explanation">
             Each QUIC packet contains a list of one or more
-            frames in its payload. This packet contains only0:w
+            frames in its payload. This packet contains only
             one frame, a <tt>CRYPTO</tt> frame.
             <br><br>
             <tt>CRYPTO</tt> frames create a single stream of bytes
