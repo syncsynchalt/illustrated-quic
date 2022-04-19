@@ -364,10 +364,12 @@ processblock {
     margin: 1em;
     padding-left: 1em;
     font-size: 0.9em;
-    max-height: 150px;
+    /* max-height: 150px; */
     overflow: hidden;
     transition: all 0.3s;
     cursor-style: pointer;
+
+    font-size: 0.8em;
 }
 
 processblock:before {
@@ -379,6 +381,7 @@ processblock:before {
     top: 0;
     pointer-events: none;
 }
+/*
 .server processblock:before {
     background: linear-gradient(rgba(255,255,255,0) 100px, #D0E8F5);
 }
@@ -388,11 +391,13 @@ processblock:before {
 .explanation processblock:before {
     background: linear-gradient(rgba(255,255,255,0) 125px, #FAF7DC);
 }
+*/
 
 processblock pre {
     margin: 0;
 }
 
+/*
 processblock.clicked,
 processblock.notrunc {
     max-height: 99999px;
@@ -402,6 +407,7 @@ processblock.clicked:before,
 processblock.notrunc:before {
     background: none;
 }
+*/
 
 /***** codesample *****/
 

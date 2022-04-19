@@ -12,7 +12,7 @@
     elliptical curve method, using the x25519 curve.
     <br/><br/>
     The private key is chosen by selecting an integer between
-    0 and 2<sup>256</sup>-1.  It does this by generating 32
+    0 and 2<sup>256</sup>-1.  The server does this by generating 32
     bytes (256 bits) of random data.  The
     <a href="files/server-ephemeral-private.key" download="server-ephemeral-private.key">private key</a>
     selected is:
@@ -54,7 +54,7 @@ pub:
 <div class="rec-explanation">
     Next, the server performs its own calculation of the Initial traffic keys.
     It gets the 8 bytes of random data from the "Destination Connection ID" field
-    from the client:
+    from the client's first Initial packet:
     <pre class="ind2"><tt class="longboi">0001020304050607</tt></pre>
     and computes the same keys using the method shown in "Client Initial Keys Calc":
     <ul>
@@ -153,11 +153,10 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
 %bytes
         </span>
         <div class="explanation">
-            The server uses this field to indicate its
-            chosen connection ID to the client.
+            The client's chosen connection ID is repeated back to it.
             <ul>
             <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>c_cid</tt>"
             </ul>
         </div>
     </span>
@@ -169,10 +168,11 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
 %bytes
         </span>
         <div class="explanation">
-            The client's chosen connection ID is repeated back to it.
+            The server uses this field to indicate its
+            chosen connection ID to the client.
             <ul>
             <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>s_cid</tt>"
             </ul>
         </div>
     </span>
@@ -205,7 +205,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             <br><br>
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0x75, or 117.
+            0x75, or 117 bytes.
         </div>
     </span>
 
@@ -267,6 +267,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 %empty
@@ -282,7 +284,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 21 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -326,7 +328,9 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>%0</tt> - frame type "ACK"
             <li><tt>%1</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>%2 %3</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of %dd2 * 256 = 147,456 µseconds
+            <li><tt>%2 %3</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
+            %d3 * 8 = 512 µseconds
             <li><tt>%4</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (%d4) optionally provided below
             <li><tt>%5</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
             </ul>
@@ -344,7 +348,7 @@ $ cat /tmp/msg1 \
             used by TLS to establish a secure connection.
             <ul>
             <li><tt>%0</tt> - frame type "CRYPTO"
-            <li><tt>%1</tt> - offset of the crypto stream data being provided (%d0 bytes)
+            <li><tt>%1</tt> - variable-length integer, offset of the crypto stream data being provided (%d1 bytes)
             <li><tt>%2 %3</tt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data length of 238 bytes
             </ul>

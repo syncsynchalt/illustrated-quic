@@ -143,6 +143,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 %empty
@@ -158,7 +160,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 16 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -213,9 +215,9 @@ $ cat /tmp/msg1 \
             <tr><td>0x2</td><td>LEN: A "Length" field is present in this frame (otherwise consume all data in the frame)</td>
             <tr><td>0x1</td><td>FIN: This frame contains the final data of this stream, and the sender is done writing to it</td>
             </table>
-		    In this case, the sender indicates all three: there
-		    will be an offset field, a length field, and this
-		    is the final data for this stream.
+            In this case, the sender indicates all three: there
+            will be an offset field, a length field, and this
+            is the final data for this stream.
         </div>
     </span>
 
@@ -249,9 +251,9 @@ $ cat /tmp/msg1 \
 %bytes
         </span>
         <div class="explanation">
-	        A variable-length integer indicating the offset of the
-	        stream data. In this case, a single-byte integer showing
-	        an offset of %n0.
+            A variable-length integer indicating the offset of the
+            stream data. In this case, a single-byte integer showing
+            an offset of %n0.
         </div>
     </span>
 

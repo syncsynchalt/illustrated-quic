@@ -12,7 +12,7 @@
     elliptical curve method, using the x25519 curve.
     <br/><br/>
     The private key is chosen by selecting an integer between
-    0 and 2<sup>256</sup>-1.  It does this by generating 32
+    0 and 2<sup>256</sup>-1.  The client does this by generating 32
     bytes (256 bits) of random data.  The
     <a href="files/client-ephemeral-private.key" download="client-ephemeral-private.key">private key</a>
     selected is:
@@ -54,13 +54,11 @@ pub:
 <div class="rec-explanation">
     Next, the client will generate traffic keys for the Initial
     packets.  Because key exchange between client and server has
-    not yet taken place there is limited security in these keys -
+    not taken place there is limited security in these keys -
     any observer can derive the same keys and read the traffic.
     Encrypting the Initial packets prevents certain kinds of attacks
     such as request forgery attacks.
-
     <br><br>
-
     The client begins by generating 8 bytes of random data,
     in this case the bytes:
     <pre class="ind2"><tt class="longboi">0001020304050607</tt></pre>
@@ -70,26 +68,25 @@ pub:
 <pre>initial_salt = 38762cf7f55934b34d179ae6a4c80cadccbb7f0a
 initial_random = (random bytes from client given above)
 initial_secret = HKDF-Extract(salt: initial_salt, key: initial_random)
-client_secret = HKDF-Expand-Label(key: initial_secret, label: "client in", context: "", length: 32)
-server_secret = HKDF-Expand-Label(key: initial_secret, label: "server in", context: "", length: 32)
-client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", context: "", length: 16)
-server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", context: "", length: 16)
-client_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", context: "", length: 12)
-server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", context: "", length: 12)
-client_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", context: "", length: 16)
-server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", context: "", length: 16)
+client_secret = HKDF-Expand-Label(key: initial_secret, label: "client in", ctx: "", len: 32)
+server_secret = HKDF-Expand-Label(key: initial_secret, label: "server in", ctx: "", len: 32)
+client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", ctx: "", len: 16)
+server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", ctx: "", len: 16)
+client_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", ctx: "", len: 12)
+server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", ctx: "", len: 12)
+client_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", ctx: "", len: 16)
+server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", ctx: "", len: 16)
 </pre>
     </processblock>
 
     The use of the magic constant "<tt>38762cf7f55934b34d179ae6a4c80cadccbb7f0a</tt>" as the initial
-    salt is interesting, as it is not derived from any mathematical constants or cryptographic
-    principal. It's the value of the first SHA-1 collision ever publicly discovered, to celebrate
-    this achievement of Google researchers (QUIC itself was initially created, sponsored, and deployed
-    by Google).
+    salt is interesting, as it is not derived from mathematical constants or cryptographic
+    principals. It's the value of the first SHA-1 collision, co-discovered by Google researchers
+    (QUIC itself was initially created, sponsored, and deployed by Google).
 
     <br><br>
 
-    This has introduced two new cryptographic methods from TLS 1.3:
+    This has introduced two new cryptographic concepts from TLS 1.3:
     <ul>
     <li><tt>HKDF-Extract</tt> - given a salt and some bytes of key material
     create 256 bits (32 bytes) of new key material, with the
@@ -231,11 +228,11 @@ ed9895bb15
 %bytes
         </span>
         <div class="explanation">
-	        The client has not yet received a connection ID chosen
-	        by the server. Instead it uses this field to provide
-	        the 8 bytes of random data for deriving Initial encryption
-	        keys, as explained in "Initial Keys Calc"
-	        above.
+            The client has not yet received a connection ID chosen
+            by the server. Instead it uses this field to provide
+            the 8 bytes of random data for deriving Initial encryption
+            keys, as explained in "Initial Keys Calc"
+            above.
             <ul>
             <li><tt>%0</tt> - %n0 bytes of connection ID follows
             <li><tt>%1 %2 ... %-2 %-1</tt> - the connection ID
@@ -266,11 +263,11 @@ ed9895bb15
 %bytes
         </span>
         <div class="explanation">
-	        The client can use this field in some scenarios to
-	        provide a token requested by the server, such as to
-	        prove that its connection attempt is not spoofed. In
-	        this case, there is no token to provide, and the field
-	        is empty.
+            The client can use this field in some scenarios to
+            provide a token requested by the server, such as to
+            prove that its connection attempt is not spoofed. In
+            this case, there is no token to provide, and the field
+            is empty.
 
             <ul>
             <li><tt>%0</tt> - %n0 bytes of token data follows
@@ -285,14 +282,14 @@ ed9895bb15
 %bytes
         </span>
         <div class="explanation">
-	        The client indicates how many bytes of encrypted payload
-	        are in the packet.  This field is a variable length
-	        integer - the first two bits of the first byte
-	        indicate how many total bytes are in the integer.
+            The client indicates how many bytes of encrypted payload
+            are in the packet.  This field is a variable length
+            integer - the first two bits of the first byte
+            indicate how many total bytes are in the integer.
 
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0x103, or 259.
+            0x103, or 259 bytes.
         </div>
     </span>
 
@@ -314,23 +311,23 @@ ed9895bb15
             0, or the first "Initial" packet sent by the client.
             <br><br>
 
-		    This data is also potentially truncated. The
-		    sending endpoint calculates the spread between
-		    the highest packet number sent and the lowest
-		    unacknowledged packet number, doubles that
-		    spread for safety, rounds up, then figures the
-		    number of bytes it can remove from the high
-		    bits of the packet number to unambiguously
-		    represent a number between those two ends. The
-		    encoded packet number is then truncated to that
-		    number of bytes, and the receiving endpoint
-		    fills in the full number based on the packet
-		    numbers it has most recently seen. Because our
-		    example conversation sends so few packets (fewer
-		    than 64), this truncation won't occur in this
-		    document.  See <a
-		    href="https://www.rfc-editor.org/rfc/rfc9000.html#section-17.1">RFC
-		    9000</a> for details.
+            This data is also potentially truncated. The
+            sending endpoint calculates the spread between
+            the highest packet number sent and the lowest
+            unacknowledged packet number, doubles that
+            spread for safety, rounds up, then figures the
+            number of bytes it can remove from the high
+            bits of the packet number to unambiguously
+            represent a number between those two ends. The
+            encoded packet number is then truncated to that
+            number of bytes, and the receiving endpoint
+            fills in the full number based on the packet
+            numbers it has most recently seen. Because our
+            example conversation sends so few packets (fewer
+            than 64), this truncation won't occur in this
+            document.  See <a
+            href="https://www.rfc-editor.org/rfc/rfc9000.html#section-17.1">RFC
+            9000</a> for details.
         </div>
     </span>
 
@@ -354,6 +351,8 @@ ed9895bb15
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 %next 918
@@ -370,7 +369,7 @@ ed9895bb15
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 24 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -411,16 +410,16 @@ $ cat /tmp/msg1 \
         </span>
         <div class="explanation">
             Each QUIC packet contains a list of one or more
-            frames in its payload. This packet only contains
+            frames in its payload. This packet contains only0:w
             one frame, a <tt>CRYPTO</tt> frame.
-            <br>
+            <br><br>
             <tt>CRYPTO</tt> frames create a single stream of bytes
             used by TLS to establish a secure connection.
             <ul>
             <li><tt>%0</tt> - frame type "CRYPTO"
-            <li><tt>%1</tt> - offset of the crypto stream data being provided (%d0 bytes)
+            <li><tt>%1</tt> - variable length integer, offset of the crypto stream data being provided (%d1 bytes)
             <li><tt>%2 %3</tt> - variable length integer (first two bits indicate 2-byte integer)
-                                 showing crypto stream data length of 238 bytes
+                                 showing crypto stream data length of %n3 bytes
             </ul>
         </div>
     </span>
@@ -655,8 +654,8 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>%0 %1</tt> - assigned value for extension "Application Layer Protocol Negotiation"
             <li><tt>%2 %3</tt> - %nn2 bytes of "ALPN" extension data follows
-            <li><tt>%4 %5</tt> - %nn2 bytes of "ALPN" protocol data follows
-            <li><tt>%6</tt> - %nn2 bytes of a protocol name follows
+            <li><tt>%4 %5</tt> - %nn4 bytes of "ALPN" protocol data follows
+            <li><tt>%6</tt> - %n6 bytes of a protocol name follows
             <li><tt>%7 %8 ... %-2 %-1</tt> - the string "<tt>ping/1.0</tt>"
             </ul>
         </div>
@@ -747,14 +746,12 @@ $ cat /tmp/msg1 \
 %bytes
         </span>
         <div class="explanation">
-            The client indicates its support of TLS 1.3. This is the only indication in the
-            Client Hello record that hints the client supports TLS 1.3, since
-            for compatibility reasons it has otherwise pretended to be a TLS 1.2 connection
-            attempt.
+            The client indicates its support of TLS 1.3. For compatibility reasons
+            this is put into an extension instead of the Client Version field above.
             <ul>
                 <li><tt>00 2b</tt> - assigned value for extension "Supported Versions"
                 <li><tt>%2 %3</tt> - %nn2 bytes of "Supported Versions" extension data follows
-                <li><tt>%4</tt> - %n4 bytes of TLS versions follow
+                <li><tt>%4</tt> - %n4 bytes of TLS version follows
                 <li><tt>03 04</tt> - assigned value for TLS 1.3
             </ul>
         </div>
@@ -770,7 +767,7 @@ $ cat /tmp/msg1 \
             The client's configuration values for the QUIC connection are given here. They are put
             into this record instead of the headers of the Initial packet because all
             data in TLS records is protected from tampering by malicious actors.
-            <br>
+            <br><br>
             The following QUIC parameters are set in the data below:
             <ul>
             <li>max_udp_payload_size: 65527
@@ -864,16 +861,16 @@ $ cat /tmp/msg1 \
             Padding this packet to a size of 1200 bytes serves two purposes:
             <ul>
 
-		    <li><b>Path MTU validation</b> - Any IPv4 host or
-		    router is allowed to drop packets
-		    that exceed their MTU limit, to a minimum of
-		    576 bytes. The vast majority of the internet
-		    has a much higher MTU (typically 1500 bytes). A higher
-		    packet size will increase throughput and
-		    performance. Given these realities QUIC chooses
-		    a minimum size constraint of 1200 bytes, which
-		    should traverse the vast majority of real
-		    networks (including tunneled networks)
+            <li><b>Path MTU validation</b> - Any IPv4 host or
+            router is allowed to drop packets
+            that exceed their MTU limit, to a minimum of
+            576 bytes. The vast majority of the internet
+            has a much higher MTU (typically 1500 bytes). A higher
+            packet size will increase throughput and
+            performance. Given these realities QUIC chooses
+            a minimum size constraint of 1200 bytes, which
+            should traverse the vast majority of real
+            networks (including tunneled networks)
             without being dropped for size.
             <br>
             To prevent a scenario where a connection is established

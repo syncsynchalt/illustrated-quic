@@ -44,7 +44,7 @@
     elliptical curve method, using the x25519 curve.
     <br/><br/>
     The private key is chosen by selecting an integer between
-    0 and 2<sup>256</sup>-1.  It does this by generating 32
+    0 and 2<sup>256</sup>-1.  The client does this by generating 32
     bytes (256 bits) of random data.  The
     <a href="files/client-ephemeral-private.key" download="client-ephemeral-private.key">private key</a>
     selected is:
@@ -86,13 +86,11 @@ pub:
 <div class="rec-explanation">
     Next, the client will generate traffic keys for the Initial
     packets.  Because key exchange between client and server has
-    not yet taken place there is limited security in these keys -
+    not taken place there is limited security in these keys -
     any observer can derive the same keys and read the traffic.
     Encrypting the Initial packets prevents certain kinds of attacks
     such as request forgery attacks.
-
     <br><br>
-
     The client begins by generating 8 bytes of random data,
     in this case the bytes:
     <pre class="ind2"><tt class="longboi">0001020304050607</tt></pre>
@@ -102,26 +100,25 @@ pub:
 <pre>initial_salt = 38762cf7f55934b34d179ae6a4c80cadccbb7f0a
 initial_random = (random bytes from client given above)
 initial_secret = HKDF-Extract(salt: initial_salt, key: initial_random)
-client_secret = HKDF-Expand-Label(key: initial_secret, label: "client in", context: "", length: 32)
-server_secret = HKDF-Expand-Label(key: initial_secret, label: "server in", context: "", length: 32)
-client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", context: "", length: 16)
-server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", context: "", length: 16)
-client_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", context: "", length: 12)
-server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", context: "", length: 12)
-client_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", context: "", length: 16)
-server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", context: "", length: 16)
+client_secret = HKDF-Expand-Label(key: initial_secret, label: "client in", ctx: "", len: 32)
+server_secret = HKDF-Expand-Label(key: initial_secret, label: "server in", ctx: "", len: 32)
+client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", ctx: "", len: 16)
+server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", ctx: "", len: 16)
+client_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", ctx: "", len: 12)
+server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", ctx: "", len: 12)
+client_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", ctx: "", len: 16)
+server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", ctx: "", len: 16)
 </pre>
     </processblock>
 
     The use of the magic constant "<tt>38762cf7f55934b34d179ae6a4c80cadccbb7f0a</tt>" as the initial
-    salt is interesting, as it is not derived from any mathematical constants or cryptographic
-    principal. It's the value of the first SHA-1 collision ever publicly discovered, to celebrate
-    this achievement of Google researchers (QUIC itself was initially created, sponsored, and deployed
-    by Google).
+    salt is interesting, as it is not derived from mathematical constants or cryptographic
+    principals. It's the value of the first SHA-1 collision, co-discovered by Google researchers
+    (QUIC itself was initially created, sponsored, and deployed by Google).
 
     <br><br>
 
-    This has introduced two new cryptographic methods from TLS 1.3:
+    This has introduced two new cryptographic concepts from TLS 1.3:
     <ul>
     <li><tt>HKDF-Extract</tt> - given a salt and some bytes of key material
     create 256 bits (32 bytes) of new key material, with the
@@ -259,11 +256,11 @@ ed9895bb15
  08 00 01 02 03 04 05 06 07
         </span>
         <div class="explanation">
-	        The client has not yet received a connection ID chosen
-	        by the server. Instead it uses this field to provide
-	        the 8 bytes of random data for deriving Initial encryption
-	        keys, as explained in "Initial Keys Calc"
-	        above.
+            The client has not yet received a connection ID chosen
+            by the server. Instead it uses this field to provide
+            the 8 bytes of random data for deriving Initial encryption
+            keys, as explained in "Initial Keys Calc"
+            above.
             <ul>
             <li><tt>08</tt> - 8 bytes of connection ID follows
             <li><tt>00 01 ... 06 07</tt> - the connection ID
@@ -292,11 +289,11 @@ ed9895bb15
  00
         </span>
         <div class="explanation">
-	        The client can use this field in some scenarios to
-	        provide a token requested by the server, such as to
-	        prove that its connection attempt is not spoofed. In
-	        this case, there is no token to provide, and the field
-	        is empty.
+            The client can use this field in some scenarios to
+            provide a token requested by the server, such as to
+            prove that its connection attempt is not spoofed. In
+            this case, there is no token to provide, and the field
+            is empty.
 
             <ul>
             <li><tt>00</tt> - 0 bytes of token data follows
@@ -310,14 +307,14 @@ ed9895bb15
  41 03
         </span>
         <div class="explanation">
-	        The client indicates how many bytes of encrypted payload
-	        are in the packet.  This field is a variable length
-	        integer - the first two bits of the first byte
-	        indicate how many total bytes are in the integer.
+            The client indicates how many bytes of encrypted payload
+            are in the packet.  This field is a variable length
+            integer - the first two bits of the first byte
+            indicate how many total bytes are in the integer.
 
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0x103, or 259.
+            0x103, or 259 bytes.
         </div>
     </span>
 
@@ -338,23 +335,23 @@ ed9895bb15
             0, or the first "Initial" packet sent by the client.
             <br><br>
 
-		    This data is also potentially truncated. The
-		    sending endpoint calculates the spread between
-		    the highest packet number sent and the lowest
-		    unacknowledged packet number, doubles that
-		    spread for safety, rounds up, then figures the
-		    number of bytes it can remove from the high
-		    bits of the packet number to unambiguously
-		    represent a number between those two ends. The
-		    encoded packet number is then truncated to that
-		    number of bytes, and the receiving endpoint
-		    fills in the full number based on the packet
-		    numbers it has most recently seen. Because our
-		    example conversation sends so few packets (fewer
-		    than 64), this truncation won't occur in this
-		    document.  See <a
-		    href="https://www.rfc-editor.org/rfc/rfc9000.html#section-17.1">RFC
-		    9000</a> for details.
+            This data is also potentially truncated. The
+            sending endpoint calculates the spread between
+            the highest packet number sent and the lowest
+            unacknowledged packet number, doubles that
+            spread for safety, rounds up, then figures the
+            number of bytes it can remove from the high
+            bits of the packet number to unambiguously
+            represent a number between those two ends. The
+            encoded packet number is then truncated to that
+            number of bytes, and the receiving endpoint
+            fills in the full number based on the packet
+            numbers it has most recently seen. Because our
+            example conversation sends so few packets (fewer
+            than 64), this truncation won't occur in this
+            document.  See <a
+            href="https://www.rfc-editor.org/rfc/rfc9000.html#section-17.1">RFC
+            9000</a> for details.
         </div>
     </span>
 
@@ -383,6 +380,8 @@ ed9895bb15
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 
@@ -397,7 +396,7 @@ ed9895bb15
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 24 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -436,16 +435,16 @@ $ cat /tmp/msg1 \
         </span>
         <div class="explanation">
             Each QUIC packet contains a list of one or more
-            frames in its payload. This packet only contains
+            frames in its payload. This packet contains only0:w
             one frame, a <tt>CRYPTO</tt> frame.
-            <br>
+            <br><br>
             <tt>CRYPTO</tt> frames create a single stream of bytes
             used by TLS to establish a secure connection.
             <ul>
             <li><tt>06</tt> - frame type "CRYPTO"
-            <li><tt>00</tt> - offset of the crypto stream data being provided (6 bytes)
+            <li><tt>00</tt> - variable length integer, offset of the crypto stream data being provided (0 bytes)
             <li><tt>40 ee</tt> - variable length integer (first two bits indicate 2-byte integer)
-                                 showing crypto stream data length of 238 bytes
+                                 showing crypto stream data length of 0xEE (238) bytes
             </ul>
         </div>
     </span>
@@ -673,8 +672,8 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>00 10</tt> - assigned value for extension "Application Layer Protocol Negotiation"
             <li><tt>00 0b</tt> - 0xB (11) bytes of "ALPN" extension data follows
-            <li><tt>00 09</tt> - 0xB (11) bytes of "ALPN" protocol data follows
-            <li><tt>08</tt> - 0xB (11) bytes of a protocol name follows
+            <li><tt>00 09</tt> - 9 bytes of "ALPN" protocol data follows
+            <li><tt>08</tt> - 8 bytes of a protocol name follows
             <li><tt>70 69 ... 2e 30</tt> - the string "<tt>ping/1.0</tt>"
             </ul>
         </div>
@@ -762,14 +761,12 @@ $ cat /tmp/msg1 \
  00 2b 00 03 02 03 04
         </span>
         <div class="explanation">
-            The client indicates its support of TLS 1.3. This is the only indication in the
-            Client Hello record that hints the client supports TLS 1.3, since
-            for compatibility reasons it has otherwise pretended to be a TLS 1.2 connection
-            attempt.
+            The client indicates its support of TLS 1.3. For compatibility reasons
+            this is put into an extension instead of the Client Version field above.
             <ul>
                 <li><tt>00 2b</tt> - assigned value for extension "Supported Versions"
                 <li><tt>00 03</tt> - 3 bytes of "Supported Versions" extension data follows
-                <li><tt>02</tt> - 2 bytes of TLS versions follow
+                <li><tt>02</tt> - 2 bytes of TLS version follows
                 <li><tt>03 04</tt> - assigned value for TLS 1.3
             </ul>
         </div>
@@ -785,7 +782,7 @@ $ cat /tmp/msg1 \
             The client's configuration values for the QUIC connection are given here. They are put
             into this record instead of the headers of the Initial packet because all
             data in TLS records is protected from tampering by malicious actors.
-            <br>
+            <br><br>
             The following QUIC parameters are set in the data below:
             <ul>
             <li>max_udp_payload_size: 65527
@@ -873,16 +870,16 @@ $ cat /tmp/msg1 \
             Padding this packet to a size of 1200 bytes serves two purposes:
             <ul>
 
-		    <li><b>Path MTU validation</b> - Any IPv4 host or
-		    router is allowed to drop packets
-		    that exceed their MTU limit, to a minimum of
-		    576 bytes. The vast majority of the internet
-		    has a much higher MTU (typically 1500 bytes). A higher
-		    packet size will increase throughput and
-		    performance. Given these realities QUIC chooses
-		    a minimum size constraint of 1200 bytes, which
-		    should traverse the vast majority of real
-		    networks (including tunneled networks)
+            <li><b>Path MTU validation</b> - Any IPv4 host or
+            router is allowed to drop packets
+            that exceed their MTU limit, to a minimum of
+            576 bytes. The vast majority of the internet
+            has a much higher MTU (typically 1500 bytes). A higher
+            packet size will increase throughput and
+            performance. Given these realities QUIC chooses
+            a minimum size constraint of 1200 bytes, which
+            should traverse the vast majority of real
+            networks (including tunneled networks)
             without being dropped for size.
             <br>
             To prevent a scenario where a connection is established
@@ -927,7 +924,7 @@ $ cat /tmp/msg1 \
     elliptical curve method, using the x25519 curve.
     <br/><br/>
     The private key is chosen by selecting an integer between
-    0 and 2<sup>256</sup>-1.  It does this by generating 32
+    0 and 2<sup>256</sup>-1.  The server does this by generating 32
     bytes (256 bits) of random data.  The
     <a href="files/server-ephemeral-private.key" download="server-ephemeral-private.key">private key</a>
     selected is:
@@ -969,7 +966,7 @@ pub:
 <div class="rec-explanation">
     Next, the server performs its own calculation of the Initial traffic keys.
     It gets the 8 bytes of random data from the "Destination Connection ID" field
-    from the client:
+    from the client's first Initial packet:
     <pre class="ind2"><tt class="longboi">0001020304050607</tt></pre>
     and computes the same keys using the method shown in "Client Initial Keys Calc":
     <ul>
@@ -1064,11 +1061,10 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
  05 63 5f 63 69 64
         </span>
         <div class="explanation">
-            The server uses this field to indicate its
-            chosen connection ID to the client.
+            The client's chosen connection ID is repeated back to it.
             <ul>
             <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
             </ul>
         </div>
     </span>
@@ -1079,10 +1075,11 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
  05 73 5f 63 69 64
         </span>
         <div class="explanation">
-            The client's chosen connection ID is repeated back to it.
+            The server uses this field to indicate its
+            chosen connection ID to the client.
             <ul>
             <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
             </ul>
         </div>
     </span>
@@ -1113,7 +1110,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             <br><br>
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0x75, or 117.
+            0x75, or 117 bytes.
         </div>
     </span>
 
@@ -1175,6 +1172,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 
@@ -1189,7 +1188,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 21 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -1231,7 +1230,9 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>02</tt> - frame type "ACK"
             <li><tt>00</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>42 40</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of 16960 * 256 = 147,456 µseconds
+            <li><tt>42 40</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
+            64 * 8 = 512 µseconds
             <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
             <li><tt>00</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
             </ul>
@@ -1248,7 +1249,7 @@ $ cat /tmp/msg1 \
             used by TLS to establish a secure connection.
             <ul>
             <li><tt>06</tt> - frame type "CRYPTO"
-            <li><tt>00</tt> - offset of the crypto stream data being provided (6 bytes)
+            <li><tt>00</tt> - variable-length integer, offset of the crypto stream data being provided (0 bytes)
             <li><tt>40 5a</tt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data length of 238 bytes
             </ul>
@@ -1476,14 +1477,14 @@ ff788f9ed09e60d8142ac10a8931cdb6a3726278d3acdba54d9d9ffc7326611b
     <processblock>
 <pre>early_secret = HKDF-Extract(salt=00, key=00...)
 empty_hash = SHA256("")
-derived_secret = HKDF-Expand-Label(key: early_secret, label: "derived", context: empty_hash, len: 32)
+derived_secret = HKDF-Expand-Label(key: early_secret, label: "derived", ctx: empty_hash, len: 32)
 handshake_secret = HKDF-Extract(salt: derived_secret, key: shared_secret)
-client_secret = HKDF-Expand-Label(key: handshake_secret, label: "c hs traffic", context: hello_hash, len: 32)
-server_secret = HKDF-Expand-Label(key: handshake_secret, label: "s hs traffic", context: hello_hash, len: 32)
-client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", context: "", len: 16)
-server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", context: "", len: 16)
-client_iv = HKDF-Expand-Label(key: client_secret, label: "quic iv", context: "", len: 12)
-server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", context: "", len: 12)
+client_secret = HKDF-Expand-Label(key: handshake_secret, label: "c hs traffic", ctx: hello_hash, len: 32)
+server_secret = HKDF-Expand-Label(key: handshake_secret, label: "s hs traffic", ctx: hello_hash, len: 32)
+client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", ctx: "", len: 16)
+server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", ctx: "", len: 16)
+client_iv = HKDF-Expand-Label(key: client_secret, label: "quic iv", ctx: "", len: 12)
+server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", ctx: "", len: 12)
 </pre>
     </processblock>
 
@@ -1633,7 +1634,7 @@ ddb7ce7613
             The source connection ID is given.
             <ul>
             <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
             </ul>
         </div>
     </span>
@@ -1651,7 +1652,7 @@ ddb7ce7613
             <br><br>
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0x414, or 1044.
+            0x414, or 1044 bytes.
         </div>
     </span>
 
@@ -1742,6 +1743,8 @@ ddb7ce7613
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 
@@ -1749,14 +1752,14 @@ ddb7ce7613
         <div class="label">Decryption</div>
         <div class="explanation">
             This data is encrypted using the server
-            "Initial" traffic key and IV that were
-            generated during the "Initial Keys
+            "Handshake" traffic key and IV that were
+            generated during the "Handshake Keys
             Calc" step.  The IV will be modified
             by XOR'ing it by the count of records that
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 20 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -1799,7 +1802,7 @@ $ cat /tmp/msg1 \
             <br>
             <ul>
             <li><tt>06</tt> - frame type "CRYPTO"
-            <li><tt>00</tt> - variable length integer, offset of the crypto stream data being provided (6 bytes)
+            <li><tt>00</tt> - variable length integer, offset of the crypto stream data being provided (0 bytes)
             <li><tt>43 ff</tt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data length of 0x3ff (1023) bytes
             </ul>
@@ -1916,8 +1919,8 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>00 10</tt> - assigned value for extension "Application Layer Protocol Negotiation"
             <li><tt>00 0b</tt> - 0xB (11) bytes of "ALPN" extension data follows
-            <li><tt>00 09</tt> - 0xB (11) bytes of "ALPN" protocol data follows
-            <li><tt>08</tt> - 0xB (11) bytes of a protocol name follows
+            <li><tt>00 09</tt> - 9 bytes of "ALPN" protocol data follows
+            <li><tt>08</tt> - 8 bytes of a protocol name follows
             <li><tt>70 69 ... 2e 30</tt> - the string "<tt>ping/1.0</tt>"
             </ul>
         </div>
@@ -1932,7 +1935,7 @@ $ cat /tmp/msg1 \
         </span>
         <div class="explanation">
             The server's configuration values for the QUIC connection are given here.
-            <br>
+            <br><br>
             The following QUIC parameters are set in the data below:
             <ul>
             <li>initial_destination_connection_id: 0001020304050607
@@ -2247,7 +2250,7 @@ e54e8fcd38
             The source connection ID is given.
             <ul>
             <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
             </ul>
         </div>
     </span>
@@ -2265,7 +2268,7 @@ e54e8fcd38
             <br><br>
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0xcf, or 207.
+            0xcf, or 207 bytes.
         </div>
     </span>
 
@@ -2282,7 +2285,7 @@ e54e8fcd38
             This byte has header protection applied, see Packet Header Byte for
             details.
             <br><br>
-            This byte has the unprotected value of 0x00, indicating it is packet
+            This byte has the unprotected value of 0x01, indicating it is packet
             1, or the second "Handshake" packet sent by the server.
             <br><br>
 
@@ -2329,6 +2332,8 @@ e54e8fcd38
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 
@@ -2336,14 +2341,14 @@ e54e8fcd38
         <div class="label">Decryption</div>
         <div class="explanation">
             This data is encrypted using the server
-            "Initial" traffic key and IV that were
-            generated during the "Initial Keys
+            "handshake" traffic key and IV that were
+            generated during the "Handshake Keys
             Calc" step.  The IV will be modified
             by XOR'ing it by the count of records that
             have already been encrypted with this key,
             which in this case is 1.  The process
             also takes as input the 20 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -2388,7 +2393,7 @@ $ cat /tmp/msg1 \
             <li><tt>06</tt> - frame type "CRYPTO"
             <li><tt>43 ff</tt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data offset of 0x3ff (1023) bytes
-            <li><tt>ff 40</tt> - variable length integer (first two bits indicate 2-byte integer)
+            <li><tt>40 b9</tt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data length of 0xb9 (185) bytes
             </ul>
         </div>
@@ -2447,17 +2452,39 @@ $ cat /tmp/msg1 \
     </span>
 
     <span class="string">
+        <span class="label">Signature Algorithm</span>
+        <span class="bytes">
+ 08 04
+        </span>
+        <div class="explanation">
+            The server indicates the signature type:
+            <ul>
+            <li><tt>08 04</tt> - assigned value for "rsa_pss_rsae_sha256"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Signature Length</span>
+        <span class="bytes">
+ 01 00
+        </span>
+        <div class="explanation">
+            The server indicates that 0x100 (256) bytes of signature follow.
+        </div>
+    </span>
+
+    <span class="string">
         <span class="label">Signature</span>
         <span class="bytes">
- 08 04 01 00 0a 99 af 32 a9 e4 06 d7 25 f9 a9 39 6d e5 af 37 56 b7 a8 f6 e4 da d5 85 ab c3 f8 7c
- 6d 1f c1 5f 5f 00 ab a8 dc a9 d0 5c db 51 d3 c9 35 43 36 56 d8 8b 74 32 00 5e e7 e0 48 03 b2 47
- 57 44 d7 55 5c f3 de 48 9c c2 16 a4 85 a7 28 b2 18 90 e8 7a a9 41 5d 19 e6 3a 6a 77 9b 9c db b1
- 28 a8 04 c4 28 b8 27 fa 65 df cd 95 2a ce 54 46 1e 8a 23 40 58 98 8e 7f 26 4d 7a b6 a5 1a 21 c6
- 29 79 b7 a6 79 f4 a0 87 70 85 6e 92 6d 37 1b 2e 89 16 9a a1 90 b8 03 63 6b b1 0c 0f b9 05 98 3d
- 2b 50 0a ad 26 83 df be 15 6e cc f6 66 de 1a 5a d4 5d 77 38 d5 e7 8b d1 7b c3 e6 d2 5f 9a d4 af
- ba 8f 81 de 9f 4d 55 72 11 8e 08 55 1a 4b b9 4b 56 a9 70 e8 04 c6 82 67 45 4b 51 7f c8 38 6c 9b
- ae 3a 77 cc cb 7f 29 0f 6e 58 fb a1 26 f0 53 33 a1 1f 8a b0 89 2e 6e 7a 89 58 53 82 d3 6e ef 25
- 29 cf 5b 7b
+ 0a 99 af 32 a9 e4 06 d7 25 f9 a9 39 6d e5 af 37 56 b7 a8 f6 e4 da d5 85 ab c3 f8 7c 6d 1f c1 5f
+ 5f 00 ab a8 dc a9 d0 5c db 51 d3 c9 35 43 36 56 d8 8b 74 32 00 5e e7 e0 48 03 b2 47 57 44 d7 55
+ 5c f3 de 48 9c c2 16 a4 85 a7 28 b2 18 90 e8 7a a9 41 5d 19 e6 3a 6a 77 9b 9c db b1 28 a8 04 c4
+ 28 b8 27 fa 65 df cd 95 2a ce 54 46 1e 8a 23 40 58 98 8e 7f 26 4d 7a b6 a5 1a 21 c6 29 79 b7 a6
+ 79 f4 a0 87 70 85 6e 92 6d 37 1b 2e 89 16 9a a1 90 b8 03 63 6b b1 0c 0f b9 05 98 3d 2b 50 0a ad
+ 26 83 df be 15 6e cc f6 66 de 1a 5a d4 5d 77 38 d5 e7 8b d1 7b c3 e6 d2 5f 9a d4 af ba 8f 81 de
+ 9f 4d 55 72 11 8e 08 55 1a 4b b9 4b 56 a9 70 e8 04 c6 82 67 45 4b 51 7f c8 38 6c 9b ae 3a 77 cc
+ cb 7f 29 0f 6e 58 fb a1 26 f0 53 33 a1 1f 8a b0 89 2e 6e 7a 89 58 53 82 d3 6e ef 25 29 cf 5b 7b
         </span>
         <div class="explanation">
             Because the server is generating ephemeral
@@ -2473,15 +2500,11 @@ $ cat /tmp/msg1 \
             key.  The signature can be proven valid by
             the client by using the certificate's public
             key.
-            <ul>
-            <li><tt>08 04</tt> - reserved value for RSA-PSS-RSAE-SHA256 signature
-            <li><tt>01 00</tt> - 0x100 (256) bytes of signature data follows
-            <li><tt>0a 99 af ... cf 5b 7b</tt> - a signature over this handshake's hash
-            </ul>
+            <br><br>
             The signing process can't be reproduced byte-for-byte
             at the command line because the signing tool introduces
             random or changing data into the signature.
-            <br/><br/>
+            <br><br>
             We can verify the signature using the
             <a href="files/server.crt" download="server.crt">server's certificate</a>
             at the command line:
@@ -2567,7 +2590,7 @@ Verified OK
             before this point (ClientHello to CertificateVerify).
 
             <processblock class="notrunc">
-<pre>finished_key = HKDF-Expand-Label(key: server_secret, label: "finished", context: "", len: 32)
+<pre>finished_key = HKDF-Expand-Label(key: server_secret, label: "finished", ctx: "", len: 32)
 finished_hash = SHA256(ClientHello ... CertificateVerify)
 verify_data = HMAC-SHA256(key: finished_key, msg: finished_hash)
 </pre>
@@ -2774,7 +2797,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
 
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0x17, or 23.
+            0x17, or 23 bytes.
         </div>
     </span>
 
@@ -2833,6 +2856,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 
@@ -2847,7 +2872,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             have already been encrypted with this key,
             which in this case is 1.  The process
             also takes as input the 21 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -2887,7 +2912,9 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>02</tt> - frame type "ACK"
             <li><tt>00</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>40 81</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of 16513 * 256 = 33,024 µseconds
+            <li><tt>40 81</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
+            129 * 8 = 1,032 µseconds
             <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
             <li><tt>00</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
             </ul>
@@ -3012,7 +3039,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
 
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0x16, or 22.
+            0x16, or 22 bytes.
         </div>
     </span>
 
@@ -3071,6 +3098,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 
@@ -3085,7 +3114,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 20 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -3125,7 +3154,9 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>02</tt> - frame type "ACK"
             <li><tt>00</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>20</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of 8192 * 256 = 8,192 µseconds
+            <li><tt>20</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
+            32 * 8 = 256 µseconds
             <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
             <li><tt>00</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
             </ul>
@@ -3216,34 +3247,31 @@ $ cat /tmp/msg1 \
   crypto_cert crypto_certverify crypto_s_finished  | openssl sha256
 
 b965185af5034eda0ea13ab424dde193afcb42451823a96921ae9d2dad9594ef
-    </code></pre>
+</code></pre>
     </codesample>
-
-    <br/><br/>
     We then feed the hash and the handshake secret into a set of
     key derivation operations, designed to protect against known and
     possible attacks:
 
     <processblock>
 <pre>empty_hash = SHA256("")
-derived_secret = HKDF-Expand-Label(key: handshake_secret, label: "derived", context: empty_hash, len: 32)
+derived_secret = HKDF-Expand-Label(key: handshake_secret, label: "derived", ctx: empty_hash, len: 32)
 master_secret = HKDF-Extract(salt: derived_secret, key: 00...)
-client_secret = HKDF-Expand-Label(key: master_secret, label: "c ap traffic", context: handshake_hash, len: 32)
-server_secret = HKDF-Expand-Label(key: master_secret, label: "s ap traffic", context: handshake_hash, len: 32)
-client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", context: "", len: 16)
-server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", context: "", len: 16)
-client_iv = HKDF-Expand-Label(key: client_secret, label: "quic iv", context: "", len: 12)
-server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", context: "", len: 12)
-client_hp_key = HKDF-Expand-Label(key: client_secret, label: "quic hp", context: "", len: 16)
-server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", context: "", len: 16)
+client_secret = HKDF-Expand-Label(key: master_secret, label: "c ap traffic", ctx: handshake_hash, len: 32)
+server_secret = HKDF-Expand-Label(key: master_secret, label: "s ap traffic", ctx: handshake_hash, len: 32)
+client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", ctx: "", len: 16)
+server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", ctx: "", len: 16)
+client_iv = HKDF-Expand-Label(key: client_secret, label: "quic iv", ctx: "", len: 12)
+server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", ctx: "", len: 12)
+client_hp_key = HKDF-Expand-Label(key: client_secret, label: "quic hp", ctx: "", len: 16)
+server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", ctx: "", len: 16)
 </pre>
     </processblock>
 
     I've created <a href="files/hkdf.sh" download="hkdf">an HKDF tool</a>
     to perform these operations on the command line.
     <codesample>
-<pre><code>
-$ handshake_hash=b965185af5034eda0ea13ab424dde193afcb42451823a96921ae9d2dad9594ef
+<pre><code>$ handshake_hash=b965185af5034eda0ea13ab424dde193afcb42451823a96921ae9d2dad9594ef
 $ handshake_secret=fb9fc80689b3a5d02c33243bf69a1b1b20705588a794304a6e7120155edf149a
 $ zero_key=0000000000000000000000000000000000000000000000000000000000000000
 $ empty_hash=$(openssl sha256 < /dev/null | sed -e 's/.* //')
@@ -3425,7 +3453,7 @@ b0b3b06690
 
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0x3f, or 63.
+            0x3f, or 63 bytes.
         </div>
     </span>
 
@@ -3485,6 +3513,8 @@ b0b3b06690
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 
@@ -3499,7 +3529,7 @@ b0b3b06690
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 20 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -3541,7 +3571,9 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>02</tt> - frame type "ACK"
             <li><tt>01</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>40 46</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of 16454 * 256 = 17,920 µseconds
+            <li><tt>40 46</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
+            70 * 8 = 560 µseconds
             <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
             <li><tt>01</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
             </ul>
@@ -3555,21 +3587,21 @@ $ cat /tmp/msg1 \
         </span>
         <div class="explanation">
             Each QUIC packet contains a list of one or more
-            frames in its payload. This packet only contains
+            frames in its payload. This packet contains only
             one frame, a <tt>CRYPTO</tt> frame.
-            <br>
+            <br><br>
             <tt>CRYPTO</tt> frames create a single stream of bytes
             used by TLS to establish a secure connection.
             <ul>
             <li><tt>06</tt> - frame type "CRYPTO"
-            <li><tt>00</tt> - offset of the crypto stream data being provided (6 bytes)
+            <li><tt>00</tt> - variable length integer, offset of the crypto stream data being provided (0 bytes)
             <li><tt>40 24</tt> - variable length integer (first two bits indicate 2-byte integer)
-                                 showing crypto stream data length of 36 bytes
+                                 showing crypto stream data length of 0x24 (36) bytes
             </ul>
         </div>
     </span>
     <span class="string decrypted">
-        <span class="label">ClientHello TLS Record</span>
+        <span class="label">Handshake Finished TLS Record</span>
         <span class="bytes">
  14 00 00 20 50 ff b0 c1 a4 25 c6 41 89 1c 98 3d 12 67 26 02 6d 3d b2 8e a3 51 0b dc 20 54 fc d6
  37 ed ca cc
@@ -3619,7 +3651,7 @@ $ cat /tmp/msg1 \
             before this point (Client Hello to Server Finished).
 
             <processblock class="notrunc">
-<pre>finished_key = HKDF-Expand-Label(key: client_secret, label: "finished", context: "", len: 32)
+<pre>finished_key = HKDF-Expand-Label(key: client_secret, label: "finished", ctx: "", len: 32)
 finished_hash = SHA256(ClientHello ... ServerFinished)
 verify_data = HMAC-SHA256(key: finished_key, msg: finished_hash)
 </pre>
@@ -3783,6 +3815,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 
@@ -3797,7 +3831,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 16 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -3850,9 +3884,9 @@ $ cat /tmp/msg1 \
             <tr><td>0x2</td><td>LEN: A "Length" field is present in this frame (otherwise consume all data in the frame)</td>
             <tr><td>0x1</td><td>FIN: This frame contains the final data of this stream, and the sender is done writing to it</td>
             </table>
-		    In this case, the sender indicates all three: there
-		    will be an offset field, a length field, and this
-		    is the final data for this stream.
+            In this case, the sender indicates all three: there
+            will be an offset field, a length field, and this
+            is the final data for this stream.
         </div>
     </span>
 
@@ -3884,9 +3918,9 @@ $ cat /tmp/msg1 \
  00
         </span>
         <div class="explanation">
-	        A variable-length integer indicating the offset of the
-	        stream data. In this case, a single-byte integer showing
-	        an offset of 0.
+            A variable-length integer indicating the offset of the
+            stream data. In this case, a single-byte integer showing
+            an offset of 0.
         </div>
     </span>
 
@@ -4035,7 +4069,7 @@ a5a6f88ece
 
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0x16, or 22.
+            0x16, or 22 bytes.
         </div>
     </span>
 
@@ -4094,6 +4128,8 @@ a5a6f88ece
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 
@@ -4108,7 +4144,7 @@ a5a6f88ece
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 20 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -4148,7 +4184,9 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>02</tt> - frame type "ACK"
             <li><tt>01</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>1c</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of 7168 * 256 = 7,168 µseconds
+            <li><tt>1c</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
+            28 * 8 = 224 µseconds
             <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (1) optionally provided below
             <li><tt>01</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
             </ul>
@@ -4296,6 +4334,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 
@@ -4310,7 +4350,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 16 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -4350,7 +4390,9 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>02</tt> - frame type "ACK"
             <li><tt>00</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>12</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of 4608 * 256 = 4,608 µseconds
+            <li><tt>12</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
+            18 * 8 = 144 µseconds
             <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
             <li><tt>00</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
             </ul>
@@ -4393,9 +4435,9 @@ $ cat /tmp/msg1 \
             <tr><td>0x2</td><td>LEN: A "Length" field is present in this frame (otherwise consume all data in the frame)</td>
             <tr><td>0x1</td><td>FIN: This frame contains the final data of this stream, and the sender is done writing to it</td>
             </table>
-		    In this case, the sender indicates all three: there
-		    will be an offset field, a length field, and this
-		    is the final data for this stream.
+            In this case, the sender indicates all three: there
+            will be an offset field, a length field, and this
+            is the final data for this stream.
         </div>
     </span>
 
@@ -4427,9 +4469,9 @@ $ cat /tmp/msg1 \
  00
         </span>
         <div class="explanation">
-	        A variable-length integer indicating the offset of the
-	        stream data. In this case, a single-byte integer showing
-	        an offset of 0.
+            A variable-length integer indicating the offset of the
+            stream data. In this case, a single-byte integer showing
+            an offset of 0.
         </div>
     </span>
 
@@ -4600,6 +4642,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 
@@ -4614,7 +4658,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 16 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -4654,7 +4698,9 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>02</tt> - frame type "ACK"
             <li><tt>00</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>0b</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of 2816 * 256 = 2,816 µseconds
+            <li><tt>0b</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
+            11 * 8 = 88 µseconds
             <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
             <li><tt>00</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
             </ul>
@@ -4805,6 +4851,8 @@ f494fdfbb6
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 
@@ -4819,7 +4867,7 @@ f494fdfbb6
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 16 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>

@@ -120,7 +120,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
 
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0x16, or 22.
+            0x16, or 22 bytes.
         </div>
     </span>
 
@@ -182,6 +182,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 %next 1116
@@ -198,7 +200,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 20 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -240,7 +242,9 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>%0</tt> - frame type "ACK"
             <li><tt>%1</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>%2</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of %dd2 * 256 = 8,192 µseconds
+            <li><tt>%2</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
+            %d2 * 8 = 256 µseconds
             <li><tt>%3</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (%d4) optionally provided below
             <li><tt>%4</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
             </ul>

@@ -18,34 +18,31 @@
   crypto_cert crypto_certverify crypto_s_finished  | openssl sha256
 
 b965185af5034eda0ea13ab424dde193afcb42451823a96921ae9d2dad9594ef
-    </code></pre>
+</code></pre>
     </codesample>
-
-    <br/><br/>
     We then feed the hash and the handshake secret into a set of
     key derivation operations, designed to protect against known and
     possible attacks:
 
     <processblock>
 <pre>empty_hash = SHA256("")
-derived_secret = HKDF-Expand-Label(key: handshake_secret, label: "derived", context: empty_hash, len: 32)
+derived_secret = HKDF-Expand-Label(key: handshake_secret, label: "derived", ctx: empty_hash, len: 32)
 master_secret = HKDF-Extract(salt: derived_secret, key: 00...)
-client_secret = HKDF-Expand-Label(key: master_secret, label: "c ap traffic", context: handshake_hash, len: 32)
-server_secret = HKDF-Expand-Label(key: master_secret, label: "s ap traffic", context: handshake_hash, len: 32)
-client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", context: "", len: 16)
-server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", context: "", len: 16)
-client_iv = HKDF-Expand-Label(key: client_secret, label: "quic iv", context: "", len: 12)
-server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", context: "", len: 12)
-client_hp_key = HKDF-Expand-Label(key: client_secret, label: "quic hp", context: "", len: 16)
-server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", context: "", len: 16)
+client_secret = HKDF-Expand-Label(key: master_secret, label: "c ap traffic", ctx: handshake_hash, len: 32)
+server_secret = HKDF-Expand-Label(key: master_secret, label: "s ap traffic", ctx: handshake_hash, len: 32)
+client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", ctx: "", len: 16)
+server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", ctx: "", len: 16)
+client_iv = HKDF-Expand-Label(key: client_secret, label: "quic iv", ctx: "", len: 12)
+server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", ctx: "", len: 12)
+client_hp_key = HKDF-Expand-Label(key: client_secret, label: "quic hp", ctx: "", len: 16)
+server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", ctx: "", len: 16)
 </pre>
     </processblock>
 
     I've created <a href="files/hkdf.sh" download="hkdf">an HKDF tool</a>
     to perform these operations on the command line.
     <codesample>
-<pre><code>
-$ handshake_hash=b965185af5034eda0ea13ab424dde193afcb42451823a96921ae9d2dad9594ef
+<pre><code>$ handshake_hash=b965185af5034eda0ea13ab424dde193afcb42451823a96921ae9d2dad9594ef
 $ handshake_secret=fb9fc80689b3a5d02c33243bf69a1b1b20705588a794304a6e7120155edf149a
 $ zero_key=0000000000000000000000000000000000000000000000000000000000000000
 $ empty_hash=$(openssl sha256 < /dev/null | sed -e 's/.* //')
@@ -233,7 +230,7 @@ b0b3b06690
 
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0x3f, or 63.
+            0x3f, or 63 bytes.
         </div>
     </span>
 
@@ -295,6 +292,8 @@ b0b3b06690
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 %empty
@@ -310,7 +309,7 @@ b0b3b06690
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 20 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -354,7 +353,9 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>%0</tt> - frame type "ACK"
             <li><tt>%1</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>%2 %3</tt> - <tt>ack_delay</tt>: amount of time this ack was delayed in sending, in microseconds.  Multiply by 2<super>ack_delay_exponent</super>, giving a value of %dd2 * 256 = 17,920 µseconds
+            <li><tt>%2 %3</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
+            %d3 * 8 = 560 µseconds
             <li><tt>%4</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (%d4) optionally provided below
             <li><tt>%5</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
             </ul>
@@ -369,21 +370,21 @@ $ cat /tmp/msg1 \
         </span>
         <div class="explanation">
             Each QUIC packet contains a list of one or more
-            frames in its payload. This packet only contains
+            frames in its payload. This packet contains only
             one frame, a <tt>CRYPTO</tt> frame.
-            <br>
+            <br><br>
             <tt>CRYPTO</tt> frames create a single stream of bytes
             used by TLS to establish a secure connection.
             <ul>
             <li><tt>%0</tt> - frame type "CRYPTO"
-            <li><tt>%1</tt> - offset of the crypto stream data being provided (%d0 bytes)
+            <li><tt>%1</tt> - variable length integer, offset of the crypto stream data being provided (%d1 bytes)
             <li><tt>%2 %3</tt> - variable length integer (first two bits indicate 2-byte integer)
-                                 showing crypto stream data length of 36 bytes
+                                 showing crypto stream data length of %n3 bytes
             </ul>
         </div>
     </span>
     <span class="string decrypted">
-        <span class="label">ClientHello TLS Record</span>
+        <span class="label">Handshake Finished TLS Record</span>
         <span class="bytes">
 %next 36
 %bytes
@@ -437,7 +438,7 @@ $ cat /tmp/msg1 \
             before this point (Client Hello to Server Finished).
 
             <processblock class="notrunc">
-<pre>finished_key = HKDF-Expand-Label(key: client_secret, label: "finished", context: "", len: 32)
+<pre>finished_key = HKDF-Expand-Label(key: client_secret, label: "finished", ctx: "", len: 32)
 finished_hash = SHA256(ClientHello ... ServerFinished)
 verify_data = HMAC-SHA256(key: finished_key, msg: finished_hash)
 </pre>

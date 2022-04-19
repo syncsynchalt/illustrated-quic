@@ -103,7 +103,7 @@ e54e8fcd38
             The source connection ID is given.
             <ul>
             <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>s_cid</tt>"
             </ul>
         </div>
     </span>
@@ -122,7 +122,7 @@ e54e8fcd38
             <br><br>
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0xcf, or 207.
+            0xcf, or 207 bytes.
         </div>
     </span>
 
@@ -140,7 +140,7 @@ e54e8fcd38
             This byte has header protection applied, see Packet Header Byte for
             details.
             <br><br>
-            This byte has the unprotected value of 0x00, indicating it is packet
+            This byte has the unprotected value of 0x01, indicating it is packet
             1, or the second "Handshake" packet sent by the server.
             <br><br>
 
@@ -184,6 +184,8 @@ e54e8fcd38
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 %empty
@@ -192,14 +194,14 @@ e54e8fcd38
         <div class="label">Decryption</div>
         <div class="explanation">
             This data is encrypted using the server
-            "Initial" traffic key and IV that were
-            generated during the "Initial Keys
+            "handshake" traffic key and IV that were
+            generated during the "Handshake Keys
             Calc" step.  The IV will be modified
             by XOR'ing it by the count of records that
             have already been encrypted with this key,
             which in this case is 1.  The process
             also takes as input the 20 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -246,7 +248,7 @@ $ cat /tmp/msg1 \
             <li><tt>%0</tt> - frame type "CRYPTO"
             <li><tt>%1 %2</tt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data offset of 0x3ff (1023) bytes
-            <li><tt>%2 %3</tt> - variable length integer (first two bits indicate 2-byte integer)
+            <li><tt>%3 %4</tt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data length of 0xb9 (185) bytes
             </ul>
         </div>
@@ -305,9 +307,34 @@ $ cat /tmp/msg1 \
     </span>
 
     <span class="string">
+        <span class="label">Signature Algorithm</span>
+        <span class="bytes">
+%next 2
+%bytes
+        </span>
+        <div class="explanation">
+            The server indicates the signature type:
+            <ul>
+            <li><tt>%0 %1</tt> - assigned value for "rsa_pss_rsae_sha256"
+            </ul>
+        </div>
+    </span>
+
+    <span class="string">
+        <span class="label">Signature Length</span>
+        <span class="bytes">
+%next 2
+%bytes
+        </span>
+        <div class="explanation">
+            The server indicates that %nn0 bytes of signature follow.
+        </div>
+    </span>
+
+    <span class="string">
         <span class="label">Signature</span>
         <span class="bytes">
-%next 260
+%next 256
 %bytes
         </span>
         <div class="explanation">
@@ -324,15 +351,11 @@ $ cat /tmp/msg1 \
             key.  The signature can be proven valid by
             the client by using the certificate's public
             key.
-            <ul>
-            <li><tt>08 04</tt> - reserved value for RSA-PSS-RSAE-SHA256 signature
-            <li><tt>%2 %3</tt> - %nn2 bytes of signature data follows
-            <li><tt>%4 %5 %6 ... %-3 %-2 %-1</tt> - a signature over this handshake's hash
-            </ul>
+            <br><br>
             The signing process can't be reproduced byte-for-byte
             at the command line because the signing tool introduces
             random or changing data into the signature.
-            <br/><br/>
+            <br><br>
             We can verify the signature using the
             <a href="files/server.crt" download="server.crt">server's certificate</a>
             at the command line:
@@ -422,7 +445,7 @@ Verified OK
             before this point (ClientHello to CertificateVerify).
 
             <processblock class="notrunc">
-<pre>finished_key = HKDF-Expand-Label(key: server_secret, label: "finished", context: "", len: 32)
+<pre>finished_key = HKDF-Expand-Label(key: server_secret, label: "finished", ctx: "", len: 32)
 finished_hash = SHA256(ClientHello ... CertificateVerify)
 verify_data = HMAC-SHA256(key: finished_key, msg: finished_hash)
 </pre>

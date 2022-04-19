@@ -49,14 +49,14 @@ ff788f9ed09e60d8142ac10a8931cdb6a3726278d3acdba54d9d9ffc7326611b
     <processblock>
 <pre>early_secret = HKDF-Extract(salt=00, key=00...)
 empty_hash = SHA256("")
-derived_secret = HKDF-Expand-Label(key: early_secret, label: "derived", context: empty_hash, len: 32)
+derived_secret = HKDF-Expand-Label(key: early_secret, label: "derived", ctx: empty_hash, len: 32)
 handshake_secret = HKDF-Extract(salt: derived_secret, key: shared_secret)
-client_secret = HKDF-Expand-Label(key: handshake_secret, label: "c hs traffic", context: hello_hash, len: 32)
-server_secret = HKDF-Expand-Label(key: handshake_secret, label: "s hs traffic", context: hello_hash, len: 32)
-client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", context: "", len: 16)
-server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", context: "", len: 16)
-client_iv = HKDF-Expand-Label(key: client_secret, label: "quic iv", context: "", len: 12)
-server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", context: "", len: 12)
+client_secret = HKDF-Expand-Label(key: handshake_secret, label: "c hs traffic", ctx: hello_hash, len: 32)
+server_secret = HKDF-Expand-Label(key: handshake_secret, label: "s hs traffic", ctx: hello_hash, len: 32)
+client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", ctx: "", len: 16)
+server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", ctx: "", len: 16)
+client_iv = HKDF-Expand-Label(key: client_secret, label: "quic iv", ctx: "", len: 12)
+server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", ctx: "", len: 12)
 </pre>
     </processblock>
 
@@ -211,7 +211,7 @@ ddb7ce7613
             The source connection ID is given.
             <ul>
             <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>s_cid</tt>"
             </ul>
         </div>
     </span>
@@ -230,7 +230,7 @@ ddb7ce7613
             <br><br>
             The first byte starts with the two bits "0 1" (0x4), which
             indicate two bytes.  The remaining bits give the number
-            0x414, or 1044.
+            0x414, or 1044 bytes.
         </div>
     </span>
 
@@ -292,6 +292,8 @@ ddb7ce7613
             This is the AEAD authentication tag
             that confirms the integrity of the
             encrypted data and the packet header.
+            It is produced by the encryption algorithm,
+            and consumed by the decryption algorithm.
         </div>
     </span>
 %empty
@@ -300,14 +302,14 @@ ddb7ce7613
         <div class="label">Decryption</div>
         <div class="explanation">
             This data is encrypted using the server
-            "Initial" traffic key and IV that were
-            generated during the "Initial Keys
+            "Handshake" traffic key and IV that were
+            generated during the "Handshake Keys
             Calc" step.  The IV will be modified
             by XOR'ing it by the count of records that
             have already been encrypted with this key,
             which in this case is 0.  The process
             also takes as input the 20 bytes of header
-            that this packet begins with, as authenticated
+            at the beginning of this packet, as authenticated
             data that must match for decryption to
             succeed.
             <br/><br/>
@@ -352,7 +354,7 @@ $ cat /tmp/msg1 \
             <br>
             <ul>
             <li><tt>%0</tt> - frame type "CRYPTO"
-            <li><tt>%1</tt> - variable length integer, offset of the crypto stream data being provided (%d0 bytes)
+            <li><tt>%1</tt> - variable length integer, offset of the crypto stream data being provided (%d1 bytes)
             <li><tt>%2 %3</tt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data length of 0x3ff (1023) bytes
             </ul>
@@ -447,8 +449,8 @@ $ cat /tmp/msg1 \
             <ul>
             <li><tt>%0 %1</tt> - assigned value for extension "Application Layer Protocol Negotiation"
             <li><tt>%2 %3</tt> - %nn2 bytes of "ALPN" extension data follows
-            <li><tt>%4 %5</tt> - %nn2 bytes of "ALPN" protocol data follows
-            <li><tt>%6</tt> - %nn2 bytes of a protocol name follows
+            <li><tt>%4 %5</tt> - %nn4 bytes of "ALPN" protocol data follows
+            <li><tt>%6</tt> - %n6 bytes of a protocol name follows
             <li><tt>%7 %8 ... %-2 %-1</tt> - the string "<tt>ping/1.0</tt>"
             </ul>
         </div>
@@ -462,7 +464,7 @@ $ cat /tmp/msg1 \
         </span>
         <div class="explanation">
             The server's configuration values for the QUIC connection are given here.
-            <br>
+            <br><br>
             The following QUIC parameters are set in the data below:
             <ul>
             <li>initial_destination_connection_id: 0001020304050607
