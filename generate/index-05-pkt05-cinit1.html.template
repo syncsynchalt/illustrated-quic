@@ -46,7 +46,7 @@ $ ./curve25519-mult client-ephemeral-private.key \
 </div>
 </div>
 
-<div class="datagram"><span class="label">UDP Datagram 4</span>
+<div class="datagram"><span class="label">UDP Datagram 4 - Acks</span>
 
 <div class="rec-outer">
 <div class="record client">

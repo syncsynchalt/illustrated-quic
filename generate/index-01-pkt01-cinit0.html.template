@@ -145,7 +145,7 @@ shp: 440b2725e91dc79b370711ef792faa3d
 </div>
 </div>
 
-<div class="datagram"><span class="label">UDP Datagram 1</span>
+<div class="datagram"><span class="label">UDP Datagram 1 - Client hello</span>
 
 <div class="rec-outer">
 <div class="record client">

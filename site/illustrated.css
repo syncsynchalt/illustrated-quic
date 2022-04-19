@@ -122,17 +122,20 @@ tt.longboi {
 }
 
 .illustrated .server.record .rec-label:before {
-    content: "⇇ ";
+    content: "❰ ";
+    color: #888;
 }
 .illustrated .client.record .rec-label:before {
-    content: "⇉ ";
-}
-.illustrated .server.record.embedded .rec-label:before,
-.illustrated .client.record.embedded .rec-label:before {
-    content: "";
+    content: "❱ ";
+    color: #888;
 }
 .illustrated .calculation .rec-label:before {
-    content: "÷ ";
+    /* content: "÷ "; */
+    /* content: "∻ "; */
+    /* content: "≑ "; */
+    content: "± ";
+    font-weight: bold;
+    color: #888;
 }
 
 .rec-label {
@@ -162,6 +165,7 @@ tt.longboi {
 }
 .illustrated .record.selected .rec-label:after,
 .illustrated .calculation.selected .rec-label:after {
+    color: #888;
     content: " ×";
     font-weight: bold;
     cursor: pointer;
@@ -214,11 +218,11 @@ tt.longboi {
 
 /***** .record-data *****/
 
-.client .record-data .string:hover {
-    color: teal;
+.client .record-data .string .bytes:hover {
+    background-color: #FFEFD5;
 }
-.server .record-data .string:hover {
-    color: darkgreen;
+.server .record-data .string .bytes:hover {
+    background-color: #FFEFD5;
 }
 .record.annotate .record-data .string:hover {
     color: inherit;
@@ -306,9 +310,15 @@ tt.longboi {
 
 .record .decryption > .label:before {
     content: "⬇ ";
+    color: #888;
 }
 .record .decryption > .label:after {
     content: " ⬇";
+    color: #888;
+}
+
+.string .bytes {
+    padding: 0.2em 0;
 }
 
 .string.encrypted .bytes {
@@ -323,9 +333,17 @@ tt.longboi {
     color: #655;
     text-shadow: 1px 1px 3px grey;
 }
-
-.string .bytes.unprotected {
-    /* text-shadow: 1px 1px 0px green; */
+.string .bytes.unprotected{
+    display: none;
+}
+.string .bytes.protected{
+    display: inline;
+}
+.string .bytes.unprotected.hp-disabled {
+    display: inline;
+}
+.string .bytes.protected.hp-disabled {
+    display: none;
 }
 
 .record-data .decryption {
@@ -494,18 +512,6 @@ button.hp-toggle:active {
     top: 1px;
 }
 
-span.bytes.unprotected{
-    display: none;
-}
-span.bytes.protected{
-    display: inline;
-}
-span.bytes.unprotected.hp-disabled {
-    display: inline;
-}
-span.bytes.protected.hp-disabled {
-    display: none;
-}
 
 /***** datagram borders *****/
 .datagram {
@@ -537,20 +543,21 @@ span.bytes.protected.hp-disabled {
     margin: 0;
     padding: 2px;
     border-bottom: 1px solid grey;
-    background-color: #ffe5b4;
+    background-color: #FFEFD5;
     color: #555;
     font-size: 0.9em;
+    text-align: right;
 }
 .header a, .header a:visited, .header a:hover {
     text-decoration: none;
     color: #555;
 }
-.header a:before {
-    /* content: "❧\00a0"; */
-    content: "•\00a0";
+.header a.this-page:before {
+    content: "❧\00a0";
+    /* content: "•\00a0"; */
 }
 .header a, .header span {
-    margin-left: 0.5em;
+    margin-right: 0.5em;
 }
 .header a.this-page {
     font-weight: bold;

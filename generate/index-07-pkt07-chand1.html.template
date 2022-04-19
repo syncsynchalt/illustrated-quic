@@ -107,7 +107,7 @@ chp: 8a6a38bc5cc40cb482a254dac68c9d2f
 </div>
 </div>
 
-<div class="datagram"><span class="label">UDP Datagram 5</span>
+<div class="datagram"><span class="label">UDP Datagram 5 - Client handshake finished, "ping"</span>
 
 <div class="rec-outer">
 <div class="record client">

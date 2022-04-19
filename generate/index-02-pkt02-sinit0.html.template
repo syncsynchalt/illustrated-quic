@@ -67,7 +67,7 @@ pub:
 </div>
 </div>
 
-<div class="datagram"><span class="label">UDP Datagram 2</span>
+<div class="datagram"><span class="label">UDP Datagram 2 - Server hello and handshake</span>
 
 <div class="rec-outer">
 <div class="record server">
