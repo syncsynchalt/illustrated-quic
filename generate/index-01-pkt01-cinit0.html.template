@@ -3,13 +3,14 @@
 <div class="rec-label">Client Key Exchange Generation</div>
 <img class="illustration" src="images/key1.png" width="135" height="250"/>
 <div class="rec-explanation">
-    The connection begins with the client creating a private/public
+    The connection begins with the client preparing a private/public
     keypair for key exchange.  Key exchange is a mathematical technique
     by which two parties can agree on the same number without an
     eavesdropper being able to tell what that number is.
     <br/><br/>
-    The endpoints of this connection will do key exchange via an
-    elliptical curve method, using the x25519 curve.
+    The key exchange will occur via an
+    <a href="https://en.wikipedia.org/wiki/Elliptic-curve_Diffie–Hellman">elliptical curve method</a>,
+    using the x25519 curve.
     <br/><br/>
     The private key is chosen by selecting an integer between
     0 and 2<sup>256</sup>-1.  The client does this by generating 32
@@ -21,7 +22,8 @@
     >202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f</tt></pre>
 
     The <a href="files/client-ephemeral-public.key" download="client-ephemeral-public.key">public key</a>
-    is chosen by multiplying the point x=9 on the x25519 curve
+    is chosen by <a href="https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication">multiplying</a>
+    the point represented by x=9 on the x25519 curve
     by the private key.  The public key calculated is:
 
     <pre class="ind2"><tt class="longboi"
@@ -43,6 +45,7 @@ pub:
     62:54
 </code></pre>
     </codesample>
+    At this point nothing has been sent over the network. Continue the connection below.
 </div>
 </div>
 </div>
@@ -52,10 +55,11 @@ pub:
 <div class="rec-label">Client Initial Keys Calc</div>
 <img class="illustration" src="images/key2.png" width="124" height="250"/>
 <div class="rec-explanation">
-    Next, the client will generate traffic keys for the Initial
-    packets.  Because key exchange between client and server has
+    Next, the client continues to prepare for the connection by generating
+    the encryption keys for the Initial packets.
+    Because key exchange between client and server has
     not taken place there is limited security in these keys -
-    any observer can derive the same keys and read the traffic.
+    any observer can derive the keys and read the traffic like the server will.
     Encrypting the Initial packets prevents certain kinds of attacks
     such as request forgery attacks.
     <br><br>
@@ -140,6 +144,7 @@ shp: 440b2725e91dc79b370711ef792faa3d
     <li>client initial header protection key: <tt class="longboi">6df4e9d737cdf714711d7c617ee82981</tt>
     <li>server initial header protection key: <tt class="longboi">440b2725e91dc79b370711ef792faa3d</tt>
     </ul>
+    At this point there is still no data sent over the network. The first data is sent below.
 </div>
 </div>
 </div>
