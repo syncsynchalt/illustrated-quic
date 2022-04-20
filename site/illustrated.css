@@ -6,10 +6,6 @@ body:not(.user-is-tabbing) textarea:focus {
     outline: none;
 }
 
-html {
-    background-color: #ffe5b4;
-}
-
 body {
     /* printmode */
     position: relative;
