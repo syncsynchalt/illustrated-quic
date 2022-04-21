@@ -4923,8 +4923,8 @@ $ cat /tmp/msg1 \
             <li><tt>1c</tt> - frame type "CONNECTION_CLOSE"
             <li><tt>00</tt> - error code: "No Error"
             <li><tt>00</tt> - frame type which triggered this error (0 = unknown)
-            <li><tt>11</tt> - variable-length integer for the length of the shutdown reason (0x11 (17) bytes)
-            <li><tt>67</tt> - shutdown reason: the string "graceful shutdown"
+            <li><tt>11</tt> - variable-length integer giving the length of the reason for shutdown
+            <li><tt>67 72 .. 77 6e</tt> - 0x11 (17) bytes giving the reason for shutdown: "graceful shutdown"
             </ul>
         </div>
     </span>
