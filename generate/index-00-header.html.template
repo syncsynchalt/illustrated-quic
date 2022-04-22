@@ -15,7 +15,7 @@
     <!-- Facebook Meta Tags -->
     <meta property="og:url" content="https://quic.ulfheim.net/">
     <meta property="og:type" content="website">
-    <meta property="og:title" content="The Illustrated QUIC Connection">
+    <meta property="og:title" content="The Illustrated QUIC Connection: Every Byte Explained">
     <meta property="og:description" content="Every byte of a QUIC connection explained and reproduced">
     <meta property="og:image" content="https://quic.ulfheim.net/images/og.png?bustin">
 
@@ -23,7 +23,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:domain" content="quic.ulfheim.net">
     <meta property="twitter:url" content="https://quic.ulfheim.net/">
-    <meta name="twitter:title" content="The Illustrated QUIC Connection">
+    <meta name="twitter:title" content="The Illustrated QUIC Connection: Every Byte Explained">
     <meta name="twitter:description" content="Every byte of a QUIC connection explained and reproduced">
     <meta name="twitter:image" content="https://quic.ulfheim.net/images/og.png?bustin">
 </head>
