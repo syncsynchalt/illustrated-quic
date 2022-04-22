@@ -39,13 +39,11 @@
 
     <h3>Every byte explained and reproduced</h3>
 
-    <div class="outerblock">
-    <p><b>
+    <h5>
     QUIC is a secure UDP-based stream protocol that forms
-    the basis of HTTP/3.</b>
-    </div>
+    the basis of HTTP/3.</h5>
 
-    <div class="outerblock">
+    <div class="outerblock" style="margin-top: 0.5em">
     <p>In this demonstration a client connects to a server,
     negotiates a QUIC connection with TLS encryption, sends "ping",
     receives "pong", then terminates the connection.
