@@ -873,8 +873,8 @@ $ cat /tmp/msg1 \
 <div class="rec-label">Padding</div>
 <div class="rec-explanation">
     Any datagram sent by the client that contains an Initial packet
-    must be padded to a length of 1200 bytes.  This is done by adding
-    Padding frames, which are a single 0x00 byte.
+    must be padded to a length of 1200 bytes. This library does it
+    by appending nul bytes to the datagram.
 </div>
 <span class="record-data">
     <span class="string">
@@ -3190,8 +3190,8 @@ $ cat /tmp/msg1 \
 <div class="rec-label">Padding</div>
 <div class="rec-explanation">
     Any datagram sent by the client that contains an Initial packet
-    must be padded to a length of 1200 bytes.  This is done by adding
-    Padding frames, which are a single 0x00 byte.
+    must be padded to a length of 1200 bytes. This library does it
+    by appending nul bytes to the datagram.
 </div>
 <span class="record-data">
     <span class="string">
