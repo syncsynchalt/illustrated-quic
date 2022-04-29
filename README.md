@@ -27,4 +27,4 @@ make
 
 Then open two terminals and run `./server` in the server/ subdir and `./client` in the client/ subdir.
 
-This has been shown to work on MacOS 12 and only has a few easy-to-find dependencies: gcc or clang, rust, cmake, make, patch.
+This has been shown to work on macOS 12 and only has a few easy-to-find dependencies: gcc or clang, rust, cmake, make, patch.
