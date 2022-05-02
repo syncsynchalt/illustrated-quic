@@ -14,7 +14,7 @@
     Elliptic Curve Cryptography: a gentle introduction</a> a good resource for this.
     <p>
     The endpoints of this connection will do key exchange via an
-    elliptical curve method, using the x25519 curve.
+    elliptic curve method, using the x25519 curve.
     <br/><br/>
     The private key is chosen by selecting an integer between
     0 and 2<sup>256</sup>-1.  The server does this by generating 32

@@ -961,7 +961,7 @@ $ cat /tmp/msg1 \
     Elliptic Curve Cryptography: a gentle introduction</a> a good resource for this.
     <p>
     The endpoints of this connection will do key exchange via an
-    elliptical curve method, using the x25519 curve.
+    elliptic curve method, using the x25519 curve.
     <br/><br/>
     The private key is chosen by selecting an integer between
     0 and 2<sup>256</sup>-1.  The server does this by generating 32
@@ -2675,7 +2675,7 @@ $ echo $fin_hash | xxd -r -p \
     result of the key exchange that allows the client and server
     to agree on a number.  The client multiplies the server's
     public key with the client's private key using the curve25519()
-    algorithm. The properties of elliptical curve multiplication will
+    algorithm. The properties of elliptic curve multiplication will
     cause this to result in the same number found by the server in its
     multiplication. The 32-byte result is found to be:
     <pre class="ind2"><tt class="longboi"
