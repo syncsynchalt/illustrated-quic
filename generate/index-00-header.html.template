@@ -42,6 +42,7 @@
 <body class="illustrated">
 <div class="header">
     <a class="this-page" href="https://quic.ulfheim.net">QUIC</a>
+    <a href="https://x25519.ulfheim.net">X25519</a>
     <a href="https://tls13.ulfheim.net">TLS 1.3</a>
     <a href="https://tls12.ulfheim.net">TLS 1.2</a>
 </div>

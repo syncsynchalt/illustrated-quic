@@ -14,7 +14,7 @@
     First, the client finds the shared secret, which is the
     result of the key exchange that allows the client and server
     to agree on a number.  The client multiplies the server's
-    public key with the client's private key using the curve25519()
+    public key by the client's private key using the curve25519()
     algorithm. The properties of elliptic curve multiplication will
     cause this to result in the same number found by the server in its
     multiplication. The 32-byte result is found to be:
