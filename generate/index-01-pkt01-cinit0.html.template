@@ -76,9 +76,9 @@ client_secret = HKDF-Expand-Label(key: initial_secret, label: "client in", ctx: 
 server_secret = HKDF-Expand-Label(key: initial_secret, label: "server in", ctx: "", len: 32)
 client_key = HKDF-Expand-Label(key: client_secret, label: "quic key", ctx: "", len: 16)
 server_key = HKDF-Expand-Label(key: server_secret, label: "quic key", ctx: "", len: 16)
-client_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", ctx: "", len: 12)
+client_iv = HKDF-Expand-Label(key: client_secret, label: "quic iv", ctx: "", len: 12)
 server_iv = HKDF-Expand-Label(key: server_secret, label: "quic iv", ctx: "", len: 12)
-client_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", ctx: "", len: 16)
+client_hp_key = HKDF-Expand-Label(key: client_secret, label: "quic hp", ctx: "", len: 16)
 server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", ctx: "", len: 16)
 </pre>
     </processblock>
