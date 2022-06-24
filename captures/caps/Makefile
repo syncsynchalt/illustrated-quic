@@ -16,7 +16,7 @@ handshake: $(HANDSHAKE)
 tools: aes_128_gcm_decrypt hp_removal
 
 aes_128_gcm_decrypt.c:
-	curl -sO https://tls13.ulfheim.net/archive/files/aes_128_gcm_decrypt.c
+	curl -sO https://tls13.xargs.org/archive/files/aes_128_gcm_decrypt.c
 
 aes_128_gcm_decrypt: aes_128_gcm_decrypt.c
 	cc -Wall -I $(OPENSSL_DIR)/include -o $@ $^ -L $(OPENSSL_DIR)/lib -lssl -lcrypto

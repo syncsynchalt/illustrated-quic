@@ -1,6 +1,6 @@
 # The Illustrated QUIC Connection
 
-Published at https://quic.ulfheim.net
+Published at https://quic.xargs.org
 
 - `site/`: page source for the finished product
 - `server/main.c`: server code
