@@ -23,7 +23,7 @@
     >909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeaf</tt></pre>
 
     The <a href="files/server-ephemeral-public.key" download="server-ephemeral-public.key">public key</a>
-    is chosen as explained on <a href="https://x25519.xargs.org/">X25519 site</a>.
+    is created from the private key as explained on the <a href="https://x25519.xargs.org/">X25519 site</a>.
     The public key calculated is:
 
     <pre class="ind2"><tt class="longboi"

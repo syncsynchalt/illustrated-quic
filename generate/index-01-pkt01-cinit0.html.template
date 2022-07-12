@@ -23,7 +23,7 @@
     >202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f</tt></pre>
 
     The <a href="files/client-ephemeral-public.key" download="client-ephemeral-public.key">public key</a>
-    is chosen as explained on <a href="https://x25519.xargs.org/">X25519 site</a>.
+    is created from the private key as explained on the <a href="https://x25519.xargs.org/">X25519 site</a>.
     The public key calculated is:
 
     <pre class="ind2"><tt class="longboi"
