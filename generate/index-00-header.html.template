@@ -1,5 +1,6 @@
 <!doctype html>
-<html>
+<!--suppress HtmlRequiredAltAttribute -->
+<html lang="en">
 
 <head>
     <title>The Illustrated QUIC Connection: Every Byte Explained</title>

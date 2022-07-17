@@ -1,6 +1,7 @@
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Key Exchange Generation</div>
+<!--suppress CheckImageSize -->
 <img class="illustration" src="images/key1.png" width="135" height="250"/>
 <div class="rec-explanation">
     <p>The connection begins with the client generating a private/public keypair
@@ -19,15 +20,15 @@
     <a href="files/client-ephemeral-private.key" download="client-ephemeral-private.key">private key</a>
     selected is:
 
-    <pre class="ind2"><tt class="longboi"
-    >202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f</tt></pre>
+    <pre class="ind2"><xtt class="longboi"
+    >202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f</xtt></pre>
 
     The <a href="files/client-ephemeral-public.key" download="client-ephemeral-public.key">public key</a>
     is created from the private key as explained on the <a href="https://x25519.xargs.org/">X25519 site</a>.
     The public key calculated is:
 
-    <pre class="ind2"><tt class="longboi"
-    >358072d6365880d1aeea329adf9121383851ed21a28e3b75e965d0d2cd166254</tt></pre>
+    <pre class="ind2"><xtt class="longboi"
+    >358072d6365880d1aeea329adf9121383851ed21a28e3b75e965d0d2cd166254</xtt></pre>
 
     The public key calculation can be confirmed at the command line:
     <codesample>
@@ -65,7 +66,7 @@ pub:
     <br><br>
     The client begins by generating 8 bytes of random data,
     in this case the bytes:
-    <pre class="ind2"><tt class="longboi">0001020304050607</tt></pre>
+    <pre class="ind2"><xtt class="longboi">0001020304050607</xtt></pre>
     The client then derives encryption keys using the following process:
 
     <processblock>
@@ -83,7 +84,7 @@ server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", ctx: "",
 </pre>
     </processblock>
 
-    The use of the magic constant "<tt>38762cf7f55934b34d179ae6a4c80cadccbb7f0a</tt>" as the initial
+    The use of the magic constant "<xtt>38762cf7f55934b34d179ae6a4c80cadccbb7f0a</xtt>" as the initial
     salt is interesting, as it is not derived from mathematical constants or cryptographic
     principles. It's the value of the first SHA-1 collision, co-discovered by Google researchers
     (QUIC itself was initially created, sponsored, and deployed by Google).
@@ -92,11 +93,11 @@ server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", ctx: "",
 
     This has introduced two new cryptographic concepts from TLS 1.3:
     <ul>
-    <li><tt>HKDF-Extract</tt> - given a salt and some bytes of key material
+    <li><xtt>HKDF-Extract</xtt> - given a salt and some bytes of key material
     create 256 bits (32 bytes) of new key material, with the
     input key material's entropy evenly distributed in the
     output.
-    <li><tt>HKDF-Expand-Label</tt> - given the inputs of key
+    <li><xtt>HKDF-Expand-Label</xtt> - given the inputs of key
     material, label, and context data, create a new key of the
     requested length.
     </ul>
@@ -134,15 +135,15 @@ shp: 440b2725e91dc79b370711ef792faa3d
 
     From this we get the following encryption keys and IVs:
     <ul>
-    <li>client initial key: <tt class="longboi">b14b918124fda5c8d79847602fa3520b</tt>
-    <li>client initial IV: <tt class="longboi">ddbc15dea80925a55686a7df</tt>
-    <li>server initial key: <tt class="longboi">d77fc4056fcfa32bd1302469ee6ebf90</tt>
-    <li>server initial IV: <tt class="longboi">fcb748e37ff79860faa07477</tt>
+    <li>client initial key: <xtt class="longboi">b14b918124fda5c8d79847602fa3520b</xtt>
+    <li>client initial IV: <xtt class="longboi">ddbc15dea80925a55686a7df</xtt>
+    <li>server initial key: <xtt class="longboi">d77fc4056fcfa32bd1302469ee6ebf90</xtt>
+    <li>server initial IV: <xtt class="longboi">fcb748e37ff79860faa07477</xtt>
     </ul>
     We also get the following "header protection keys", which will be explained below:
     <ul>
-    <li>client initial header protection key: <tt class="longboi">6df4e9d737cdf714711d7c617ee82981</tt>
-    <li>server initial header protection key: <tt class="longboi">440b2725e91dc79b370711ef792faa3d</tt>
+    <li>client initial header protection key: <xtt class="longboi">6df4e9d737cdf714711d7c617ee82981</xtt>
+    <li>server initial header protection key: <xtt class="longboi">440b2725e91dc79b370711ef792faa3d</xtt>
     </ul>
     At this point there is still no data sent over the network. The first data is sent below.
 </div>
@@ -205,11 +206,11 @@ ed9895bb15
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Packet type: Initial</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td>MSB</td><td><xtt>1</xtt></td><td>Long header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Packet type: Initial</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -239,8 +240,8 @@ ed9895bb15
             keys, as explained in "Initial Keys Calc"
             above.
             <ul>
-            <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 ... %-2 %-1</tt> - the connection ID
+            <li><xtt>%0</xtt> - %n0 bytes of connection ID follows
+            <li><xtt>%1 %2 ... %-2 %-1</xtt> - the connection ID
             </ul>
         </div>
     </span>
@@ -255,8 +256,8 @@ ed9895bb15
             The client uses this field to indicate its
             chosen connection ID to the server.
             <ul>
-            <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>%0</xtt> - %n0 bytes of connection ID follows
+            <li><xtt>%1 %2 %3 %4 %5</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -275,7 +276,7 @@ ed9895bb15
             is empty.
 
             <ul>
-            <li><tt>%0</tt> - %n0 bytes of token data follows
+            <li><xtt>%0</xtt> - %n0 bytes of token data follows
             </ul>
         </div>
     </span>
@@ -378,7 +379,7 @@ ed9895bb15
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -416,14 +417,14 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             Each QUIC packet contains a list of one or more
             frames in its payload. This packet contains only
-            one frame, a <tt>CRYPTO</tt> frame.
+            one frame, a <xtt>CRYPTO</xtt> frame.
             <br><br>
-            <tt>CRYPTO</tt> frames create a single stream of bytes
+            <xtt>CRYPTO</xtt> frames create a single stream of bytes
             used by TLS to establish a secure connection.
             <ul>
-            <li><tt>%0</tt> - frame type "CRYPTO"
-            <li><tt>%1</tt> - variable length integer, offset of the crypto stream data being provided (%d1 bytes)
-            <li><tt>%2 %3</tt> - variable length integer (first two bits indicate 2-byte integer)
+            <li><xtt>%0</xtt> - frame type "CRYPTO"
+            <li><xtt>%1</xtt> - variable length integer, offset of the crypto stream data being provided (%d1 bytes)
+            <li><xtt>%2 %3</xtt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data length of %n3 bytes
             </ul>
         </div>
@@ -469,8 +470,8 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             Each TLS handshake message starts with a type and a length.
             <ul>
-            <li><tt>%0</tt> - handshake message type 0x01 (client hello)
-            <li><tt>%1 %2 %3</tt> - %nnn1 bytes of client hello data follows
+            <li><xtt>%0</xtt> - handshake message type 0x01 (client hello)
+            <li><xtt>%1 %2 %3</xtt> - %nnn1 bytes of client hello data follows
             </ul>
         </div>
     </span>
@@ -521,7 +522,7 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             This is a legacy field and is not used in QUIC.
             <ul>
-            <li><tt>%0</tt> - %n0 bytes of session ID follow
+            <li><xtt>%0</xtt> - %n0 bytes of session ID follow
             </ul>
         </div>
     </span>
@@ -538,10 +539,10 @@ $ cat /tmp/msg1 \
             The list is in the order preferred by the
             client, with highest preference first.
             <ul>
-            <li><tt>%0 %1</tt> - %nn0 bytes of cipher suite data
-            <li><tt>13 01</tt> - assigned value for <tt>TLS_AES_128_GCM_SHA256</tt>
-            <li><tt>13 02</tt> - assigned value for <tt>TLS_AES_256_GCM_SHA384</tt>
-            <li><tt>13 03</tt> - assigned value for <tt>TLS_CHACHA20_POLY1305_SHA256</tt>
+            <li><xtt>%0 %1</xtt> - %nn0 bytes of cipher suite data
+            <li><xtt>13 01</xtt> - assigned value for <xtt>TLS_AES_128_GCM_SHA256</xtt>
+            <li><xtt>13 02</xtt> - assigned value for <xtt>TLS_AES_256_GCM_SHA384</xtt>
+            <li><xtt>13 03</xtt> - assigned value for <xtt>TLS_CHACHA20_POLY1305_SHA256</xtt>
             </ul>
         </div>
     </span>
@@ -563,8 +564,8 @@ $ cat /tmp/msg1 \
             the "null" compression method which performs
             no change to the data.
             <ul>
-            <li><tt>%0</tt> - %n0 bytes of compression methods
-            <li><tt>00</tt> - assigned value for "null" compression
+            <li><xtt>%0</xtt> - %n0 bytes of compression methods
+            <li><xtt>00</xtt> - assigned value for "null" compression
             </ul>
         </div>
     </span>
@@ -580,7 +581,7 @@ $ cat /tmp/msg1 \
             extensions which the server can use to
             take action or enable new features.
             <ul>
-            <li><tt>%0 %1</tt> - the extensions will take %nn0 bytes of data
+            <li><xtt>%0 %1</xtt> - the extensions will take %nn0 bytes of data
             </ul>
             Each extension will start with two bytes
             that indicate which extension it is, followed
@@ -608,12 +609,12 @@ $ cat /tmp/msg1 \
             after the TLS session was negotiated and the
             HTTP request was made.
             <ul>
-                <li><tt>00 00</tt> - assigned value for extension "server name"
-                <li><tt>%2 %3</tt> - %nn2 bytes of "server name" extension data follows
-                <li><tt>%4 %5</tt> - %nn4 bytes of first (and only) list entry follows
-                <li><tt>%6</tt> - list entry is type 0x00 "DNS hostname"
-                <li><tt>%7 %8</tt> - %nn7 bytes of hostname follows
-                <li><tt>%9 %10 %11 ... %-3 %-2 %-1</tt> - "example.ulfheim.net"
+                <li><xtt>00 00</xtt> - assigned value for extension "server name"
+                <li><xtt>%2 %3</xtt> - %nn2 bytes of "server name" extension data follows
+                <li><xtt>%4 %5</xtt> - %nn4 bytes of first (and only) list entry follows
+                <li><xtt>%6</xtt> - list entry is type 0x00 "DNS hostname"
+                <li><xtt>%7 %8</xtt> - %nn7 bytes of hostname follows
+                <li><xtt>%9 %10 %11 ... %-3 %-2 %-1</xtt> - "example.ulfheim.net"
             </ul>
         </div>
     </span>
@@ -635,12 +636,12 @@ $ cat /tmp/msg1 \
             This list is presented in descending order
             of the client's preference.
             <ul>
-                <li><tt>00 0a</tt> - assigned value for extension "supported groups"
-                <li><tt>%2 %3</tt> - %nn2 bytes of "supported group" extension data follows
-                <li><tt>%4 %5</tt> - %nn4 bytes of data are in the curves list
-                <li><tt>00 1d</tt> - assigned value for the curve "x25519"
-                <li><tt>00 17</tt> - assigned value for the curve "secp256r1"
-                <li><tt>00 18</tt> - assigned value for the curve "secp384r1"
+                <li><xtt>00 0a</xtt> - assigned value for extension "supported groups"
+                <li><xtt>%2 %3</xtt> - %nn2 bytes of "supported group" extension data follows
+                <li><xtt>%4 %5</xtt> - %nn4 bytes of data are in the curves list
+                <li><xtt>00 1d</xtt> - assigned value for the curve "x25519"
+                <li><xtt>00 17</xtt> - assigned value for the curve "secp256r1"
+                <li><xtt>00 18</xtt> - assigned value for the curve "secp384r1"
             </ul>
         </div>
     </span>
@@ -657,11 +658,11 @@ $ cat /tmp/msg1 \
             <br>
             Some example applications might be "http/1.1", "h2" (HTTP/2), or "h3" (HTTP/3).
             <ul>
-            <li><tt>%0 %1</tt> - assigned value for extension "Application Layer Protocol Negotiation"
-            <li><tt>%2 %3</tt> - %nn2 bytes of "ALPN" extension data follows
-            <li><tt>%4 %5</tt> - %nn4 bytes of "ALPN" protocol data follows
-            <li><tt>%6</tt> - %n6 bytes of a protocol name follows
-            <li><tt>%7 %8 ... %-2 %-1</tt> - the string "<tt>ping/1.0</tt>"
+            <li><xtt>%0 %1</xtt> - assigned value for extension "Application Layer Protocol Negotiation"
+            <li><xtt>%2 %3</xtt> - %nn2 bytes of "ALPN" extension data follows
+            <li><xtt>%4 %5</xtt> - %nn4 bytes of "ALPN" protocol data follows
+            <li><xtt>%6</xtt> - %n6 bytes of a protocol name follows
+            <li><xtt>%7 %8 ... %-2 %-1</xtt> - the string "<xtt>ping/1.0</xtt>"
             </ul>
         </div>
     </span>
@@ -683,18 +684,18 @@ $ cat /tmp/msg1 \
             This list is presented in descending order
             of the client's preference.
             <ul>
-                <li><tt>00 0d</tt> - assigned value for extension "Signature Algorithms"
-                <li><tt>%2 %3</tt> - %nn2 bytes of "Signature Algorithms" extension data follows
-                <li><tt>%4 %5</tt> - %nn4 bytes of data are in the following list of algorithms
-                <li><tt>04 03</tt> - assigned value for ECDSA-SECP256r1-SHA256
-                <li><tt>08 04</tt> - assigned value for RSA-PSS-RSAE-SHA256
-                <li><tt>04 01</tt> - assigned value for RSA-PKCS1-SHA256
-                <li><tt>05 03</tt> - assigned value for ECDSA-SECP384r1-SHA384
-                <li><tt>08 05</tt> - assigned value for RSA-PSS-RSAE-SHA384
-                <li><tt>05 01</tt> - assigned value for RSA-PKCS1-SHA384
-                <li><tt>08 06</tt> - assigned value for RSA-PSS-RSAE-SHA512
-                <li><tt>06 01</tt> - assigned value for RSA-PKCS1-SHA512
-                <li><tt>02 01</tt> - assigned value for RSA-PKCS1-SHA1
+                <li><xtt>00 0d</xtt> - assigned value for extension "Signature Algorithms"
+                <li><xtt>%2 %3</xtt> - %nn2 bytes of "Signature Algorithms" extension data follows
+                <li><xtt>%4 %5</xtt> - %nn4 bytes of data are in the following list of algorithms
+                <li><xtt>04 03</xtt> - assigned value for ECDSA-SECP256r1-SHA256
+                <li><xtt>08 04</xtt> - assigned value for RSA-PSS-RSAE-SHA256
+                <li><xtt>04 01</xtt> - assigned value for RSA-PKCS1-SHA256
+                <li><xtt>05 03</xtt> - assigned value for ECDSA-SECP384r1-SHA384
+                <li><xtt>08 05</xtt> - assigned value for RSA-PSS-RSAE-SHA384
+                <li><xtt>05 01</xtt> - assigned value for RSA-PKCS1-SHA384
+                <li><xtt>08 06</xtt> - assigned value for RSA-PSS-RSAE-SHA512
+                <li><xtt>06 01</xtt> - assigned value for RSA-PKCS1-SHA512
+                <li><xtt>02 01</xtt> - assigned value for RSA-PKCS1-SHA1
             </ul>
         </div>
     </span>
@@ -714,12 +715,12 @@ $ cat /tmp/msg1 \
             unlike previous protocol versions where the
             handshake was sent in the clear.
             <ul>
-                <li><tt>00 33</tt> - assigned value for extension "Key Share"
-                <li><tt>%2 %3</tt> - %nn2 bytes of "Key Share" extension data follows
-                <li><tt>%4 %5</tt> - %nn4 bytes of key share data follows
-                <li><tt>00 1d</tt> - assigned value for x25519 (key exchange via curve25519)
-                <li><tt>%8 %9</tt> - %nn8 bytes of public key follows
-                <li><tt>%10 %11 ... %-2 %-1</tt></l> - public key from the step "Client Key Exchange Generation"
+                <li><xtt>00 33</xtt> - assigned value for extension "Key Share"
+                <li><xtt>%2 %3</xtt> - %nn2 bytes of "Key Share" extension data follows
+                <li><xtt>%4 %5</xtt> - %nn4 bytes of key share data follows
+                <li><xtt>00 1d</xtt> - assigned value for x25519 (key exchange via curve25519)
+                <li><xtt>%8 %9</xtt> - %nn8 bytes of public key follows
+                <li><xtt>%10 %11 ... %-2 %-1</xtt> - public key from the step "Client Key Exchange Generation"
             </ul>
         </div>
     </span>
@@ -736,10 +737,10 @@ $ cat /tmp/msg1 \
             (PSKs).  Since we do not use PSKs in this
             session, this extension has no effect.
             <ul>
-                <li><tt>00 2d</tt> - assigned value for extension "PSK Key Exchange Modes"
-                <li><tt>%2 %3</tt> - %nn2 bytes of "PSK Key Exchange Modes" extension data follows
-                <li><tt>%4</tt> - %n4 bytes of exchange modes follow
-                <li><tt>01</tt> - assigned value for "PSK with (EC)DHE key establishment"
+                <li><xtt>00 2d</xtt> - assigned value for extension "PSK Key Exchange Modes"
+                <li><xtt>%2 %3</xtt> - %nn2 bytes of "PSK Key Exchange Modes" extension data follows
+                <li><xtt>%4</xtt> - %n4 bytes of exchange modes follow
+                <li><xtt>01</xtt> - assigned value for "PSK with (EC)DHE key establishment"
             </ul>
         </div>
     </span>
@@ -754,10 +755,10 @@ $ cat /tmp/msg1 \
             The client indicates its support of TLS 1.3. For compatibility reasons
             this is put into an extension instead of the Client Version field above.
             <ul>
-                <li><tt>00 2b</tt> - assigned value for extension "Supported Versions"
-                <li><tt>%2 %3</tt> - %nn2 bytes of "Supported Versions" extension data follows
-                <li><tt>%4</tt> - %n4 bytes of TLS version follows
-                <li><tt>03 04</tt> - assigned value for TLS 1.3
+                <li><xtt>00 2b</xtt> - assigned value for extension "Supported Versions"
+                <li><xtt>%2 %3</xtt> - %nn2 bytes of "Supported Versions" extension data follows
+                <li><xtt>%4</xtt> - %n4 bytes of TLS version follows
+                <li><xtt>03 04</xtt> - assigned value for TLS 1.3
             </ul>
         </div>
     </span>
@@ -787,50 +788,50 @@ $ cat /tmp/msg1 \
             </ul>
             A full listing and explanation of the bytes follows:
             <ul>
-            <li><tt>%0 %1</tt> - assigned value for extension "QUIC Transport Parameters"
-            <li><tt>%2 %3</tt> - %nn2 bytes of "QUIC Transport Parameters" extension data follows
+            <li><xtt>%0 %1</xtt> - assigned value for extension "QUIC Transport Parameters"
+            <li><xtt>%2 %3</xtt> - %nn2 bytes of "QUIC Transport Parameters" extension data follows
 
-            <li><tt>%4</tt> - assigned value for "max_udp_payload_size"
-            <li><tt>%5</tt> - %d5 bytes of "max_udp_payload_size" data follows
-            <li><tt>%6 %7 %8 %9</tt> - a variable length integer with value 0xfff7 (65527)
+            <li><xtt>%4</xtt> - assigned value for "max_udp_payload_size"
+            <li><xtt>%5</xtt> - %d5 bytes of "max_udp_payload_size" data follows
+            <li><xtt>%6 %7 %8 %9</xtt> - a variable length integer with value 0xfff7 (65527)
 
-            <li><tt>%10</tt> - assigned value for "initial_max_data"
-            <li><tt>%11</tt> - %d11 bytes of "initial_max_data" data follows
-            <li><tt>%12 %13 %14 %15</tt> - a variable length integer with value 0xa00000 (10485760)
+            <li><xtt>%10</xtt> - assigned value for "initial_max_data"
+            <li><xtt>%11</xtt> - %d11 bytes of "initial_max_data" data follows
+            <li><xtt>%12 %13 %14 %15</xtt> - a variable length integer with value 0xa00000 (10485760)
 
-            <li><tt>%16</tt> - assigned value for "initial_max_stream_data_bidi_local"
-            <li><tt>%17</tt> - %d17 bytes of "initial_max_stream_data_bidi_local" data follows
-            <li><tt>%18 %19 %20 %21</tt> - a variable length integer with value 0x100000 (1048576)
+            <li><xtt>%16</xtt> - assigned value for "initial_max_stream_data_bidi_local"
+            <li><xtt>%17</xtt> - %d17 bytes of "initial_max_stream_data_bidi_local" data follows
+            <li><xtt>%18 %19 %20 %21</xtt> - a variable length integer with value 0x100000 (1048576)
 
-            <li><tt>%22</tt> - assigned value for "initial_max_stream_data_bidi_remote"
-            <li><tt>%23</tt> - %d23 bytes of "initial_max_stream_data_bidi_remote" data follows
-            <li><tt>%24 %25 %26 %27</tt> - a variable length integer with value 0x100000 (1048576)
+            <li><xtt>%22</xtt> - assigned value for "initial_max_stream_data_bidi_remote"
+            <li><xtt>%23</xtt> - %d23 bytes of "initial_max_stream_data_bidi_remote" data follows
+            <li><xtt>%24 %25 %26 %27</xtt> - a variable length integer with value 0x100000 (1048576)
 
-            <li><tt>%28</tt> - assigned value for "initial_max_stream_data_uni"
-            <li><tt>%29</tt> - %d29 bytes of "initial_max_stream_data_uni" data follows
-            <li><tt>%30 %31 %32 %33</tt> - a variable length integer with value 0x100000 (1048576)
+            <li><xtt>%28</xtt> - assigned value for "initial_max_stream_data_uni"
+            <li><xtt>%29</xtt> - %d29 bytes of "initial_max_stream_data_uni" data follows
+            <li><xtt>%30 %31 %32 %33</xtt> - a variable length integer with value 0x100000 (1048576)
 
-            <li><tt>%34</tt> - assigned value for "initial_max_streams_bidi"
-            <li><tt>%35</tt> - %d35 bytes of "initial_max_streams_bidi" data follows
-            <li><tt>%36</tt> - a variable length integer with value %n36
+            <li><xtt>%34</xtt> - assigned value for "initial_max_streams_bidi"
+            <li><xtt>%35</xtt> - %d35 bytes of "initial_max_streams_bidi" data follows
+            <li><xtt>%36</xtt> - a variable length integer with value %n36
 
-            <li><tt>%37</tt> - assigned value for "initial_max_streams_uni"
-            <li><tt>%38</tt> - %d38 bytes of "initial_max_streams_uni" data follows
-            <li><tt>%39</tt> - a variable length integer with value %n39
+            <li><xtt>%37</xtt> - assigned value for "initial_max_streams_uni"
+            <li><xtt>%38</xtt> - %d38 bytes of "initial_max_streams_uni" data follows
+            <li><xtt>%39</xtt> - a variable length integer with value %n39
 
-            <li><tt>%40</tt> - assigned value for "ack_delay_exponent"
-            <li><tt>%41</tt> - %d41 bytes of "ack_delay_exponent" data follows
-            <li><tt>%42</tt> - a variable length integer with value %n42
+            <li><xtt>%40</xtt> - assigned value for "ack_delay_exponent"
+            <li><xtt>%41</xtt> - %d41 bytes of "ack_delay_exponent" data follows
+            <li><xtt>%42</xtt> - a variable length integer with value %n42
 
-            <li><tt>%43</tt> - assigned value for "GREASE", a technique for preventing
+            <li><xtt>%43</xtt> - assigned value for "GREASE", a technique for preventing
             middleboxes from disallowing new extensions, by pre-reserving extension values
             and injecting them randomly into connections
-            <li><tt>%44</tt> - %d44 bytes of "GREASE" data follows
-            <li><tt>%45</tt> - a variable length integer with value %n45
+            <li><xtt>%44</xtt> - %d44 bytes of "GREASE" data follows
+            <li><xtt>%45</xtt> - a variable length integer with value %n45
 
-            <li><tt>%46</tt> - assigned value for "initial_source_connection_id"
-            <li><tt>%47</tt> - %d47 bytes of "initial_source_connection_id" data follows
-            <li><tt>%48 %49 %50 %51 %52</tt> - a copy of the source connection ID from the packet header: "<tt>c_cid</tt>"
+            <li><xtt>%46</xtt> - assigned value for "initial_source_connection_id"
+            <li><xtt>%47</xtt> - %d47 bytes of "initial_source_connection_id" data follows
+            <li><xtt>%48 %49 %50 %51 %52</xtt> - a copy of the source connection ID from the packet header: "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -897,6 +898,7 @@ $ cat /tmp/msg1 \
             it's at the given address (such as round-trip data originally from the server).
             Adding padding to this Initial datagram gives the server a "byte budget"
             to perform handshake responses without exceeding this 3x limit.
+            </ul>
         </div>
     </span>
 </span>

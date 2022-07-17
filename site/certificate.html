@@ -18,6 +18,7 @@
 <div class="rec-outer">
 <div class="record server selected">
 <div class="rec-label">Server Certificate Detail</div>
+<!--suppress CheckImageSize -->
 <img class="illustration" src="images/key9.png" width="97" height="250"/>
 <div class="rec-explanation">
     The certificate is in ASN.1 DER binary encoding.  This encoding consists of records in the following sequence:
@@ -39,8 +40,8 @@
         <div class="explanation">
             Sequence of three entries follows: the certificate info, the signature algorithm, and the signature.
             <ul>
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>82 03 21</tt> - long-form length of 0x321 (801) bytes
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>82 03 21</xtt> - long-form length of 0x321 (801) bytes
             </ul>
         </div>
     </span>
@@ -53,8 +54,8 @@
         <div class="explanation">
             Sequence of certificate info follows.
             <ul>
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>82 02 09</tt> - long-form sequence length of 0x209 (521) bytes
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>82 02 09</xtt> - long-form sequence length of 0x209 (521) bytes
             </ul>
         </div>
     </span>
@@ -67,11 +68,11 @@
         <div class="explanation">
             Certificate version 0x2 - assigned value for "v3"
             <ul>
-            <li><tt>a0</tt> - constructed context-specific type [0]
-            <li><tt>03</tt> - length of 0x3 (3) bytes
-            <li><tt>02</tt> - universal type integer
-            <li><tt>01</tt> - integer length of 0x1 bytes
-            <li><tt>02</tt> - integer value of 2
+            <li><xtt>a0</xtt> - constructed context-specific type [0]
+            <li><xtt>03</xtt> - length of 0x3 (3) bytes
+            <li><xtt>02</xtt> - universal type integer
+            <li><xtt>01</xtt> - integer length of 0x1 bytes
+            <li><xtt>02</xtt> - integer value of 2
             </ul>
         </div>
     </span>
@@ -84,9 +85,9 @@
         <div class="explanation">
             Sequence number 0x155a92adc2048f90
             <ul>
-            <li><tt>02</tt> - universal type integer
-            <li><tt>08</tt> - integer length of 8 bytes
-            <li><tt>15 5a 92 ad c2 04 8f 90</tt> - integer value of 0x155a92adc2048f90
+            <li><xtt>02</xtt> - universal type integer
+            <li><xtt>08</xtt> - integer length of 8 bytes
+            <li><xtt>15 5a 92 ad c2 04 8f 90</xtt> - integer value of 0x155a92adc2048f90
             </ul>
         </div>
     </span>
@@ -99,13 +100,13 @@
         <div class="explanation">
             Algorithm SHA256 with RSA Encryption, null params.
             <ul>
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>0d</tt> - sequence length of 0xD (13) bytes
-            <li><tt>06</tt> - universal type object id (OID)
-            <li><tt>09</tt> - OID length of 9 bytes
-            <li><tt>2a 86 48 86 f7 0d 01 01 0b</tt> - OID 1.2.840.113549.1.1.11 "Sha256WithRSAEncryption"
-            <li><tt>05</tt> - universal type null (parameters)
-            <li><tt>00</tt> - null length of 0x0 (0) bytes
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>0d</xtt> - sequence length of 0xD (13) bytes
+            <li><xtt>06</xtt> - universal type object id (OID)
+            <li><xtt>09</xtt> - OID length of 9 bytes
+            <li><xtt>2a 86 48 86 f7 0d 01 01 0b</xtt> - OID 1.2.840.113549.1.1.11 "Sha256WithRSAEncryption"
+            <li><xtt>05</xtt> - universal type null (parameters)
+            <li><xtt>00</xtt> - null length of 0x0 (0) bytes
             </ul>
         </div>
     </span>
@@ -118,8 +119,8 @@
         <div class="explanation">
             Sequence of items making up the Issuer name follow.
             <ul>
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>22</tt> - sequence length of 0x22 (34) bytes
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>22</xtt> - sequence length of 0x22 (34) bytes
             </ul>
         </div>
     </span>
@@ -132,15 +133,15 @@
         <div class="explanation">
             Country "US"
             <ul>
-            <li><tt>31</tt> - constructed universal type set
-            <li><tt>0b</tt> - set length of 0xB (11) bytes
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>09</tt> - sequence length of 9 bytes
-            <li><tt>06</tt> - universal type object ID (OID)
-            <li><tt>03 55 04 06</tt> - OID 2.5.4.6 "Country"
-            <li><tt>13</tt> - universal type printablestring
-            <li><tt>02</tt> - printable string length 2 bytes
-            <li><tt>55 53</tt> - "US"
+            <li><xtt>31</xtt> - constructed universal type set
+            <li><xtt>0b</xtt> - set length of 0xB (11) bytes
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>09</xtt> - sequence length of 9 bytes
+            <li><xtt>06</xtt> - universal type object ID (OID)
+            <li><xtt>03 55 04 06</xtt> - OID 2.5.4.6 "Country"
+            <li><xtt>13</xtt> - universal type printablestring
+            <li><xtt>02</xtt> - printable string length 2 bytes
+            <li><xtt>55 53</xtt> - "US"
             </ul>
         </div>
     </span>
@@ -153,15 +154,15 @@
         <div class="explanation">
             Organizational Unit "Example CA"
             <ul>
-            <li><tt>31</tt> - constructed universal type set
-            <li><tt>13</tt> - set length of 0x13 (19) bytes
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>11</tt> - sequence length of 0x11 (17) bytes
-            <li><tt>06</tt> - universal type object ID (OID)
-            <li><tt>03 55 04 0a</tt> - OID 2.5.4.10 "OrganizationalUnit"
-            <li><tt>13</tt> - universal type printablestring
-            <li><tt>0a</tt> - printable string length 0xA (10) bytes
-            <li><tt>45 78 61 6d 70 6c 65 20 43 41</tt> - "Example CA"
+            <li><xtt>31</xtt> - constructed universal type set
+            <li><xtt>13</xtt> - set length of 0x13 (19) bytes
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>11</xtt> - sequence length of 0x11 (17) bytes
+            <li><xtt>06</xtt> - universal type object ID (OID)
+            <li><xtt>03 55 04 0a</xtt> - OID 2.5.4.10 "OrganizationalUnit"
+            <li><xtt>13</xtt> - universal type printablestring
+            <li><xtt>0a</xtt> - printable string length 0xA (10) bytes
+            <li><xtt>45 78 61 6d 70 6c 65 20 43 41</xtt> - "Example CA"
             </ul>
         </div>
     </span>
@@ -174,14 +175,14 @@
         <div class="explanation">
             Valid from 2018-10-05 01:38:17 GMT to 2019-10-05 01:38:17 GMT
             <ul>
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>1e</tt> - set length of 0x1E (30) bytes
-            <li><tt>17</tt> - universal type utctime
-            <li><tt>0d</tt> - utctime length 0xD (13) bytes
-            <li><tt>31 38 31 30 30 35 30 31 33 38 31 37 5a</tt> - "181005013817Z"
-            <li><tt>17</tt> - universal type utctime
-            <li><tt>0d</tt> - utctime length 0xD (13) bytes
-            <li><tt>31 39 31 30 30 35 30 31 33 38 31 37 5a</tt> - "191005013817Z"
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>1e</xtt> - set length of 0x1E (30) bytes
+            <li><xtt>17</xtt> - universal type utctime
+            <li><xtt>0d</xtt> - utctime length 0xD (13) bytes
+            <li><xtt>31 38 31 30 30 35 30 31 33 38 31 37 5a</xtt> - "181005013817Z"
+            <li><xtt>17</xtt> - universal type utctime
+            <li><xtt>0d</xtt> - utctime length 0xD (13) bytes
+            <li><xtt>31 39 31 30 30 35 30 31 33 38 31 37 5a</xtt> - "191005013817Z"
             </ul>
         </div>
     </span>
@@ -194,8 +195,8 @@
         <div class="explanation">
             Sequence of items making up the subject of this certificate follow.
             <ul>
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>2b</tt> - sequence length of 0x2B (43) bytes
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>2b</xtt> - sequence length of 0x2B (43) bytes
             </ul>
         </div>
     </span>
@@ -208,16 +209,16 @@
         <div class="explanation">
             Country "US"
             <ul>
-            <li><tt>31</tt> - constructed universal type set
-            <li><tt>0b</tt> - set length of 0xB (11) bytes
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>09</tt> - sequence length of 9 bytes
-            <li><tt>06</tt> - universal type object ID (OID)
-            <li><tt>03</tt> - OID length 3 bytes
-            <li><tt>55 04 06</tt> - OID 2.5.4.6 "Country"
-            <li><tt>13</tt> - universal type printablestring
-            <li><tt>02</tt> - printable string length 2 bytes
-            <li><tt>55 53</tt> - "US"
+            <li><xtt>31</xtt> - constructed universal type set
+            <li><xtt>0b</xtt> - set length of 0xB (11) bytes
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>09</xtt> - sequence length of 9 bytes
+            <li><xtt>06</xtt> - universal type object ID (OID)
+            <li><xtt>03</xtt> - OID length 3 bytes
+            <li><xtt>55 04 06</xtt> - OID 2.5.4.6 "Country"
+            <li><xtt>13</xtt> - universal type printablestring
+            <li><xtt>02</xtt> - printable string length 2 bytes
+            <li><xtt>55 53</xtt> - "US"
             </ul>
         </div>
     </span>
@@ -230,17 +231,17 @@
         <div class="explanation">
             Common Name "example.ulfheim.net"
             <ul>
-            <li><tt>31</tt> - constructed universal type set
-            <li><tt>1c</tt> - set length of 0x1C (28) bytes
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>1a</tt> - sequence length of 0x1A (26) bytes
-            <li><tt>06</tt> - universal type object ID (OID)
-            <li><tt>03</tt> - OID length 3 bytes
-            <li><tt>55 04 03</tt> - OID 2.5.4.3 "CommonName"
-            <li><tt>13</tt> - universal type printablestring
-            <li><tt>13</tt> - printable string length 0x13 (19) bytes
-            <li><tt>65 78 61 6d 70 6c 65 2e 75 6c
-                66 68 65 69 6d 2e 6e 65 74</tt> - "example.ulfheim.net"
+            <li><xtt>31</xtt> - constructed universal type set
+            <li><xtt>1c</xtt> - set length of 0x1C (28) bytes
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>1a</xtt> - sequence length of 0x1A (26) bytes
+            <li><xtt>06</xtt> - universal type object ID (OID)
+            <li><xtt>03</xtt> - OID length 3 bytes
+            <li><xtt>55 04 03</xtt> - OID 2.5.4.3 "CommonName"
+            <li><xtt>13</xtt> - universal type printablestring
+            <li><xtt>13</xtt> - printable string length 0x13 (19) bytes
+            <li><xtt>65 78 61 6d 70 6c 65 2e 75 6c
+                66 68 65 69 6d 2e 6e 65 74</xtt> - "example.ulfheim.net"
             </ul>
         </div>
     </span>
@@ -262,19 +263,19 @@
         <div class="explanation">
             Provides public key and its type (RSA)
             <ul>
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>82 01 22</tt> - long-form sequence length 0x122 (290 bytes)
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>0d</tt> - sequence length 0xD (13) bytes
-            <li><tt>06</tt> - universal type object id (OID)
-            <li><tt>09</tt> - OID length of 9 bytes
-            <li><tt>2a 86 48 86 f7 0d 01 01 01</tt> - OID 1.2.840.113549.1.1.1 (RSA Encryption)
-            <li><tt>05</tt> - universal type null (parameters)
-            <li><tt>00</tt> - null length of 0 bytes
-            <li><tt>03</tt> - universal type bitstring
-            <li><tt>82 01 0f</tt> - long-form bitstring length 0x10f (271) bytes
-            <li><tt>00</tt> - right-pad bitstring by 0 bits
-            <li><tt>30 82 01 ... 01 00 01</tt> - public key
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>82 01 22</xtt> - long-form sequence length 0x122 (290 bytes)
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>0d</xtt> - sequence length 0xD (13) bytes
+            <li><xtt>06</xtt> - universal type object id (OID)
+            <li><xtt>09</xtt> - OID length of 9 bytes
+            <li><xtt>2a 86 48 86 f7 0d 01 01 01</xtt> - OID 1.2.840.113549.1.1.1 (RSA Encryption)
+            <li><xtt>05</xtt> - universal type null (parameters)
+            <li><xtt>00</xtt> - null length of 0 bytes
+            <li><xtt>03</xtt> - universal type bitstring
+            <li><xtt>82 01 0f</xtt> - long-form bitstring length 0x10f (271) bytes
+            <li><xtt>00</xtt> - right-pad bitstring by 0 bits
+            <li><xtt>30 82 01 ... 01 00 01</xtt> - public key
             </ul>
         </div>
     </span>
@@ -287,10 +288,10 @@
         <div class="explanation">
             Extension data follows.
             <ul>
-            <li><tt>a3</tt> - constructed context-specific type [3]
-            <li><tt>52</tt> - length of 0x52 (82) bytes
-            <li><tt>30</tt> - constructed universal sequence
-            <li><tt>50</tt> - sequence length of 0x50 (80) bytes
+            <li><xtt>a3</xtt> - constructed context-specific type [3]
+            <li><xtt>52</xtt> - length of 0x52 (82) bytes
+            <li><xtt>30</xtt> - constructed universal sequence
+            <li><xtt>50</xtt> - sequence length of 0x50 (80) bytes
             </ul>
         </div>
     </span>
@@ -303,21 +304,21 @@
         <div class="explanation">
             Key Usage: digitalSignature and keyEncipherment
             <ul>
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>0e</tt> - sequence length of 0xE (14) bytes
-            <li><tt>06</tt> - universal type object id (OID)
-            <li><tt>03</tt> - OID length of 3 bytes
-            <li><tt>55 1d 0f</tt> - OID 2.5.29.15 "KeyUsage"
-            <li><tt>01</tt> - universal type boolean
-            <li><tt>01</tt> - boolean length 1 bytes
-            <li><tt>ff</tt> - boolean value "true" (extension is critical)
-            <li><tt>04</tt> - universal type octetstring
-            <li><tt>04</tt> - octetstring length 4 bytes
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>0e</xtt> - sequence length of 0xE (14) bytes
+            <li><xtt>06</xtt> - universal type object id (OID)
+            <li><xtt>03</xtt> - OID length of 3 bytes
+            <li><xtt>55 1d 0f</xtt> - OID 2.5.29.15 "KeyUsage"
+            <li><xtt>01</xtt> - universal type boolean
+            <li><xtt>01</xtt> - boolean length 1 bytes
+            <li><xtt>ff</xtt> - boolean value "true" (extension is critical)
+            <li><xtt>04</xtt> - universal type octetstring
+            <li><xtt>04</xtt> - octetstring length 4 bytes
             <li>(octetstring is a DER document as follows):
-            <li><tt>03</tt> - universal type bitstring
-            <li><tt>02</tt> - bitstring length 2 bytes
-            <li><tt>05</tt> - right-pad bitstring by 5 bits
-            <li><tt>a0</tt> - bits 0 (digitalSignature) and 2 (keyEncipherment) are set
+            <li><xtt>03</xtt> - universal type bitstring
+            <li><xtt>02</xtt> - bitstring length 2 bytes
+            <li><xtt>05</xtt> - right-pad bitstring by 5 bits
+            <li><xtt>a0</xtt> - bits 0 (digitalSignature) and 2 (keyEncipherment) are set
             </ul>
         </div>
     </span>
@@ -330,22 +331,22 @@
         <div class="explanation">
             Indicates the cert is valid as a TLS client cert and/or server cert.
             <ul>
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>1d</tt> - sequence length of 0x1D (29) bytes
-            <li><tt>06</tt> - universal type object id (OID)
-            <li><tt>03</tt> - OID length of 3 bytes
-            <li><tt>55 1d 25</tt> - OID 2.5.29.37 "ExtendedKeyUsage"
-            <li><tt>04</tt> - universal type octetstring
-            <li><tt>16</tt> - octetstring length 0x16 (22) bytes
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>1d</xtt> - sequence length of 0x1D (29) bytes
+            <li><xtt>06</xtt> - universal type object id (OID)
+            <li><xtt>03</xtt> - OID length of 3 bytes
+            <li><xtt>55 1d 25</xtt> - OID 2.5.29.37 "ExtendedKeyUsage"
+            <li><xtt>04</xtt> - universal type octetstring
+            <li><xtt>16</xtt> - octetstring length 0x16 (22) bytes
             <li>(octetstring is a DER document as follows):
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>14</tt> - sequence length 0x14 (20) bytes
-            <li><tt>06</tt> - universal type object id (OID)
-            <li><tt>08</tt> - OID length of 8 bytes
-            <li><tt>2b 06 01 05 05 07 03 02</tt> - OID 1.3.6.1.5.5.7.3.2 "id-kp-clientAuth"
-            <li><tt>06</tt> - universal type object id (OID)
-            <li><tt>08</tt> - OID length of 8 bytes
-            <li><tt>2b 06 01 05 05 07 03 01</tt> - OID 1.3.6.1.5.5.7.3.1 "id-kp-serverAuth"
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>14</xtt> - sequence length 0x14 (20) bytes
+            <li><xtt>06</xtt> - universal type object id (OID)
+            <li><xtt>08</xtt> - OID length of 8 bytes
+            <li><xtt>2b 06 01 05 05 07 03 02</xtt> - OID 1.3.6.1.5.5.7.3.2 "id-kp-clientAuth"
+            <li><xtt>06</xtt> - universal type object id (OID)
+            <li><xtt>08</xtt> - OID length of 8 bytes
+            <li><xtt>2b 06 01 05 05 07 03 01</xtt> - OID 1.3.6.1.5.5.7.3.1 "id-kp-serverAuth"
             </ul>
         </div>
     </span>
@@ -359,19 +360,19 @@
         <div class="explanation">
             Indicates the CA's public key to be used to verify the certificate's signature.
             <ul>
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>1f</tt> - sequence length of 0x1F (31) bytes
-            <li><tt>06</tt> - universal type object id (OID)
-            <li><tt>03</tt> - OID length of 3 bytes
-            <li><tt>55 1d 23</tt> - OID 2.5.29.35 "AuthorityKeyIdentifier"
-            <li><tt>04</tt> - universal type octetstring
-            <li><tt>18</tt> - octetstring length 0x18 (24) bytes
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>1f</xtt> - sequence length of 0x1F (31) bytes
+            <li><xtt>06</xtt> - universal type object id (OID)
+            <li><xtt>03</xtt> - OID length of 3 bytes
+            <li><xtt>55 1d 23</xtt> - OID 2.5.29.35 "AuthorityKeyIdentifier"
+            <li><xtt>04</xtt> - universal type octetstring
+            <li><xtt>18</xtt> - octetstring length 0x18 (24) bytes
             <li>(octetstring is a DER document as follows):
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>16</tt> - sequence length 0x16 (22) bytes
-            <li><tt>80</tt> - context-specific type [0]
-            <li><tt>14</tt> - length of 0x14 (20) bytes
-            <li><tt>89 4f ... c1 46</tt> - octet string identifying the public key
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>16</xtt> - sequence length 0x16 (22) bytes
+            <li><xtt>80</xtt> - context-specific type [0]
+            <li><xtt>14</xtt> - length of 0x14 (20) bytes
+            <li><xtt>89 4f ... c1 46</xtt> - octet string identifying the public key
             </ul>
         </div>
     </span>
@@ -384,13 +385,13 @@
         <div class="explanation">
             The signature algorithm: SHA256 with RSA Encryption, null params.
             <ul>
-            <li><tt>30</tt> - constructed universal type sequence
-            <li><tt>0d</tt> - sequence length of 0xD (13) bytes
-            <li><tt>06</tt> - universal type object ID (OID)
-            <li><tt>09</tt> - OID length of 9 bytes
-            <li><tt>2a 86 48 86 f7 0d 01 01 0b</tt> - OID 1.2.840.113549.1.1.11 "Sha256WithRSAEncryption"
-            <li><tt>05</tt> - universal type null (params)
-            <li><tt>00</tt> - null length 0 bytes
+            <li><xtt>30</xtt> - constructed universal type sequence
+            <li><xtt>0d</xtt> - sequence length of 0xD (13) bytes
+            <li><xtt>06</xtt> - universal type object ID (OID)
+            <li><xtt>09</xtt> - OID length of 9 bytes
+            <li><xtt>2a 86 48 86 f7 0d 01 01 0b</xtt> - OID 1.2.840.113549.1.1.11 "Sha256WithRSAEncryption"
+            <li><xtt>05</xtt> - universal type null (params)
+            <li><xtt>00</xtt> - null length 0 bytes
         </div>
     </span>
 
@@ -410,10 +411,10 @@
         <div class="explanation">
             The signature.
             <ul>
-            <li><tt>03</tt> - universal type bitstring
-            <li><tt>82 01 01</tt> - long-form bitstring length 0x101 (257) bytes
-            <li><tt>00</tt> - right-padded by 0x0 (0) bits
-            <li><tt>59 16 .. 36 a0</tt> - signature
+            <li><xtt>03</xtt> - universal type bitstring
+            <li><xtt>82 01 01</xtt> - long-form bitstring length 0x101 (257) bytes
+            <li><xtt>00</xtt> - right-padded by 0x0 (0) bits
+            <li><xtt>59 16 .. 36 a0</xtt> - signature
             </ul>
         </div>
     </span>

@@ -52,13 +52,13 @@ f494fdfbb6
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>0</tt></td><td>Short header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>0</tt></td><td>"Spin" bit, optionally used to allow observers to measure RTT,
+            <tr><td>MSB</td><td><xtt>0</xtt></td><td>Short header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>0</xtt></td><td>"Spin" bit, optionally used to allow observers to measure RTT,
                 but unused by this library</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td></td><td><tt>0</tt></td><td>Key phase bit, used to signal when key rotation occurs</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td></td><td><xtt>0</xtt></td><td>Key phase bit, used to signal when key rotation occurs</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -81,7 +81,7 @@ f494fdfbb6
             must know the length, either by always using the same length,
             or by embedding its own length encoding in the ID.
             <ul>
-            <li><tt>%0 %1 %2 %3 %4</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>%0 %1 %2 %3 %4</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -165,7 +165,7 @@ f494fdfbb6
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -202,11 +202,11 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The server sends an indication to close the connection.
             <ul>
-            <li><tt>%0</tt> - frame type "CONNECTION_CLOSE"
-            <li><tt>%1</tt> - error code: "No Error"
-            <li><tt>%2</tt> - frame type which triggered this error (0 = unknown)
-            <li><tt>%3</tt> - variable-length integer giving the length of the reason for shutdown
-            <li><tt>%4 %5 .. %-2 %-1</tt> - %n3 bytes giving the reason for shutdown: "graceful shutdown"
+            <li><xtt>%0</xtt> - frame type "CONNECTION_CLOSE"
+            <li><xtt>%1</xtt> - error code: "No Error"
+            <li><xtt>%2</xtt> - frame type which triggered this error (0 = unknown)
+            <li><xtt>%3</xtt> - variable-length integer giving the length of the reason for shutdown
+            <li><xtt>%4 %5 .. %-2 %-1</xtt> - %n3 bytes giving the reason for shutdown: "graceful shutdown"
             </ul>
         </div>
     </span>

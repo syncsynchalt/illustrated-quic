@@ -1,6 +1,7 @@
 <div class="rec-outer">
 <div class="calculation server">
 <div class="rec-label">Server Application Keys Calc</div>
+<!--suppress CheckImageSize -->
 <img class="illustration" src="images/key7.png" width="116" height="250"/>
 <div class="rec-explanation">
     The server now has the information to calculate the
@@ -12,7 +13,7 @@
     </ul>
     The hash input does not include the QUIC frame headers.
 
-    This "handshake_hash" is <tt class="longboi">b965185af5034eda0ea13ab424dde193afcb42451823a96921ae9d2dad9594ef</tt>:
+    This "handshake_hash" is <xtt class="longboi">b965185af5034eda0ea13ab424dde193afcb42451823a96921ae9d2dad9594ef</xtt>:
     <codesample>
     <pre><code>$ cat crypto_clienthello crypto_serverhello crypto_extensions \
   crypto_cert crypto_certverify crypto_s_finished  | openssl sha256
@@ -74,12 +75,12 @@ chp: 8a6a38bc5cc40cb482a254dac68c9d2f
 
     From this we get the following key data:
     <ul>
-    <li>server application key: <tt class="longboi">fd8c7da9de1b2da4d2ef9fd5188922d0</tt>
-    <li>server application IV: <tt class="longboi">02f6180e4f4aa456d7e8a602</tt>
-    <li>server application header protection key: <tt class="longboi">b7f6f021453e52b58940e4bba72a35d4</tt>
-    <li>client application key: <tt class="longboi">e010a295f0c2864f186b2a7e8fdc9ed7</tt>
-    <li>client application IV: <tt class="longboi">eb3fbc384a3199dcf6b4c808</tt>
-    <li>client application header protection key: <tt class="longboi">8a6a38bc5cc40cb482a254dac68c9d2f</tt>
+    <li>server application key: <xtt class="longboi">fd8c7da9de1b2da4d2ef9fd5188922d0</xtt>
+    <li>server application IV: <xtt class="longboi">02f6180e4f4aa456d7e8a602</xtt>
+    <li>server application header protection key: <xtt class="longboi">b7f6f021453e52b58940e4bba72a35d4</xtt>
+    <li>client application key: <xtt class="longboi">e010a295f0c2864f186b2a7e8fdc9ed7</xtt>
+    <li>client application IV: <xtt class="longboi">eb3fbc384a3199dcf6b4c808</xtt>
+    <li>client application header protection key: <xtt class="longboi">8a6a38bc5cc40cb482a254dac68c9d2f</xtt>
     </ul>
 </div>
 </div>
@@ -88,6 +89,7 @@ chp: 8a6a38bc5cc40cb482a254dac68c9d2f
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Application Keys Calc</div>
+<!--suppress CheckImageSize -->
 <img class="illustration" src="images/key8.png" width="97" height="250"/>
 <div class="rec-explanation">
     The client has the information to calculate the
@@ -95,12 +97,12 @@ chp: 8a6a38bc5cc40cb482a254dac68c9d2f
     It performs the same calculation shown in "Server Application
     Keys Calc" and finds the same values:
     <ul>
-    <li>server application key: <tt class="longboi">fd8c7da9de1b2da4d2ef9fd5188922d0</tt>
-    <li>server application IV: <tt class="longboi">02f6180e4f4aa456d7e8a602</tt>
-    <li>server application header protection key: <tt class="longboi">b7f6f021453e52b58940e4bba72a35d4</tt>
-    <li>client application key: <tt class="longboi">e010a295f0c2864f186b2a7e8fdc9ed7</tt>
-    <li>client application IV: <tt class="longboi">eb3fbc384a3199dcf6b4c808</tt>
-    <li>client application header protection key: <tt class="longboi">8a6a38bc5cc40cb482a254dac68c9d2f</tt>
+    <li>server application key: <xtt class="longboi">fd8c7da9de1b2da4d2ef9fd5188922d0</xtt>
+    <li>server application IV: <xtt class="longboi">02f6180e4f4aa456d7e8a602</xtt>
+    <li>server application header protection key: <xtt class="longboi">b7f6f021453e52b58940e4bba72a35d4</xtt>
+    <li>client application key: <xtt class="longboi">e010a295f0c2864f186b2a7e8fdc9ed7</xtt>
+    <li>client application IV: <xtt class="longboi">eb3fbc384a3199dcf6b4c808</xtt>
+    <li>client application header protection key: <xtt class="longboi">8a6a38bc5cc40cb482a254dac68c9d2f</xtt>
     </ul>
 </div>
 </div>
@@ -161,11 +163,11 @@ b0b3b06690
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>10</tt></td><td>Packet type: Handshake</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td>MSB</td><td><xtt>1</xtt></td><td>Long header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>10</xtt></td><td>Packet type: Handshake</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -195,8 +197,8 @@ b0b3b06690
             changed, making it more resilient than the underlying network
             connection.
             <ul>
-            <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><xtt>%0</xtt> - %n0 bytes of connection ID follows
+            <li><xtt>%1 %2 %3 %4 %5</xtt> - the connection ID "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -210,8 +212,8 @@ b0b3b06690
         <div class="explanation">
             The source connection ID is given.
             <ul>
-            <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>%0</xtt> - %n0 bytes of connection ID follows
+            <li><xtt>%1 %2 %3 %4 %5</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -313,7 +315,7 @@ b0b3b06690
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -351,13 +353,13 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The client acknowledges receipt of the server's Handshake packet 1.
             <ul>
-            <li><tt>%0</tt> - frame type "ACK"
-            <li><tt>%1</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>%2 %3</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            <li><xtt>%0</xtt> - frame type "ACK"
+            <li><xtt>%1</xtt> - <xtt>largest_acknowledged</xtt>: largest packet being acknowledged
+            <li><xtt>%2 %3</xtt> - <xtt>ack_delay</xtt>: variable-length integer giving the amount of time this ack was delayed
             in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
             %d3 * 8 = 560 µseconds
-            <li><tt>%4</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (%d4) optionally provided below
-            <li><tt>%5</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            <li><xtt>%4</xtt> - <xtt>ack_range_count</xtt>: the number of additional ack ranges (%d4) optionally provided below
+            <li><xtt>%5</xtt> - <xtt>first_ack_range</xtt>: variable length integer giving the number of packets before <xtt>largest_acknowledged</xtt> that are also being acknowledged
             </ul>
         </div>
     </span>
@@ -371,14 +373,14 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             Each QUIC packet contains a list of one or more
             frames in its payload. This packet contains only
-            one frame, a <tt>CRYPTO</tt> frame.
+            one frame, a <xtt>CRYPTO</xtt> frame.
             <br><br>
-            <tt>CRYPTO</tt> frames create a single stream of bytes
+            <xtt>CRYPTO</xtt> frames create a single stream of bytes
             used by TLS to establish a secure connection.
             <ul>
-            <li><tt>%0</tt> - frame type "CRYPTO"
-            <li><tt>%1</tt> - variable length integer, offset of the crypto stream data being provided (%d1 bytes)
-            <li><tt>%2 %3</tt> - variable length integer (first two bits indicate 2-byte integer)
+            <li><xtt>%0</xtt> - frame type "CRYPTO"
+            <li><xtt>%1</xtt> - variable length integer, offset of the crypto stream data being provided (%d1 bytes)
+            <li><xtt>%2 %3</xtt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data length of %n3 bytes
             </ul>
         </div>
@@ -418,8 +420,8 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             Each TLS handshake message starts with a type and a length.
             <ul>
-            <li><tt>%0</tt> - handshake message type 0x14 (finished)
-            <li><tt>%1 %2 %3</tt> - %nnn1 bytes of handshake finished data follow
+            <li><xtt>%0</xtt> - handshake message type 0x14 (finished)
+            <li><xtt>%1 %2 %3</xtt> - %nnn1 bytes of handshake finished data follow
             </ul>
         </div>
     </span>
@@ -461,6 +463,7 @@ $ echo $fin_hash | xxd -r -p \
             </codesample>
         </div>
     </span>
+</span>
 </div>
 </div>
 %empty

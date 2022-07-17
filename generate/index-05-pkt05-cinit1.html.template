@@ -1,6 +1,7 @@
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Handshake Keys Calc</div>
+<!--suppress CheckImageSize -->
 <img class="illustration" src="images/key6.png" width="105" height="250"/>
 <div class="rec-explanation">
     The client now has the information to calculate the
@@ -18,8 +19,8 @@
     algorithm. The properties of elliptic curve multiplication will
     cause this to result in the same number found by the server in its
     multiplication. The 32-byte result is found to be:
-    <pre class="ind2"><tt class="longboi"
-    >df4a291baa1eb7cfa6934b29b474baad2697e29f1f920dcc77c8a0a088447624</tt></pre>
+    <pre class="ind2"><xtt class="longboi"
+    >df4a291baa1eb7cfa6934b29b474baad2697e29f1f920dcc77c8a0a088447624</xtt></pre>
 
     I've provided <a href="files/curve25519-mult.c" download="curve25519-mult.c">a tool</a>
     to perform this calculation:
@@ -36,12 +37,12 @@ $ ./curve25519-mult client-ephemeral-private.key \
     server in "Server Handshake Keys Calc", the rest of
     the calculation is identical and the same values are found:
     <ul>
-    <li>client handshake key: <tt class="longboi">30a7e816f6a1e1b3434cf39cf4b415e7</tt>
-    <li>client handshake IV: <tt class="longboi">11e70a5d1361795d2bb04465</tt>
-    <li>client handshake header protection key: <tt class="longboi">84b3c21cacaf9f54c885e9a506459079</tt>
-    <li>server handshake key: <tt class="longboi">17abbf0a788f96c6986964660414e7ec</tt>
-    <li>server handshake IV: <tt class="longboi">09597a2ea3b04c00487e71f3</tt>
-    <li>server handshake header protection key: <tt class="longboi">2a18061c396c2828582b41b0910ed536</tt>
+    <li>client handshake key: <xtt class="longboi">30a7e816f6a1e1b3434cf39cf4b415e7</xtt>
+    <li>client handshake IV: <xtt class="longboi">11e70a5d1361795d2bb04465</xtt>
+    <li>client handshake header protection key: <xtt class="longboi">84b3c21cacaf9f54c885e9a506459079</xtt>
+    <li>server handshake key: <xtt class="longboi">17abbf0a788f96c6986964660414e7ec</xtt>
+    <li>server handshake IV: <xtt class="longboi">09597a2ea3b04c00487e71f3</xtt>
+    <li>server handshake header protection key: <xtt class="longboi">2a18061c396c2828582b41b0910ed536</xtt>
     </ul>
 </div>
 </div>
@@ -102,11 +103,11 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Packet type: Initial</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td>MSB</td><td><xtt>1</xtt></td><td>Long header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Packet type: Initial</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -136,8 +137,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             changed, making it more resilient than the underlying network
             connection.
             <ul>
-            <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><xtt>%0</xtt> - %n0 bytes of connection ID follows
+            <li><xtt>%1 %2 %3 %4 %5</xtt> - the connection ID "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -151,8 +152,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
         <div class="explanation">
             The source connection ID is given.
             <ul>
-            <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>%0</xtt> - %n0 bytes of connection ID follows
+            <li><xtt>%1 %2 %3 %4 %5</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -166,7 +167,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
         <div class="explanation">
             A token is not needed here, and is not sent.
             <ul>
-            <li><tt>%0</tt> - %n0 bytes of token data follows
+            <li><xtt>%0</xtt> - %n0 bytes of token data follows
             </ul>
         </div>
     </span>
@@ -268,7 +269,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -304,13 +305,13 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The server acknowledges receipt of the client's Initial packet 0.
             <ul>
-            <li><tt>%0</tt> - frame type "ACK"
-            <li><tt>%1</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>%2 %3</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            <li><xtt>%0</xtt> - frame type "ACK"
+            <li><xtt>%1</xtt> - <xtt>largest_acknowledged</xtt>: largest packet being acknowledged
+            <li><xtt>%2 %3</xtt> - <xtt>ack_delay</xtt>: variable-length integer giving the amount of time this ack was delayed
             in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
             %d3 * 8 = 1,032 µseconds
-            <li><tt>%4</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (%d4) optionally provided below
-            <li><tt>%5</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            <li><xtt>%4</xtt> - <xtt>ack_range_count</xtt>: the number of additional ack ranges (%d4) optionally provided below
+            <li><xtt>%5</xtt> - <xtt>first_ack_range</xtt>: variable length integer giving the number of packets before <xtt>largest_acknowledged</xtt> that are also being acknowledged
             </ul>
         </div>
     </span>

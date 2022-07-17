@@ -51,13 +51,13 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>0</tt></td><td>Short header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>0</tt></td><td>"Spin" bit, optionally used to allow observers to measure RTT,
+            <tr><td>MSB</td><td><xtt>0</xtt></td><td>Short header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>0</xtt></td><td>"Spin" bit, optionally used to allow observers to measure RTT,
                 but unused by this library</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td></td><td><tt>0</tt></td><td>Key phase bit, used to signal when key rotation occurs</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td></td><td><xtt>0</xtt></td><td>Key phase bit, used to signal when key rotation occurs</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -80,7 +80,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             must know the length, either by always using the same length,
             or by embedding its own length encoding in the ID.
             <ul>
-            <li><tt>%0 %1 %2 %3 %4</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><xtt>%0 %1 %2 %3 %4</xtt> - the connection ID "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -164,7 +164,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -237,8 +237,8 @@ $ cat /tmp/msg1 \
                 <th>Meaning</th>
             </tr>
             </thead>
-            <tr><td>0x2</td><td>Indicates whether the stream is bi-directional (<tt>0</tt>) or uni-directional (<tt>1</tt>).</td>
-            <tr><td>0x1</td><td>Indicates whether the stream was opened by client (<tt>0</tt>) or server (<tt>1</tt>).</td>
+            <tr><td>0x2</td><td>Indicates whether the stream is bi-directional (<xtt>0</xtt>) or uni-directional (<xtt>1</xtt>).</td>
+            <tr><td>0x1</td><td>Indicates whether the stream was opened by client (<xtt>0</xtt>) or server (<xtt>1</xtt>).</td>
             </table>
             In this case, the stream ID of 0 indicates it is the first bi-directional stream opened by the client.
         </div>
@@ -278,7 +278,7 @@ $ cat /tmp/msg1 \
 %bytes
         </span>
         <div class="explanation">
-            The application data "<tt>ping</tt>".
+            The application data "<xtt>ping</xtt>".
         </div>
     </span>
 %empty

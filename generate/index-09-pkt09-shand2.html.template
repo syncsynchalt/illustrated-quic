@@ -53,11 +53,11 @@ a5a6f88ece
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>10</tt></td><td>Packet type: Handshake</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td>MSB</td><td><xtt>1</xtt></td><td>Long header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>10</xtt></td><td>Packet type: Handshake</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -87,8 +87,8 @@ a5a6f88ece
             changed, making it more resilient than the underlying network
             connection.
             <ul>
-            <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>%0</xtt> - %n0 bytes of connection ID follows
+            <li><xtt>%1 %2 %3 %4 %5</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -102,8 +102,8 @@ a5a6f88ece
         <div class="explanation">
             The source connection ID is given.
             <ul>
-            <li><tt>%0</tt> - %n0 bytes of connection ID follows
-            <li><tt>%1 %2 %3 %4 %5</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><xtt>%0</xtt> - %n0 bytes of connection ID follows
+            <li><xtt>%1 %2 %3 %4 %5</xtt> - the connection ID "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -205,7 +205,7 @@ a5a6f88ece
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -241,13 +241,13 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The server acknowledges receipt of the client's Handshake packet 0.
             <ul>
-            <li><tt>%0</tt> - frame type "ACK"
-            <li><tt>%1</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>%2</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            <li><xtt>%0</xtt> - frame type "ACK"
+            <li><xtt>%1</xtt> - <xtt>largest_acknowledged</xtt>: largest packet being acknowledged
+            <li><xtt>%2</xtt> - <xtt>ack_delay</xtt>: variable-length integer giving the amount of time this ack was delayed
             in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
             %d2 * 8 = 224 µseconds
-            <li><tt>%3</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (%d4) optionally provided below
-            <li><tt>%4</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            <li><xtt>%3</xtt> - <xtt>ack_range_count</xtt>: the number of additional ack ranges (%d4) optionally provided below
+            <li><xtt>%4</xtt> - <xtt>first_ack_range</xtt>: variable length integer giving the number of packets before <xtt>largest_acknowledged</xtt> that are also being acknowledged
             </ul>
         </div>
     </span>
