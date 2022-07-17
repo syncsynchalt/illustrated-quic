@@ -1,5 +1,6 @@
 <!doctype html>
-<html>
+<!--suppress HtmlRequiredAltAttribute -->
+<html lang="en">
 
 <head>
     <title>The Illustrated QUIC Connection: Every Byte Explained</title>
@@ -64,6 +65,7 @@
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Key Exchange Generation</div>
+<!--suppress CheckImageSize -->
 <img class="illustration" src="images/key1.png" width="135" height="250"/>
 <div class="rec-explanation">
     <p>The connection begins with the client generating a private/public keypair
@@ -82,15 +84,15 @@
     <a href="files/client-ephemeral-private.key" download="client-ephemeral-private.key">private key</a>
     selected is:
 
-    <pre class="ind2"><tt class="longboi"
-    >202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f</tt></pre>
+    <pre class="ind2"><xtt class="longboi"
+    >202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f</xtt></pre>
 
     The <a href="files/client-ephemeral-public.key" download="client-ephemeral-public.key">public key</a>
     is created from the private key as explained on the <a href="https://x25519.xargs.org/">X25519 site</a>.
     The public key calculated is:
 
-    <pre class="ind2"><tt class="longboi"
-    >358072d6365880d1aeea329adf9121383851ed21a28e3b75e965d0d2cd166254</tt></pre>
+    <pre class="ind2"><xtt class="longboi"
+    >358072d6365880d1aeea329adf9121383851ed21a28e3b75e965d0d2cd166254</xtt></pre>
 
     The public key calculation can be confirmed at the command line:
     <codesample>
@@ -128,7 +130,7 @@ pub:
     <br><br>
     The client begins by generating 8 bytes of random data,
     in this case the bytes:
-    <pre class="ind2"><tt class="longboi">0001020304050607</tt></pre>
+    <pre class="ind2"><xtt class="longboi">0001020304050607</xtt></pre>
     The client then derives encryption keys using the following process:
 
     <processblock>
@@ -146,7 +148,7 @@ server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", ctx: "",
 </pre>
     </processblock>
 
-    The use of the magic constant "<tt>38762cf7f55934b34d179ae6a4c80cadccbb7f0a</tt>" as the initial
+    The use of the magic constant "<xtt>38762cf7f55934b34d179ae6a4c80cadccbb7f0a</xtt>" as the initial
     salt is interesting, as it is not derived from mathematical constants or cryptographic
     principles. It's the value of the first SHA-1 collision, co-discovered by Google researchers
     (QUIC itself was initially created, sponsored, and deployed by Google).
@@ -155,11 +157,11 @@ server_hp_key = HKDF-Expand-Label(key: server_secret, label: "quic hp", ctx: "",
 
     This has introduced two new cryptographic concepts from TLS 1.3:
     <ul>
-    <li><tt>HKDF-Extract</tt> - given a salt and some bytes of key material
+    <li><xtt>HKDF-Extract</xtt> - given a salt and some bytes of key material
     create 256 bits (32 bytes) of new key material, with the
     input key material's entropy evenly distributed in the
     output.
-    <li><tt>HKDF-Expand-Label</tt> - given the inputs of key
+    <li><xtt>HKDF-Expand-Label</xtt> - given the inputs of key
     material, label, and context data, create a new key of the
     requested length.
     </ul>
@@ -197,15 +199,15 @@ shp: 440b2725e91dc79b370711ef792faa3d
 
     From this we get the following encryption keys and IVs:
     <ul>
-    <li>client initial key: <tt class="longboi">b14b918124fda5c8d79847602fa3520b</tt>
-    <li>client initial IV: <tt class="longboi">ddbc15dea80925a55686a7df</tt>
-    <li>server initial key: <tt class="longboi">d77fc4056fcfa32bd1302469ee6ebf90</tt>
-    <li>server initial IV: <tt class="longboi">fcb748e37ff79860faa07477</tt>
+    <li>client initial key: <xtt class="longboi">b14b918124fda5c8d79847602fa3520b</xtt>
+    <li>client initial IV: <xtt class="longboi">ddbc15dea80925a55686a7df</xtt>
+    <li>server initial key: <xtt class="longboi">d77fc4056fcfa32bd1302469ee6ebf90</xtt>
+    <li>server initial IV: <xtt class="longboi">fcb748e37ff79860faa07477</xtt>
     </ul>
     We also get the following "header protection keys", which will be explained below:
     <ul>
-    <li>client initial header protection key: <tt class="longboi">6df4e9d737cdf714711d7c617ee82981</tt>
-    <li>server initial header protection key: <tt class="longboi">440b2725e91dc79b370711ef792faa3d</tt>
+    <li>client initial header protection key: <xtt class="longboi">6df4e9d737cdf714711d7c617ee82981</xtt>
+    <li>server initial header protection key: <xtt class="longboi">440b2725e91dc79b370711ef792faa3d</xtt>
     </ul>
     At this point there is still no data sent over the network. The first data is sent below.
 </div>
@@ -266,11 +268,11 @@ ed9895bb15
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Packet type: Initial</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td>MSB</td><td><xtt>1</xtt></td><td>Long header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Packet type: Initial</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -298,8 +300,8 @@ ed9895bb15
             keys, as explained in "Initial Keys Calc"
             above.
             <ul>
-            <li><tt>08</tt> - 8 bytes of connection ID follows
-            <li><tt>00 01 ... 06 07</tt> - the connection ID
+            <li><xtt>08</xtt> - 8 bytes of connection ID follows
+            <li><xtt>00 01 ... 06 07</xtt> - the connection ID
             </ul>
         </div>
     </span>
@@ -313,8 +315,8 @@ ed9895bb15
             The client uses this field to indicate its
             chosen connection ID to the server.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>63 5f 63 69 64</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -332,7 +334,7 @@ ed9895bb15
             is empty.
 
             <ul>
-            <li><tt>00</tt> - 0 bytes of token data follows
+            <li><xtt>00</xtt> - 0 bytes of token data follows
             </ul>
         </div>
     </span>
@@ -436,7 +438,7 @@ ed9895bb15
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -472,14 +474,14 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             Each QUIC packet contains a list of one or more
             frames in its payload. This packet contains only
-            one frame, a <tt>CRYPTO</tt> frame.
+            one frame, a <xtt>CRYPTO</xtt> frame.
             <br><br>
-            <tt>CRYPTO</tt> frames create a single stream of bytes
+            <xtt>CRYPTO</xtt> frames create a single stream of bytes
             used by TLS to establish a secure connection.
             <ul>
-            <li><tt>06</tt> - frame type "CRYPTO"
-            <li><tt>00</tt> - variable length integer, offset of the crypto stream data being provided (0 bytes)
-            <li><tt>40 ee</tt> - variable length integer (first two bits indicate 2-byte integer)
+            <li><xtt>06</xtt> - frame type "CRYPTO"
+            <li><xtt>00</xtt> - variable length integer, offset of the crypto stream data being provided (0 bytes)
+            <li><xtt>40 ee</xtt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data length of 0xEE (238) bytes
             </ul>
         </div>
@@ -527,8 +529,8 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             Each TLS handshake message starts with a type and a length.
             <ul>
-            <li><tt>01</tt> - handshake message type 0x01 (client hello)
-            <li><tt>00 00 ea</tt> - 0xEA (234) bytes of client hello data follows
+            <li><xtt>01</xtt> - handshake message type 0x01 (client hello)
+            <li><xtt>00 00 ea</xtt> - 0xEA (234) bytes of client hello data follows
             </ul>
         </div>
     </span>
@@ -576,7 +578,7 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             This is a legacy field and is not used in QUIC.
             <ul>
-            <li><tt>00</tt> - 0 bytes of session ID follow
+            <li><xtt>00</xtt> - 0 bytes of session ID follow
             </ul>
         </div>
     </span>
@@ -592,10 +594,10 @@ $ cat /tmp/msg1 \
             The list is in the order preferred by the
             client, with highest preference first.
             <ul>
-            <li><tt>00 06</tt> - 6 bytes of cipher suite data
-            <li><tt>13 01</tt> - assigned value for <tt>TLS_AES_128_GCM_SHA256</tt>
-            <li><tt>13 02</tt> - assigned value for <tt>TLS_AES_256_GCM_SHA384</tt>
-            <li><tt>13 03</tt> - assigned value for <tt>TLS_CHACHA20_POLY1305_SHA256</tt>
+            <li><xtt>00 06</xtt> - 6 bytes of cipher suite data
+            <li><xtt>13 01</xtt> - assigned value for <xtt>TLS_AES_128_GCM_SHA256</xtt>
+            <li><xtt>13 02</xtt> - assigned value for <xtt>TLS_AES_256_GCM_SHA384</xtt>
+            <li><xtt>13 03</xtt> - assigned value for <xtt>TLS_CHACHA20_POLY1305_SHA256</xtt>
             </ul>
         </div>
     </span>
@@ -616,8 +618,8 @@ $ cat /tmp/msg1 \
             the "null" compression method which performs
             no change to the data.
             <ul>
-            <li><tt>01</tt> - 1 bytes of compression methods
-            <li><tt>00</tt> - assigned value for "null" compression
+            <li><xtt>01</xtt> - 1 bytes of compression methods
+            <li><xtt>00</xtt> - assigned value for "null" compression
             </ul>
         </div>
     </span>
@@ -632,7 +634,7 @@ $ cat /tmp/msg1 \
             extensions which the server can use to
             take action or enable new features.
             <ul>
-            <li><tt>00 bb</tt> - the extensions will take 0xBB (187) bytes of data
+            <li><xtt>00 bb</xtt> - the extensions will take 0xBB (187) bytes of data
             </ul>
             Each extension will start with two bytes
             that indicate which extension it is, followed
@@ -659,12 +661,12 @@ $ cat /tmp/msg1 \
             after the TLS session was negotiated and the
             HTTP request was made.
             <ul>
-                <li><tt>00 00</tt> - assigned value for extension "server name"
-                <li><tt>00 18</tt> - 0x18 (24) bytes of "server name" extension data follows
-                <li><tt>00 16</tt> - 0x16 (22) bytes of first (and only) list entry follows
-                <li><tt>00</tt> - list entry is type 0x00 "DNS hostname"
-                <li><tt>00 13</tt> - 0x13 (19) bytes of hostname follows
-                <li><tt>65 78 61 ... 6e 65 74</tt> - "example.ulfheim.net"
+                <li><xtt>00 00</xtt> - assigned value for extension "server name"
+                <li><xtt>00 18</xtt> - 0x18 (24) bytes of "server name" extension data follows
+                <li><xtt>00 16</xtt> - 0x16 (22) bytes of first (and only) list entry follows
+                <li><xtt>00</xtt> - list entry is type 0x00 "DNS hostname"
+                <li><xtt>00 13</xtt> - 0x13 (19) bytes of hostname follows
+                <li><xtt>65 78 61 ... 6e 65 74</xtt> - "example.ulfheim.net"
             </ul>
         </div>
     </span>
@@ -685,12 +687,12 @@ $ cat /tmp/msg1 \
             This list is presented in descending order
             of the client's preference.
             <ul>
-                <li><tt>00 0a</tt> - assigned value for extension "supported groups"
-                <li><tt>00 08</tt> - 8 bytes of "supported group" extension data follows
-                <li><tt>00 06</tt> - 6 bytes of data are in the curves list
-                <li><tt>00 1d</tt> - assigned value for the curve "x25519"
-                <li><tt>00 17</tt> - assigned value for the curve "secp256r1"
-                <li><tt>00 18</tt> - assigned value for the curve "secp384r1"
+                <li><xtt>00 0a</xtt> - assigned value for extension "supported groups"
+                <li><xtt>00 08</xtt> - 8 bytes of "supported group" extension data follows
+                <li><xtt>00 06</xtt> - 6 bytes of data are in the curves list
+                <li><xtt>00 1d</xtt> - assigned value for the curve "x25519"
+                <li><xtt>00 17</xtt> - assigned value for the curve "secp256r1"
+                <li><xtt>00 18</xtt> - assigned value for the curve "secp384r1"
             </ul>
         </div>
     </span>
@@ -706,11 +708,11 @@ $ cat /tmp/msg1 \
             <br>
             Some example applications might be "http/1.1", "h2" (HTTP/2), or "h3" (HTTP/3).
             <ul>
-            <li><tt>00 10</tt> - assigned value for extension "Application Layer Protocol Negotiation"
-            <li><tt>00 0b</tt> - 0xB (11) bytes of "ALPN" extension data follows
-            <li><tt>00 09</tt> - 9 bytes of "ALPN" protocol data follows
-            <li><tt>08</tt> - 8 bytes of a protocol name follows
-            <li><tt>70 69 ... 2e 30</tt> - the string "<tt>ping/1.0</tt>"
+            <li><xtt>00 10</xtt> - assigned value for extension "Application Layer Protocol Negotiation"
+            <li><xtt>00 0b</xtt> - 0xB (11) bytes of "ALPN" extension data follows
+            <li><xtt>00 09</xtt> - 9 bytes of "ALPN" protocol data follows
+            <li><xtt>08</xtt> - 8 bytes of a protocol name follows
+            <li><xtt>70 69 ... 2e 30</xtt> - the string "<xtt>ping/1.0</xtt>"
             </ul>
         </div>
     </span>
@@ -731,18 +733,18 @@ $ cat /tmp/msg1 \
             This list is presented in descending order
             of the client's preference.
             <ul>
-                <li><tt>00 0d</tt> - assigned value for extension "Signature Algorithms"
-                <li><tt>00 14</tt> - 0x14 (20) bytes of "Signature Algorithms" extension data follows
-                <li><tt>00 12</tt> - 0x12 (18) bytes of data are in the following list of algorithms
-                <li><tt>04 03</tt> - assigned value for ECDSA-SECP256r1-SHA256
-                <li><tt>08 04</tt> - assigned value for RSA-PSS-RSAE-SHA256
-                <li><tt>04 01</tt> - assigned value for RSA-PKCS1-SHA256
-                <li><tt>05 03</tt> - assigned value for ECDSA-SECP384r1-SHA384
-                <li><tt>08 05</tt> - assigned value for RSA-PSS-RSAE-SHA384
-                <li><tt>05 01</tt> - assigned value for RSA-PKCS1-SHA384
-                <li><tt>08 06</tt> - assigned value for RSA-PSS-RSAE-SHA512
-                <li><tt>06 01</tt> - assigned value for RSA-PKCS1-SHA512
-                <li><tt>02 01</tt> - assigned value for RSA-PKCS1-SHA1
+                <li><xtt>00 0d</xtt> - assigned value for extension "Signature Algorithms"
+                <li><xtt>00 14</xtt> - 0x14 (20) bytes of "Signature Algorithms" extension data follows
+                <li><xtt>00 12</xtt> - 0x12 (18) bytes of data are in the following list of algorithms
+                <li><xtt>04 03</xtt> - assigned value for ECDSA-SECP256r1-SHA256
+                <li><xtt>08 04</xtt> - assigned value for RSA-PSS-RSAE-SHA256
+                <li><xtt>04 01</xtt> - assigned value for RSA-PKCS1-SHA256
+                <li><xtt>05 03</xtt> - assigned value for ECDSA-SECP384r1-SHA384
+                <li><xtt>08 05</xtt> - assigned value for RSA-PSS-RSAE-SHA384
+                <li><xtt>05 01</xtt> - assigned value for RSA-PKCS1-SHA384
+                <li><xtt>08 06</xtt> - assigned value for RSA-PSS-RSAE-SHA512
+                <li><xtt>06 01</xtt> - assigned value for RSA-PKCS1-SHA512
+                <li><xtt>02 01</xtt> - assigned value for RSA-PKCS1-SHA1
             </ul>
         </div>
     </span>
@@ -762,12 +764,12 @@ $ cat /tmp/msg1 \
             unlike previous protocol versions where the
             handshake was sent in the clear.
             <ul>
-                <li><tt>00 33</tt> - assigned value for extension "Key Share"
-                <li><tt>00 26</tt> - 0x26 (38) bytes of "Key Share" extension data follows
-                <li><tt>00 24</tt> - 0x24 (36) bytes of key share data follows
-                <li><tt>00 1d</tt> - assigned value for x25519 (key exchange via curve25519)
-                <li><tt>00 20</tt> - 0x20 (32) bytes of public key follows
-                <li><tt>35 80 ... 62 54</tt></l> - public key from the step "Client Key Exchange Generation"
+                <li><xtt>00 33</xtt> - assigned value for extension "Key Share"
+                <li><xtt>00 26</xtt> - 0x26 (38) bytes of "Key Share" extension data follows
+                <li><xtt>00 24</xtt> - 0x24 (36) bytes of key share data follows
+                <li><xtt>00 1d</xtt> - assigned value for x25519 (key exchange via curve25519)
+                <li><xtt>00 20</xtt> - 0x20 (32) bytes of public key follows
+                <li><xtt>35 80 ... 62 54</xtt> - public key from the step "Client Key Exchange Generation"
             </ul>
         </div>
     </span>
@@ -783,10 +785,10 @@ $ cat /tmp/msg1 \
             (PSKs).  Since we do not use PSKs in this
             session, this extension has no effect.
             <ul>
-                <li><tt>00 2d</tt> - assigned value for extension "PSK Key Exchange Modes"
-                <li><tt>00 02</tt> - 2 bytes of "PSK Key Exchange Modes" extension data follows
-                <li><tt>01</tt> - 1 bytes of exchange modes follow
-                <li><tt>01</tt> - assigned value for "PSK with (EC)DHE key establishment"
+                <li><xtt>00 2d</xtt> - assigned value for extension "PSK Key Exchange Modes"
+                <li><xtt>00 02</xtt> - 2 bytes of "PSK Key Exchange Modes" extension data follows
+                <li><xtt>01</xtt> - 1 bytes of exchange modes follow
+                <li><xtt>01</xtt> - assigned value for "PSK with (EC)DHE key establishment"
             </ul>
         </div>
     </span>
@@ -800,10 +802,10 @@ $ cat /tmp/msg1 \
             The client indicates its support of TLS 1.3. For compatibility reasons
             this is put into an extension instead of the Client Version field above.
             <ul>
-                <li><tt>00 2b</tt> - assigned value for extension "Supported Versions"
-                <li><tt>00 03</tt> - 3 bytes of "Supported Versions" extension data follows
-                <li><tt>02</tt> - 2 bytes of TLS version follows
-                <li><tt>03 04</tt> - assigned value for TLS 1.3
+                <li><xtt>00 2b</xtt> - assigned value for extension "Supported Versions"
+                <li><xtt>00 03</xtt> - 3 bytes of "Supported Versions" extension data follows
+                <li><xtt>02</xtt> - 2 bytes of TLS version follows
+                <li><xtt>03 04</xtt> - assigned value for TLS 1.3
             </ul>
         </div>
     </span>
@@ -833,50 +835,50 @@ $ cat /tmp/msg1 \
             </ul>
             A full listing and explanation of the bytes follows:
             <ul>
-            <li><tt>00 39</tt> - assigned value for extension "QUIC Transport Parameters"
-            <li><tt>00 31</tt> - 0x31 (49) bytes of "QUIC Transport Parameters" extension data follows
+            <li><xtt>00 39</xtt> - assigned value for extension "QUIC Transport Parameters"
+            <li><xtt>00 31</xtt> - 0x31 (49) bytes of "QUIC Transport Parameters" extension data follows
 
-            <li><tt>03</tt> - assigned value for "max_udp_payload_size"
-            <li><tt>04</tt> - 4 bytes of "max_udp_payload_size" data follows
-            <li><tt>80 00 ff f7</tt> - a variable length integer with value 0xfff7 (65527)
+            <li><xtt>03</xtt> - assigned value for "max_udp_payload_size"
+            <li><xtt>04</xtt> - 4 bytes of "max_udp_payload_size" data follows
+            <li><xtt>80 00 ff f7</xtt> - a variable length integer with value 0xfff7 (65527)
 
-            <li><tt>04</tt> - assigned value for "initial_max_data"
-            <li><tt>04</tt> - 4 bytes of "initial_max_data" data follows
-            <li><tt>80 a0 00 00</tt> - a variable length integer with value 0xa00000 (10485760)
+            <li><xtt>04</xtt> - assigned value for "initial_max_data"
+            <li><xtt>04</xtt> - 4 bytes of "initial_max_data" data follows
+            <li><xtt>80 a0 00 00</xtt> - a variable length integer with value 0xa00000 (10485760)
 
-            <li><tt>05</tt> - assigned value for "initial_max_stream_data_bidi_local"
-            <li><tt>04</tt> - 4 bytes of "initial_max_stream_data_bidi_local" data follows
-            <li><tt>80 10 00 00</tt> - a variable length integer with value 0x100000 (1048576)
+            <li><xtt>05</xtt> - assigned value for "initial_max_stream_data_bidi_local"
+            <li><xtt>04</xtt> - 4 bytes of "initial_max_stream_data_bidi_local" data follows
+            <li><xtt>80 10 00 00</xtt> - a variable length integer with value 0x100000 (1048576)
 
-            <li><tt>06</tt> - assigned value for "initial_max_stream_data_bidi_remote"
-            <li><tt>04</tt> - 4 bytes of "initial_max_stream_data_bidi_remote" data follows
-            <li><tt>80 10 00 00</tt> - a variable length integer with value 0x100000 (1048576)
+            <li><xtt>06</xtt> - assigned value for "initial_max_stream_data_bidi_remote"
+            <li><xtt>04</xtt> - 4 bytes of "initial_max_stream_data_bidi_remote" data follows
+            <li><xtt>80 10 00 00</xtt> - a variable length integer with value 0x100000 (1048576)
 
-            <li><tt>07</tt> - assigned value for "initial_max_stream_data_uni"
-            <li><tt>04</tt> - 4 bytes of "initial_max_stream_data_uni" data follows
-            <li><tt>80 10 00 00</tt> - a variable length integer with value 0x100000 (1048576)
+            <li><xtt>07</xtt> - assigned value for "initial_max_stream_data_uni"
+            <li><xtt>04</xtt> - 4 bytes of "initial_max_stream_data_uni" data follows
+            <li><xtt>80 10 00 00</xtt> - a variable length integer with value 0x100000 (1048576)
 
-            <li><tt>08</tt> - assigned value for "initial_max_streams_bidi"
-            <li><tt>01</tt> - 1 bytes of "initial_max_streams_bidi" data follows
-            <li><tt>0a</tt> - a variable length integer with value 0xA (10)
+            <li><xtt>08</xtt> - assigned value for "initial_max_streams_bidi"
+            <li><xtt>01</xtt> - 1 bytes of "initial_max_streams_bidi" data follows
+            <li><xtt>0a</xtt> - a variable length integer with value 0xA (10)
 
-            <li><tt>09</tt> - assigned value for "initial_max_streams_uni"
-            <li><tt>01</tt> - 1 bytes of "initial_max_streams_uni" data follows
-            <li><tt>0a</tt> - a variable length integer with value 0xA (10)
+            <li><xtt>09</xtt> - assigned value for "initial_max_streams_uni"
+            <li><xtt>01</xtt> - 1 bytes of "initial_max_streams_uni" data follows
+            <li><xtt>0a</xtt> - a variable length integer with value 0xA (10)
 
-            <li><tt>0a</tt> - assigned value for "ack_delay_exponent"
-            <li><tt>01</tt> - 1 bytes of "ack_delay_exponent" data follows
-            <li><tt>03</tt> - a variable length integer with value 3
+            <li><xtt>0a</xtt> - assigned value for "ack_delay_exponent"
+            <li><xtt>01</xtt> - 1 bytes of "ack_delay_exponent" data follows
+            <li><xtt>03</xtt> - a variable length integer with value 3
 
-            <li><tt>0b</tt> - assigned value for "GREASE", a technique for preventing
+            <li><xtt>0b</xtt> - assigned value for "GREASE", a technique for preventing
             middleboxes from disallowing new extensions, by pre-reserving extension values
             and injecting them randomly into connections
-            <li><tt>01</tt> - 1 bytes of "GREASE" data follows
-            <li><tt>19</tt> - a variable length integer with value 0x19 (25)
+            <li><xtt>01</xtt> - 1 bytes of "GREASE" data follows
+            <li><xtt>19</xtt> - a variable length integer with value 0x19 (25)
 
-            <li><tt>0f</tt> - assigned value for "initial_source_connection_id"
-            <li><tt>05</tt> - 5 bytes of "initial_source_connection_id" data follows
-            <li><tt>63 5f 63 69 64</tt> - a copy of the source connection ID from the packet header: "<tt>c_cid</tt>"
+            <li><xtt>0f</xtt> - assigned value for "initial_source_connection_id"
+            <li><xtt>05</xtt> - 5 bytes of "initial_source_connection_id" data follows
+            <li><xtt>63 5f 63 69 64</xtt> - a copy of the source connection ID from the packet header: "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -937,6 +939,7 @@ $ cat /tmp/msg1 \
             it's at the given address (such as round-trip data originally from the server).
             Adding padding to this Initial datagram gives the server a "byte budget"
             to perform handshake responses without exceeding this 3x limit.
+            </ul>
         </div>
     </span>
 </span>
@@ -948,6 +951,7 @@ $ cat /tmp/msg1 \
 <div class="rec-outer">
 <div class="calculation server">
 <div class="rec-label">Server Key Exchange Generation</div>
+<!--suppress CheckImageSize -->
 <img class="illustration" src="images/key3.png" width="130" height="250"/>
 <div class="rec-explanation">
     <p>The server creates its own private/public keypair
@@ -966,15 +970,15 @@ $ cat /tmp/msg1 \
     <a href="files/server-ephemeral-private.key" download="server-ephemeral-private.key">private key</a>
     selected is:
 
-    <pre class="ind2"><tt class="longboi"
-    >909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeaf</tt></pre>
+    <pre class="ind2"><xtt class="longboi"
+    >909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeaf</xtt></pre>
 
     The <a href="files/server-ephemeral-public.key" download="server-ephemeral-public.key">public key</a>
     is created from the private key as explained on the <a href="https://x25519.xargs.org/">X25519 site</a>.
     The public key calculated is:
 
-    <pre class="ind2"><tt class="longboi"
-    >9fd7ad6dcff4298dd3f96d5b1b2af910a0535b1488d7f8fabb349a982880b615</tt></pre>
+    <pre class="ind2"><xtt class="longboi"
+    >9fd7ad6dcff4298dd3f96d5b1b2af910a0535b1488d7f8fabb349a982880b615</xtt></pre>
 
     The public key calculation can be confirmed with command line tools:
     <codesample>
@@ -999,20 +1003,21 @@ pub:
 <div class="rec-outer">
 <div class="calculation server">
 <div class="rec-label">Server Initial Keys Calc</div>
+<!--suppress CheckImageSize -->
 <img class="illustration" src="images/key4.png" width="106" height="250"/>
 <div class="rec-explanation">
     Next, the server performs its own calculation of the Initial traffic keys.
     It gets the 8 bytes of random data from the "Destination Connection ID" field
     from the client's first Initial packet:
-    <pre class="ind2"><tt class="longboi">0001020304050607</tt></pre>
+    <pre class="ind2"><xtt class="longboi">0001020304050607</xtt></pre>
     and computes the same keys using the method shown in "Client Initial Keys Calc":
     <ul>
-    <li>client initial key: <tt class="longboi">b14b918124fda5c8d79847602fa3520b</tt>
-    <li>client initial IV: <tt class="longboi">ddbc15dea80925a55686a7df</tt>
-    <li>client initial header protection key: <tt class="longboi">6df4e9d737cdf714711d7c617ee82981</tt>
-    <li>server initial key: <tt class="longboi">d77fc4056fcfa32bd1302469ee6ebf90</tt>
-    <li>server initial IV: <tt class="longboi">fcb748e37ff79860faa07477</tt>
-    <li>server initial header protection key: <tt class="longboi">440b2725e91dc79b370711ef792faa3d</tt>
+    <li>client initial key: <xtt class="longboi">b14b918124fda5c8d79847602fa3520b</xtt>
+    <li>client initial IV: <xtt class="longboi">ddbc15dea80925a55686a7df</xtt>
+    <li>client initial header protection key: <xtt class="longboi">6df4e9d737cdf714711d7c617ee82981</xtt>
+    <li>server initial key: <xtt class="longboi">d77fc4056fcfa32bd1302469ee6ebf90</xtt>
+    <li>server initial IV: <xtt class="longboi">fcb748e37ff79860faa07477</xtt>
+    <li>server initial header protection key: <xtt class="longboi">440b2725e91dc79b370711ef792faa3d</xtt>
     </ul>
 </div>
 </div>
@@ -1072,11 +1077,11 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Packet type: Initial</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td>MSB</td><td><xtt>1</xtt></td><td>Long header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Packet type: Initial</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -1100,8 +1105,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
         <div class="explanation">
             The client's chosen connection ID is repeated back to it.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>63 5f 63 69 64</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -1115,8 +1120,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             The server uses this field to indicate its
             chosen connection ID to the client.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>73 5f 63 69 64</xtt> - the connection ID "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -1129,7 +1134,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
         <div class="explanation">
             This field is unused in server responses.
             <ul>
-            <li><tt>00</tt> - 0 bytes of token data follows
+            <li><xtt>00</xtt> - 0 bytes of token data follows
             </ul>
         </div>
     </span>
@@ -1229,7 +1234,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -1265,13 +1270,13 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The server acknowledges receipt of the client's Initial packet 0.
             <ul>
-            <li><tt>02</tt> - frame type "ACK"
-            <li><tt>00</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>42 40</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            <li><xtt>02</xtt> - frame type "ACK"
+            <li><xtt>00</xtt> - <xtt>largest_acknowledged</xtt>: largest packet being acknowledged
+            <li><xtt>42 40</xtt> - <xtt>ack_delay</xtt>: variable-length integer giving the amount of time this ack was delayed
             in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
             64 * 8 = 512 µseconds
-            <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
-            <li><tt>00</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            <li><xtt>00</xtt> - <xtt>ack_range_count</xtt>: the number of additional ack ranges (0) optionally provided below
+            <li><xtt>00</xtt> - <xtt>first_ack_range</xtt>: variable length integer giving the number of packets before <xtt>largest_acknowledged</xtt> that are also being acknowledged
             </ul>
         </div>
     </span>
@@ -1282,12 +1287,12 @@ $ cat /tmp/msg1 \
  06 00 40 5a
         </span>
         <div class="explanation">
-            <tt>CRYPTO</tt> frames create a single stream of bytes
+            <xtt>CRYPTO</xtt> frames create a single stream of bytes
             used by TLS to establish a secure connection.
             <ul>
-            <li><tt>06</tt> - frame type "CRYPTO"
-            <li><tt>00</tt> - variable-length integer, offset of the crypto stream data being provided (0 bytes)
-            <li><tt>40 5a</tt> - variable length integer (first two bits indicate 2-byte integer)
+            <li><xtt>06</xtt> - frame type "CRYPTO"
+            <li><xtt>00</xtt> - variable-length integer, offset of the crypto stream data being provided (0 bytes)
+            <li><xtt>40 5a</xtt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data length of 238 bytes
             </ul>
         </div>
@@ -1328,8 +1333,8 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             Each TLS handshake message starts with a type and a length.
             <ul>
-            <li><tt>02</tt> - handshake message type 0x02 (server hello)
-            <li><tt>00 00 56</tt> - 0x56 (86) bytes of server hello data follows
+            <li><xtt>02</xtt> - handshake message type 0x02 (server hello)
+            <li><xtt>00 00 56</xtt> - 0x56 (86) bytes of server hello data follows
             </ul>
         </div>
     </span>
@@ -1377,7 +1382,7 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             This is a legacy field and is not used in QUIC.
             <ul>
-            <li><tt>00</tt> - 0 bytes of session ID follow
+            <li><xtt>00</xtt> - 0 bytes of session ID follow
             </ul>
         </div>
     </span>
@@ -1418,7 +1423,7 @@ $ cat /tmp/msg1 \
             message, the server knows that the client
             will understand and support all extensions listed.
             <ul>
-            <li><tt>00 2e</tt> - the extensions will take 0x2E (46) bytes of data
+            <li><xtt>00 2e</xtt> - the extensions will take 0x2E (46) bytes of data
             </ul>
         </div>
     </span>
@@ -1437,11 +1442,11 @@ $ cat /tmp/msg1 \
             unlike previous protocol versions where the
             handshake was sent in the clear.
             <ul>
-                <li><tt>00 33</tt> - assigned value for extension "Key Share"
-                <li><tt>00 24</tt> - 0x24 (36) bytes of "Key Share" extension data follows
-                <li><tt>00 1d</tt> - assigned value for x25519 (key exchange via curve25519)
-                <li><tt>00 20</tt> - 0x20 (32) bytes of public key follows
-                <li><tt>9f d7 ... b6 15</tt></l> - public key from the step "Server Key Exchange Generation"
+                <li><xtt>00 33</xtt> - assigned value for extension "Key Share"
+                <li><xtt>00 24</xtt> - 0x24 (36) bytes of "Key Share" extension data follows
+                <li><xtt>00 1d</xtt> - assigned value for x25519 (key exchange via curve25519)
+                <li><xtt>00 20</xtt> - 0x20 (32) bytes of public key follows
+                <li><xtt>9f d7 ... b6 15</xtt> - public key from the step "Server Key Exchange Generation"
             </ul>
         </div>
     </span>
@@ -1454,9 +1459,9 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The server indicates the negotiated TLS version of 1.3.
             <ul>
-                <li><tt>00 2b</tt> - assigned value for extension "Supported Versions"
-                <li><tt>00 02</tt> - 2 bytes of "Supported Versions" extension data follows
-                <li><tt>03 04</tt> - assigned value for TLS 1.3
+                <li><xtt>00 2b</xtt> - assigned value for extension "Supported Versions"
+                <li><xtt>00 02</xtt> - 2 bytes of "Supported Versions" extension data follows
+                <li><xtt>03 04</xtt> - assigned value for TLS 1.3
             </ul>
         </div>
     </span>
@@ -1466,6 +1471,7 @@ $ cat /tmp/msg1 \
 <div class="rec-outer">
 <div class="calculation server">
 <div class="rec-label">Server Handshake Keys Calc</div>
+<!--suppress CheckImageSize -->
 <img class="illustration" src="images/key5.png" width="124" height="250"/>
 <div class="rec-explanation">
     The server now has the information needed to calculate the
@@ -1481,8 +1487,8 @@ $ cat /tmp/msg1 \
     to agree on a number.  The server multiplies the client's
     public key by the server's private key using the curve25519()
     algorithm.  The 32-byte result is found to be:
-    <pre class="ind2"><tt class="longboi"
-    >df4a291baa1eb7cfa6934b29b474baad2697e29f1f920dcc77c8a0a088447624</tt></pre>
+    <pre class="ind2"><xtt class="longboi"
+    >df4a291baa1eb7cfa6934b29b474baad2697e29f1f920dcc77c8a0a088447624</xtt></pre>
 
     I've provided <a href="files/curve25519-mult.c" download="curve25519-mult.c">a tool</a>
     to perform this calculation:
@@ -1499,8 +1505,8 @@ $ ./curve25519-mult server-ephemeral-private.key \
     It then calculates the SHA256 hash of all handshake messages
     to this point (ClientHello and ServerHello).  The hash does
     not include the 6-byte CRYPTO frame headers.  This "hello_hash"
-    is <tt class="longboi"
-    >ff788f9ed09e60d8142ac10a8931cdb6a3726278d3acdba54d9d9ffc7326611b</tt>:
+    is <xtt class="longboi"
+    >ff788f9ed09e60d8142ac10a8931cdb6a3726278d3acdba54d9d9ffc7326611b</xtt>:
     <codesample>
 <pre><code>$ cat crypto_clienthello crypto_serverhello | openssl sha256
 ff788f9ed09e60d8142ac10a8931cdb6a3726278d3acdba54d9d9ffc7326611b
@@ -1562,12 +1568,12 @@ shp: 2a18061c396c2828582b41b0910ed536
 
     From this we get the following encryption keys and IVs:
     <ul>
-    <li>client handshake key: <tt class="longboi">30a7e816f6a1e1b3434cf39cf4b415e7</tt>
-    <li>client handshake IV: <tt class="longboi">11e70a5d1361795d2bb04465</tt>
-    <li>client handshake header protection key: <tt class="longboi">84b3c21cacaf9f54c885e9a506459079</tt>
-    <li>server handshake key: <tt class="longboi">17abbf0a788f96c6986964660414e7ec</tt>
-    <li>server handshake IV: <tt class="longboi">09597a2ea3b04c00487e71f3</tt>
-    <li>server handshake header protection key: <tt class="longboi">2a18061c396c2828582b41b0910ed536</tt>
+    <li>client handshake key: <xtt class="longboi">30a7e816f6a1e1b3434cf39cf4b415e7</xtt>
+    <li>client handshake IV: <xtt class="longboi">11e70a5d1361795d2bb04465</xtt>
+    <li>client handshake header protection key: <xtt class="longboi">84b3c21cacaf9f54c885e9a506459079</xtt>
+    <li>server handshake key: <xtt class="longboi">17abbf0a788f96c6986964660414e7ec</xtt>
+    <li>server handshake IV: <xtt class="longboi">09597a2ea3b04c00487e71f3</xtt>
+    <li>server handshake header protection key: <xtt class="longboi">2a18061c396c2828582b41b0910ed536</xtt>
     </ul>
 </div>
 </div>
@@ -1624,11 +1630,11 @@ ddb7ce7613
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>10</tt></td><td>Packet type: Handshake</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td>MSB</td><td><xtt>1</xtt></td><td>Long header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>10</xtt></td><td>Packet type: Handshake</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -1656,8 +1662,8 @@ ddb7ce7613
             changed, making it more resilient than the underlying network
             connection.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>63 5f 63 69 64</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -1670,8 +1676,8 @@ ddb7ce7613
         <div class="explanation">
             The source connection ID is given.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>73 5f 63 69 64</xtt> - the connection ID "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -1800,7 +1806,7 @@ ddb7ce7613
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -1834,13 +1840,13 @@ $ cat /tmp/msg1 \
  06 00 43 ff
         </span>
         <div class="explanation">
-            <tt>CRYPTO</tt> frames create a single stream of bytes
+            <xtt>CRYPTO</xtt> frames create a single stream of bytes
             used by TLS to establish a secure connection.
             <br>
             <ul>
-            <li><tt>06</tt> - frame type "CRYPTO"
-            <li><tt>00</tt> - variable length integer, offset of the crypto stream data being provided (0 bytes)
-            <li><tt>43 ff</tt> - variable length integer (first two bits indicate 2-byte integer)
+            <li><xtt>06</xtt> - frame type "CRYPTO"
+            <li><xtt>00</xtt> - variable length integer, offset of the crypto stream data being provided (0 bytes)
+            <li><xtt>43 ff</xtt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data length of 0x3ff (1023) bytes
             </ul>
         </div>
@@ -1925,8 +1931,8 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             Each TLS handshake message starts with a type and a length.
             <ul>
-            <li><tt>08</tt> - handshake message type 0x08 (encrypted extensions)
-            <li><tt>00 00 56</tt> - 0x56 (86) bytes of handshake message data follows
+            <li><xtt>08</xtt> - handshake message type 0x08 (encrypted extensions)
+            <li><xtt>00 00 56</xtt> - 0x56 (86) bytes of handshake message data follows
             </ul>
         </div>
     </span>
@@ -1937,7 +1943,7 @@ $ cat /tmp/msg1 \
         </span>
         <div class="explanation">
             <ul>
-            <li><tt>00 54</tt> - 0x54 (84) bytes of extension data follows
+            <li><xtt>00 54</xtt> - 0x54 (84) bytes of extension data follows
             </ul>
         </div>
     </span>
@@ -1954,11 +1960,11 @@ $ cat /tmp/msg1 \
             The server indicates it has chosen "ping/1.0" for the application protocol.  It was the only
             option given by the client.
             <ul>
-            <li><tt>00 10</tt> - assigned value for extension "Application Layer Protocol Negotiation"
-            <li><tt>00 0b</tt> - 0xB (11) bytes of "ALPN" extension data follows
-            <li><tt>00 09</tt> - 9 bytes of "ALPN" protocol data follows
-            <li><tt>08</tt> - 8 bytes of a protocol name follows
-            <li><tt>70 69 ... 2e 30</tt> - the string "<tt>ping/1.0</tt>"
+            <li><xtt>00 10</xtt> - assigned value for extension "Application Layer Protocol Negotiation"
+            <li><xtt>00 0b</xtt> - 0xB (11) bytes of "ALPN" extension data follows
+            <li><xtt>00 09</xtt> - 9 bytes of "ALPN" protocol data follows
+            <li><xtt>08</xtt> - 8 bytes of a protocol name follows
+            <li><xtt>70 69 ... 2e 30</xtt> - the string "<xtt>ping/1.0</xtt>"
             </ul>
         </div>
     </span>
@@ -1988,58 +1994,58 @@ $ cat /tmp/msg1 \
             </ul>
             A full listing and explanation of the bytes follows:
             <ul>
-            <li><tt>00 39</tt> - assigned value for extension "QUIC Transport Parameters"
-            <li><tt>00 41</tt> - 0x41 (65) bytes of "QUIC Transport Parameters" extension data follows
+            <li><xtt>00 39</xtt> - assigned value for extension "QUIC Transport Parameters"
+            <li><xtt>00 41</xtt> - 0x41 (65) bytes of "QUIC Transport Parameters" extension data follows
 
-            <li><tt>00</tt> - assigned value for "initial_destination_connection_id"
-            <li><tt>08</tt> - 8 bytes of "initial_destination_connection_id" data follows
-            <li><tt>00 01 ... 06 07</tt> - the initial connection ID given by the client (used for Initial keys)
+            <li><xtt>00</xtt> - assigned value for "initial_destination_connection_id"
+            <li><xtt>08</xtt> - 8 bytes of "initial_destination_connection_id" data follows
+            <li><xtt>00 01 ... 06 07</xtt> - the initial connection ID given by the client (used for Initial keys)
 
-            <li><tt>01</tt> - assigned value for "max_idle_timeout"
-            <li><tt>04</tt> - 4 bytes of "max_idle_timeout" data follows
-            <li><tt>80 01 d4 c0</tt> - a variable length integer with value 0x1d4c0 (120000)
+            <li><xtt>01</xtt> - assigned value for "max_idle_timeout"
+            <li><xtt>04</xtt> - 4 bytes of "max_idle_timeout" data follows
+            <li><xtt>80 01 d4 c0</xtt> - a variable length integer with value 0x1d4c0 (120000)
 
-            <li><tt>03</tt> - assigned value for "max_udp_payload_size"
-            <li><tt>04</tt> - 4 bytes of "max_udp_payload_size" data follows
-            <li><tt>80 00 ff f7</tt> - a variable length integer with value 0xfff7 (65527)
+            <li><xtt>03</xtt> - assigned value for "max_udp_payload_size"
+            <li><xtt>04</xtt> - 4 bytes of "max_udp_payload_size" data follows
+            <li><xtt>80 00 ff f7</xtt> - a variable length integer with value 0xfff7 (65527)
 
-            <li><tt>04</tt> - assigned value for "initial_max_data"
-            <li><tt>04</tt> - 4 bytes of "initial_max_data" data follows
-            <li><tt>80 50 00 00</tt> - a variable length integer with value 0x500000 (5242880)
+            <li><xtt>04</xtt> - assigned value for "initial_max_data"
+            <li><xtt>04</xtt> - 4 bytes of "initial_max_data" data follows
+            <li><xtt>80 50 00 00</xtt> - a variable length integer with value 0x500000 (5242880)
 
-            <li><tt>05</tt> - assigned value for "initial_max_stream_data_bidi_local"
-            <li><tt>04</tt> - 4 bytes of "initial_max_stream_data_bidi_local" data follows
-            <li><tt>80 08 00 00</tt> - a variable length integer with value 0x80000 (524288)
+            <li><xtt>05</xtt> - assigned value for "initial_max_stream_data_bidi_local"
+            <li><xtt>04</xtt> - 4 bytes of "initial_max_stream_data_bidi_local" data follows
+            <li><xtt>80 08 00 00</xtt> - a variable length integer with value 0x80000 (524288)
 
-            <li><tt>06</tt> - assigned value for "initial_max_stream_data_bidi_remote"
-            <li><tt>04</tt> - 4 bytes of "initial_max_stream_data_bidi_remote" data follows
-            <li><tt>80 08 00 00</tt> - a variable length integer with value 0x80000 (524288)
+            <li><xtt>06</xtt> - assigned value for "initial_max_stream_data_bidi_remote"
+            <li><xtt>04</xtt> - 4 bytes of "initial_max_stream_data_bidi_remote" data follows
+            <li><xtt>80 08 00 00</xtt> - a variable length integer with value 0x80000 (524288)
 
-            <li><tt>07</tt> - assigned value for "initial_max_stream_data_uni"
-            <li><tt>04</tt> - 4 bytes of "initial_max_stream_data_uni" data follows
-            <li><tt>80 08 00 00</tt> - a variable length integer with value 0x80000 (524288)
+            <li><xtt>07</xtt> - assigned value for "initial_max_stream_data_uni"
+            <li><xtt>04</xtt> - 4 bytes of "initial_max_stream_data_uni" data follows
+            <li><xtt>80 08 00 00</xtt> - a variable length integer with value 0x80000 (524288)
 
-            <li><tt>08</tt> - assigned value for "initial_max_streams_bidi"
-            <li><tt>01</tt> - 1 bytes of "initial_max_streams_bidi" data follows
-            <li><tt>02</tt> - a variable length integer with value 2
+            <li><xtt>08</xtt> - assigned value for "initial_max_streams_bidi"
+            <li><xtt>01</xtt> - 1 bytes of "initial_max_streams_bidi" data follows
+            <li><xtt>02</xtt> - a variable length integer with value 2
 
-            <li><tt>09</tt> - assigned value for "initial_max_streams_uni"
-            <li><tt>01</tt> - 1 bytes of "initial_max_streams_uni" data follows
-            <li><tt>02</tt> - a variable length integer with value 2
+            <li><xtt>09</xtt> - assigned value for "initial_max_streams_uni"
+            <li><xtt>01</xtt> - 1 bytes of "initial_max_streams_uni" data follows
+            <li><xtt>02</xtt> - a variable length integer with value 2
 
-            <li><tt>0a</tt> - assigned value for "ack_delay_exponent"
-            <li><tt>01</tt> - 1 bytes of "ack_delay_exponent" data follows
-            <li><tt>03</tt> - a variable length integer with value 3
+            <li><xtt>0a</xtt> - assigned value for "ack_delay_exponent"
+            <li><xtt>01</xtt> - 1 bytes of "ack_delay_exponent" data follows
+            <li><xtt>03</xtt> - a variable length integer with value 3
 
-            <li><tt>0b</tt> - assigned value for "GREASE", a technique for preventing
+            <li><xtt>0b</xtt> - assigned value for "GREASE", a technique for preventing
             middleboxes from disallowing new extensions, by pre-reserving extension values
             and injecting them randomly into connections
-            <li><tt>01</tt> - 1 bytes of "GREASE" data follows
-            <li><tt>19</tt> - a variable length integer with value 25
+            <li><xtt>01</xtt> - 1 bytes of "GREASE" data follows
+            <li><xtt>19</xtt> - a variable length integer with value 25
 
-            <li><tt>0f</tt> - assigned value for "initial_source_connection_id"
-            <li><tt>05</tt> - 5 bytes of "initial_source_connection_id" data follows
-            <li><tt>73 5f 63 69 64</tt> - a copy of the source connection ID from the packet header: "<tt>s_cid</tt>"
+            <li><xtt>0f</xtt> - assigned value for "initial_source_connection_id"
+            <li><xtt>05</xtt> - 5 bytes of "initial_source_connection_id" data follows
+            <li><xtt>73 5f 63 69 64</xtt> - a copy of the source connection ID from the packet header: "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -2076,8 +2082,8 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             Each TLS handshake message starts with a type and a length.
             <ul>
-            <li><tt>0b</tt> - handshake message type 0x0B (certificate)
-            <li><tt>00 03 2e</tt> - 0x32E (814) bytes of certificate payload follow
+            <li><xtt>0b</xtt> - handshake message type 0x0B (certificate)
+            <li><xtt>00 03 2e</xtt> - 0x32E (814) bytes of certificate payload follow
             </ul>
         </div>
     </span>
@@ -2091,7 +2097,7 @@ $ cat /tmp/msg1 \
             This record is empty because this certificate was not sent in
             response to a Certificate Request.
             <ul>
-            <li><tt>00</tt> - 0 bytes of request context follows
+            <li><xtt>00</xtt> - 0 bytes of request context follows
             </ul>
         </div>
     </span>
@@ -2103,7 +2109,7 @@ $ cat /tmp/msg1 \
         </span>
         <div class="explanation">
             <ul>
-            <li><tt>00 03 2a</tt> - 0x32A (810) bytes of certificates follow
+            <li><xtt>00 03 2a</xtt> - 0x32A (810) bytes of certificates follow
             </ul>
         </div>
     </span>
@@ -2116,7 +2122,7 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The length of the first (and only) certificate.
             <ul>
-            <li><tt>00 03 25</tt> - 0x325 (805) bytes of certificate follows
+            <li><xtt>00 03 25</xtt> - 0x325 (805) bytes of certificate follows
             </ul>
         </div>
     </span>
@@ -2178,7 +2184,7 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The server can provide extension data for the certificate.
             <ul>
-            <li><tt>00 00</tt> - 0 bytes of extension data follows
+            <li><xtt>00 00</xtt> - 0 bytes of extension data follows
             </ul>
         </div>
     </span>
@@ -2240,11 +2246,11 @@ e54e8fcd38
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>10</tt></td><td>Packet type: Handshake</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td>MSB</td><td><xtt>1</xtt></td><td>Long header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>10</xtt></td><td>Packet type: Handshake</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -2272,8 +2278,8 @@ e54e8fcd38
             changed, making it more resilient than the underlying network
             connection.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>63 5f 63 69 64</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -2286,8 +2292,8 @@ e54e8fcd38
         <div class="explanation">
             The source connection ID is given.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>73 5f 63 69 64</xtt> - the connection ID "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -2389,7 +2395,7 @@ e54e8fcd38
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -2423,14 +2429,14 @@ $ cat /tmp/msg1 \
  06 43 ff 40 b9
         </span>
         <div class="explanation">
-            <tt>CRYPTO</tt> frames create a single stream of bytes
+            <xtt>CRYPTO</xtt> frames create a single stream of bytes
             used by TLS to establish a secure connection.
             <br>
             <ul>
-            <li><tt>06</tt> - frame type "CRYPTO"
-            <li><tt>43 ff</tt> - variable length integer (first two bits indicate 2-byte integer)
+            <li><xtt>06</xtt> - frame type "CRYPTO"
+            <li><xtt>43 ff</xtt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data offset of 0x3ff (1023) bytes
-            <li><tt>40 b9</tt> - variable length integer (first two bits indicate 2-byte integer)
+            <li><xtt>40 b9</xtt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data length of 0xb9 (185) bytes
             </ul>
         </div>
@@ -2482,8 +2488,8 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             Each TLS handshake message starts with a type and a length.
             <ul>
-            <li><tt>0f</tt> - handshake message type 0x0f (certificate verify)
-            <li><tt>00 01 04</tt> - 0x104 (260) bytes of handshake message data follows
+            <li><xtt>0f</xtt> - handshake message type 0x0f (certificate verify)
+            <li><xtt>00 01 04</xtt> - 0x104 (260) bytes of handshake message data follows
             </ul>
         </div>
     </span>
@@ -2496,7 +2502,7 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The server indicates the signature type:
             <ul>
-            <li><tt>08 04</tt> - assigned value for "rsa_pss_rsae_sha256"
+            <li><xtt>08 04</xtt> - assigned value for "rsa_pss_rsae_sha256"
             </ul>
         </div>
     </span>
@@ -2609,8 +2615,8 @@ Verified OK
         <div class="explanation">
             Each TLS handshake message starts with a type and a length.
             <ul>
-            <li><tt>14</tt> - handshake message type 0x14 (finished)
-            <li><tt>00 00 20</tt> - 0x20 (32) bytes of handshake finished data follows
+            <li><xtt>14</xtt> - handshake message type 0x14 (finished)
+            <li><xtt>00 00 20</xtt> - 0x20 (32) bytes of handshake finished data follows
             </ul>
         </div>
     </span>
@@ -2650,6 +2656,7 @@ $ echo $fin_hash | xxd -r -p \
             </codesample>
         </div>
     </span>
+</span>
 </div>
 </div>
 
@@ -2657,6 +2664,7 @@ $ echo $fin_hash | xxd -r -p \
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Handshake Keys Calc</div>
+<!--suppress CheckImageSize -->
 <img class="illustration" src="images/key6.png" width="105" height="250"/>
 <div class="rec-explanation">
     The client now has the information to calculate the
@@ -2674,8 +2682,8 @@ $ echo $fin_hash | xxd -r -p \
     algorithm. The properties of elliptic curve multiplication will
     cause this to result in the same number found by the server in its
     multiplication. The 32-byte result is found to be:
-    <pre class="ind2"><tt class="longboi"
-    >df4a291baa1eb7cfa6934b29b474baad2697e29f1f920dcc77c8a0a088447624</tt></pre>
+    <pre class="ind2"><xtt class="longboi"
+    >df4a291baa1eb7cfa6934b29b474baad2697e29f1f920dcc77c8a0a088447624</xtt></pre>
 
     I've provided <a href="files/curve25519-mult.c" download="curve25519-mult.c">a tool</a>
     to perform this calculation:
@@ -2692,12 +2700,12 @@ $ ./curve25519-mult client-ephemeral-private.key \
     server in "Server Handshake Keys Calc", the rest of
     the calculation is identical and the same values are found:
     <ul>
-    <li>client handshake key: <tt class="longboi">30a7e816f6a1e1b3434cf39cf4b415e7</tt>
-    <li>client handshake IV: <tt class="longboi">11e70a5d1361795d2bb04465</tt>
-    <li>client handshake header protection key: <tt class="longboi">84b3c21cacaf9f54c885e9a506459079</tt>
-    <li>server handshake key: <tt class="longboi">17abbf0a788f96c6986964660414e7ec</tt>
-    <li>server handshake IV: <tt class="longboi">09597a2ea3b04c00487e71f3</tt>
-    <li>server handshake header protection key: <tt class="longboi">2a18061c396c2828582b41b0910ed536</tt>
+    <li>client handshake key: <xtt class="longboi">30a7e816f6a1e1b3434cf39cf4b415e7</xtt>
+    <li>client handshake IV: <xtt class="longboi">11e70a5d1361795d2bb04465</xtt>
+    <li>client handshake header protection key: <xtt class="longboi">84b3c21cacaf9f54c885e9a506459079</xtt>
+    <li>server handshake key: <xtt class="longboi">17abbf0a788f96c6986964660414e7ec</xtt>
+    <li>server handshake IV: <xtt class="longboi">09597a2ea3b04c00487e71f3</xtt>
+    <li>server handshake header protection key: <xtt class="longboi">2a18061c396c2828582b41b0910ed536</xtt>
     </ul>
 </div>
 </div>
@@ -2756,11 +2764,11 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Packet type: Initial</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td>MSB</td><td><xtt>1</xtt></td><td>Long header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Packet type: Initial</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -2788,8 +2796,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             changed, making it more resilient than the underlying network
             connection.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>73 5f 63 69 64</xtt> - the connection ID "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -2802,8 +2810,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
         <div class="explanation">
             The source connection ID is given.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>63 5f 63 69 64</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -2816,7 +2824,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
         <div class="explanation">
             A token is not needed here, and is not sent.
             <ul>
-            <li><tt>00</tt> - 0 bytes of token data follows
+            <li><xtt>00</xtt> - 0 bytes of token data follows
             </ul>
         </div>
     </span>
@@ -2913,7 +2921,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -2947,13 +2955,13 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The server acknowledges receipt of the client's Initial packet 0.
             <ul>
-            <li><tt>02</tt> - frame type "ACK"
-            <li><tt>00</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>40 81</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            <li><xtt>02</xtt> - frame type "ACK"
+            <li><xtt>00</xtt> - <xtt>largest_acknowledged</xtt>: largest packet being acknowledged
+            <li><xtt>40 81</xtt> - <xtt>ack_delay</xtt>: variable-length integer giving the amount of time this ack was delayed
             in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
             129 * 8 = 1,032 µseconds
-            <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
-            <li><tt>00</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            <li><xtt>00</xtt> - <xtt>ack_range_count</xtt>: the number of additional ack ranges (0) optionally provided below
+            <li><xtt>00</xtt> - <xtt>first_ack_range</xtt>: variable length integer giving the number of packets before <xtt>largest_acknowledged</xtt> that are also being acknowledged
             </ul>
         </div>
     </span>
@@ -3011,11 +3019,11 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>10</tt></td><td>Packet type: Handshake</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td>MSB</td><td><xtt>1</xtt></td><td>Long header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>10</xtt></td><td>Packet type: Handshake</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -3043,8 +3051,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             changed, making it more resilient than the underlying network
             connection.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>73 5f 63 69 64</xtt> - the connection ID "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -3057,8 +3065,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
         <div class="explanation">
             The source connection ID is given.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>63 5f 63 69 64</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -3155,7 +3163,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -3189,13 +3197,13 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The client acknowledges receipt of the server's Handshake packet 0.
             <ul>
-            <li><tt>02</tt> - frame type "ACK"
-            <li><tt>00</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>20</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            <li><xtt>02</xtt> - frame type "ACK"
+            <li><xtt>00</xtt> - <xtt>largest_acknowledged</xtt>: largest packet being acknowledged
+            <li><xtt>20</xtt> - <xtt>ack_delay</xtt>: variable-length integer giving the amount of time this ack was delayed
             in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
             32 * 8 = 256 µseconds
-            <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
-            <li><tt>00</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            <li><xtt>00</xtt> - <xtt>ack_range_count</xtt>: the number of additional ack ranges (0) optionally provided below
+            <li><xtt>00</xtt> - <xtt>first_ack_range</xtt>: variable length integer giving the number of packets before <xtt>largest_acknowledged</xtt> that are also being acknowledged
             </ul>
         </div>
     </span>
@@ -3256,6 +3264,7 @@ $ cat /tmp/msg1 \
             it's at the given address (such as round-trip data originally from the server).
             Adding padding to this Initial datagram gives the server a "byte budget"
             to perform handshake responses without exceeding this 3x limit.
+            </ul>
         </div>
     </span>
 </span>
@@ -3266,6 +3275,7 @@ $ cat /tmp/msg1 \
 <div class="rec-outer">
 <div class="calculation server">
 <div class="rec-label">Server Application Keys Calc</div>
+<!--suppress CheckImageSize -->
 <img class="illustration" src="images/key7.png" width="116" height="250"/>
 <div class="rec-explanation">
     The server now has the information to calculate the
@@ -3277,7 +3287,7 @@ $ cat /tmp/msg1 \
     </ul>
     The hash input does not include the QUIC frame headers.
 
-    This "handshake_hash" is <tt class="longboi">b965185af5034eda0ea13ab424dde193afcb42451823a96921ae9d2dad9594ef</tt>:
+    This "handshake_hash" is <xtt class="longboi">b965185af5034eda0ea13ab424dde193afcb42451823a96921ae9d2dad9594ef</xtt>:
     <codesample>
     <pre><code>$ cat crypto_clienthello crypto_serverhello crypto_extensions \
   crypto_cert crypto_certverify crypto_s_finished  | openssl sha256
@@ -3339,12 +3349,12 @@ chp: 8a6a38bc5cc40cb482a254dac68c9d2f
 
     From this we get the following key data:
     <ul>
-    <li>server application key: <tt class="longboi">fd8c7da9de1b2da4d2ef9fd5188922d0</tt>
-    <li>server application IV: <tt class="longboi">02f6180e4f4aa456d7e8a602</tt>
-    <li>server application header protection key: <tt class="longboi">b7f6f021453e52b58940e4bba72a35d4</tt>
-    <li>client application key: <tt class="longboi">e010a295f0c2864f186b2a7e8fdc9ed7</tt>
-    <li>client application IV: <tt class="longboi">eb3fbc384a3199dcf6b4c808</tt>
-    <li>client application header protection key: <tt class="longboi">8a6a38bc5cc40cb482a254dac68c9d2f</tt>
+    <li>server application key: <xtt class="longboi">fd8c7da9de1b2da4d2ef9fd5188922d0</xtt>
+    <li>server application IV: <xtt class="longboi">02f6180e4f4aa456d7e8a602</xtt>
+    <li>server application header protection key: <xtt class="longboi">b7f6f021453e52b58940e4bba72a35d4</xtt>
+    <li>client application key: <xtt class="longboi">e010a295f0c2864f186b2a7e8fdc9ed7</xtt>
+    <li>client application IV: <xtt class="longboi">eb3fbc384a3199dcf6b4c808</xtt>
+    <li>client application header protection key: <xtt class="longboi">8a6a38bc5cc40cb482a254dac68c9d2f</xtt>
     </ul>
 </div>
 </div>
@@ -3353,6 +3363,7 @@ chp: 8a6a38bc5cc40cb482a254dac68c9d2f
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Application Keys Calc</div>
+<!--suppress CheckImageSize -->
 <img class="illustration" src="images/key8.png" width="97" height="250"/>
 <div class="rec-explanation">
     The client has the information to calculate the
@@ -3360,12 +3371,12 @@ chp: 8a6a38bc5cc40cb482a254dac68c9d2f
     It performs the same calculation shown in "Server Application
     Keys Calc" and finds the same values:
     <ul>
-    <li>server application key: <tt class="longboi">fd8c7da9de1b2da4d2ef9fd5188922d0</tt>
-    <li>server application IV: <tt class="longboi">02f6180e4f4aa456d7e8a602</tt>
-    <li>server application header protection key: <tt class="longboi">b7f6f021453e52b58940e4bba72a35d4</tt>
-    <li>client application key: <tt class="longboi">e010a295f0c2864f186b2a7e8fdc9ed7</tt>
-    <li>client application IV: <tt class="longboi">eb3fbc384a3199dcf6b4c808</tt>
-    <li>client application header protection key: <tt class="longboi">8a6a38bc5cc40cb482a254dac68c9d2f</tt>
+    <li>server application key: <xtt class="longboi">fd8c7da9de1b2da4d2ef9fd5188922d0</xtt>
+    <li>server application IV: <xtt class="longboi">02f6180e4f4aa456d7e8a602</xtt>
+    <li>server application header protection key: <xtt class="longboi">b7f6f021453e52b58940e4bba72a35d4</xtt>
+    <li>client application key: <xtt class="longboi">e010a295f0c2864f186b2a7e8fdc9ed7</xtt>
+    <li>client application IV: <xtt class="longboi">eb3fbc384a3199dcf6b4c808</xtt>
+    <li>client application header protection key: <xtt class="longboi">8a6a38bc5cc40cb482a254dac68c9d2f</xtt>
     </ul>
 </div>
 </div>
@@ -3424,11 +3435,11 @@ b0b3b06690
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>10</tt></td><td>Packet type: Handshake</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td>MSB</td><td><xtt>1</xtt></td><td>Long header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>10</xtt></td><td>Packet type: Handshake</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -3456,8 +3467,8 @@ b0b3b06690
             changed, making it more resilient than the underlying network
             connection.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>73 5f 63 69 64</xtt> - the connection ID "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -3470,8 +3481,8 @@ b0b3b06690
         <div class="explanation">
             The source connection ID is given.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>63 5f 63 69 64</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -3569,7 +3580,7 @@ b0b3b06690
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -3605,13 +3616,13 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The client acknowledges receipt of the server's Handshake packet 1.
             <ul>
-            <li><tt>02</tt> - frame type "ACK"
-            <li><tt>01</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>40 46</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            <li><xtt>02</xtt> - frame type "ACK"
+            <li><xtt>01</xtt> - <xtt>largest_acknowledged</xtt>: largest packet being acknowledged
+            <li><xtt>40 46</xtt> - <xtt>ack_delay</xtt>: variable-length integer giving the amount of time this ack was delayed
             in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
             70 * 8 = 560 µseconds
-            <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
-            <li><tt>01</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            <li><xtt>00</xtt> - <xtt>ack_range_count</xtt>: the number of additional ack ranges (0) optionally provided below
+            <li><xtt>01</xtt> - <xtt>first_ack_range</xtt>: variable length integer giving the number of packets before <xtt>largest_acknowledged</xtt> that are also being acknowledged
             </ul>
         </div>
     </span>
@@ -3624,14 +3635,14 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             Each QUIC packet contains a list of one or more
             frames in its payload. This packet contains only
-            one frame, a <tt>CRYPTO</tt> frame.
+            one frame, a <xtt>CRYPTO</xtt> frame.
             <br><br>
-            <tt>CRYPTO</tt> frames create a single stream of bytes
+            <xtt>CRYPTO</xtt> frames create a single stream of bytes
             used by TLS to establish a secure connection.
             <ul>
-            <li><tt>06</tt> - frame type "CRYPTO"
-            <li><tt>00</tt> - variable length integer, offset of the crypto stream data being provided (0 bytes)
-            <li><tt>40 24</tt> - variable length integer (first two bits indicate 2-byte integer)
+            <li><xtt>06</xtt> - frame type "CRYPTO"
+            <li><xtt>00</xtt> - variable length integer, offset of the crypto stream data being provided (0 bytes)
+            <li><xtt>40 24</xtt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data length of 0x24 (36) bytes
             </ul>
         </div>
@@ -3668,8 +3679,8 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             Each TLS handshake message starts with a type and a length.
             <ul>
-            <li><tt>14</tt> - handshake message type 0x14 (finished)
-            <li><tt>00 00 20</tt> - 0x20 (32) bytes of handshake finished data follow
+            <li><xtt>14</xtt> - handshake message type 0x14 (finished)
+            <li><xtt>00 00 20</xtt> - 0x20 (32) bytes of handshake finished data follow
             </ul>
         </div>
     </span>
@@ -3710,6 +3721,7 @@ $ echo $fin_hash | xxd -r -p \
             </codesample>
         </div>
     </span>
+</span>
 </div>
 </div>
 <div class="rec-outer">
@@ -3763,13 +3775,13 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>0</tt></td><td>Short header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>0</tt></td><td>"Spin" bit, optionally used to allow observers to measure RTT,
+            <tr><td>MSB</td><td><xtt>0</xtt></td><td>Short header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>0</xtt></td><td>"Spin" bit, optionally used to allow observers to measure RTT,
                 but unused by this library</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td></td><td><tt>0</tt></td><td>Key phase bit, used to signal when key rotation occurs</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td></td><td><xtt>0</xtt></td><td>Key phase bit, used to signal when key rotation occurs</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -3791,7 +3803,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             must know the length, either by always using the same length,
             or by embedding its own length encoding in the ID.
             <ul>
-            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><xtt>73 5f 63 69 64</xtt> - the connection ID "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -3871,7 +3883,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -3941,8 +3953,8 @@ $ cat /tmp/msg1 \
                 <th>Meaning</th>
             </tr>
             </thead>
-            <tr><td>0x2</td><td>Indicates whether the stream is bi-directional (<tt>0</tt>) or uni-directional (<tt>1</tt>).</td>
-            <tr><td>0x1</td><td>Indicates whether the stream was opened by client (<tt>0</tt>) or server (<tt>1</tt>).</td>
+            <tr><td>0x2</td><td>Indicates whether the stream is bi-directional (<xtt>0</xtt>) or uni-directional (<xtt>1</xtt>).</td>
+            <tr><td>0x1</td><td>Indicates whether the stream was opened by client (<xtt>0</xtt>) or server (<xtt>1</xtt>).</td>
             </table>
             In this case, the stream ID of 0 indicates it is the first bi-directional stream opened by the client.
         </div>
@@ -3979,7 +3991,7 @@ $ cat /tmp/msg1 \
  70 69 6e 67
         </span>
         <div class="explanation">
-            The application data "<tt>ping</tt>".
+            The application data "<xtt>ping</xtt>".
         </div>
     </span>
 </span>
@@ -4040,11 +4052,11 @@ a5a6f88ece
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>1</tt></td><td>Long header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>10</tt></td><td>Packet type: Handshake</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td>MSB</td><td><xtt>1</xtt></td><td>Long header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>10</xtt></td><td>Packet type: Handshake</td></tr>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -4072,8 +4084,8 @@ a5a6f88ece
             changed, making it more resilient than the underlying network
             connection.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>63 5f 63 69 64</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -4086,8 +4098,8 @@ a5a6f88ece
         <div class="explanation">
             The source connection ID is given.
             <ul>
-            <li><tt>05</tt> - 5 bytes of connection ID follows
-            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><xtt>05</xtt> - 5 bytes of connection ID follows
+            <li><xtt>73 5f 63 69 64</xtt> - the connection ID "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -4184,7 +4196,7 @@ a5a6f88ece
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -4218,13 +4230,13 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The server acknowledges receipt of the client's Handshake packet 0.
             <ul>
-            <li><tt>02</tt> - frame type "ACK"
-            <li><tt>01</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>1c</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            <li><xtt>02</xtt> - frame type "ACK"
+            <li><xtt>01</xtt> - <xtt>largest_acknowledged</xtt>: largest packet being acknowledged
+            <li><xtt>1c</xtt> - <xtt>ack_delay</xtt>: variable-length integer giving the amount of time this ack was delayed
             in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
             28 * 8 = 224 µseconds
-            <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (1) optionally provided below
-            <li><tt>01</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            <li><xtt>00</xtt> - <xtt>ack_range_count</xtt>: the number of additional ack ranges (1) optionally provided below
+            <li><xtt>01</xtt> - <xtt>first_ack_range</xtt>: variable length integer giving the number of packets before <xtt>largest_acknowledged</xtt> that are also being acknowledged
             </ul>
         </div>
     </span>
@@ -4282,13 +4294,13 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>0</tt></td><td>Short header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>0</tt></td><td>"Spin" bit, optionally used to allow observers to measure RTT,
+            <tr><td>MSB</td><td><xtt>0</xtt></td><td>Short header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>0</xtt></td><td>"Spin" bit, optionally used to allow observers to measure RTT,
                 but unused by this library</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td></td><td><tt>0</tt></td><td>Key phase bit, used to signal when key rotation occurs</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td></td><td><xtt>0</xtt></td><td>Key phase bit, used to signal when key rotation occurs</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -4310,7 +4322,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             must know the length, either by always using the same length,
             or by embedding its own length encoding in the ID.
             <ul>
-            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>63 5f 63 69 64</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -4390,7 +4402,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -4424,13 +4436,13 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The server acknowledges receipt of the client's Application packet 0.
             <ul>
-            <li><tt>02</tt> - frame type "ACK"
-            <li><tt>00</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>12</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            <li><xtt>02</xtt> - frame type "ACK"
+            <li><xtt>00</xtt> - <xtt>largest_acknowledged</xtt>: largest packet being acknowledged
+            <li><xtt>12</xtt> - <xtt>ack_delay</xtt>: variable-length integer giving the amount of time this ack was delayed
             in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
             18 * 8 = 144 µseconds
-            <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
-            <li><tt>00</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            <li><xtt>00</xtt> - <xtt>ack_range_count</xtt>: the number of additional ack ranges (0) optionally provided below
+            <li><xtt>00</xtt> - <xtt>first_ack_range</xtt>: variable length integer giving the number of packets before <xtt>largest_acknowledged</xtt> that are also being acknowledged
             </ul>
         </div>
     </span>
@@ -4443,7 +4455,7 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The server confirms to the client that the handshake is complete. This frame has no content other than its type.
             <ul>
-            <li><tt>1e</tt> - frame type "HANDSHAKE_DONE"
+            <li><xtt>1e</xtt> - frame type "HANDSHAKE_DONE"
             </ul>
         </div>
     </span>
@@ -4492,8 +4504,8 @@ $ cat /tmp/msg1 \
                 <th>Meaning</th>
             </tr>
             </thead>
-            <tr><td>0x2</td><td>Indicates whether the stream is bi-directional (<tt>0</tt>) or uni-directional (<tt>1</tt>).</td>
-            <tr><td>0x1</td><td>Indicates whether the stream was opened by client (<tt>0</tt>) or server (<tt>1</tt>).</td>
+            <tr><td>0x2</td><td>Indicates whether the stream is bi-directional (<xtt>0</xtt>) or uni-directional (<xtt>1</xtt>).</td>
+            <tr><td>0x1</td><td>Indicates whether the stream was opened by client (<xtt>0</xtt>) or server (<xtt>1</xtt>).</td>
             </table>
             In this case, the stream ID of 0 indicates it is the first bi-directional stream opened by the client.
         </div>
@@ -4530,7 +4542,7 @@ $ cat /tmp/msg1 \
  70 6f 6e 67
         </span>
         <div class="explanation">
-            The application data "<tt>pong</tt>".
+            The application data "<xtt>pong</xtt>".
         </div>
     </span>
 </span>
@@ -4590,13 +4602,13 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>0</tt></td><td>Short header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>0</tt></td><td>"Spin" bit, optionally used to allow observers to measure RTT,
+            <tr><td>MSB</td><td><xtt>0</xtt></td><td>Short header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>0</xtt></td><td>"Spin" bit, optionally used to allow observers to measure RTT,
                 but unused by this library</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td></td><td><tt>0</tt></td><td>Key phase bit, used to signal when key rotation occurs</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td></td><td><xtt>0</xtt></td><td>Key phase bit, used to signal when key rotation occurs</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -4618,7 +4630,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             must know the length, either by always using the same length,
             or by embedding its own length encoding in the ID.
             <ul>
-            <li><tt>73 5f 63 69 64</tt> - the connection ID "<tt>s_cid</tt>"
+            <li><xtt>73 5f 63 69 64</xtt> - the connection ID "<xtt>s_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -4698,7 +4710,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -4732,13 +4744,13 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The client acknowledges receipt of the server's Application packet 0.
             <ul>
-            <li><tt>02</tt> - frame type "ACK"
-            <li><tt>00</tt> - <tt>largest_acknowledged</tt>: largest packet being acknowledged
-            <li><tt>0b</tt> - <tt>ack_delay</tt>: variable-length integer giving the amount of time this ack was delayed
+            <li><xtt>02</xtt> - frame type "ACK"
+            <li><xtt>00</xtt> - <xtt>largest_acknowledged</xtt>: largest packet being acknowledged
+            <li><xtt>0b</xtt> - <xtt>ack_delay</xtt>: variable-length integer giving the amount of time this ack was delayed
             in sending, in microseconds.  Multiply by 2<sup>ack_delay_exponent</sup>, giving a value of
             11 * 8 = 88 µseconds
-            <li><tt>00</tt> - <tt>ack_range_count</tt>: the number of additional ack ranges (0) optionally provided below
-            <li><tt>00</tt> - <tt>first_ack_range</tt>: variable length integer giving the number of packets before <tt>largest_acknowledged</tt> that are also being acknowledged
+            <li><xtt>00</xtt> - <xtt>ack_range_count</xtt>: the number of additional ack ranges (0) optionally provided below
+            <li><xtt>00</xtt> - <xtt>first_ack_range</xtt>: variable length integer giving the number of packets before <xtt>largest_acknowledged</xtt> that are also being acknowledged
             </ul>
         </div>
     </span>
@@ -4799,13 +4811,13 @@ f494fdfbb6
               <th>Val</th>
               <th>Meaning</th>
             </tr></thead>
-            <tr><td>MSB</td><td><tt>0</tt></td><td>Short header format</td></tr>
-            <tr><td></td><td><tt>1</tt></td><td>Fixed bit (always set)</td></tr>
-            <tr><td></td><td><tt>0</tt></td><td>"Spin" bit, optionally used to allow observers to measure RTT,
+            <tr><td>MSB</td><td><xtt>0</xtt></td><td>Short header format</td></tr>
+            <tr><td></td><td><xtt>1</xtt></td><td>Fixed bit (always set)</td></tr>
+            <tr><td></td><td><xtt>0</xtt></td><td>"Spin" bit, optionally used to allow observers to measure RTT,
                 but unused by this library</td></tr>
-            <tr><td></td><td><tt>00</tt></td><td>Reserved (always unset)</td></tr>
-            <tr><td></td><td><tt>0</tt></td><td>Key phase bit, used to signal when key rotation occurs</td></tr>
-            <tr><td>LSB</td><td><tt>00</tt></td><td>Packet Number field length (indicates the "Packet Number"<br>
+            <tr><td></td><td><xtt>00</xtt></td><td>Reserved (always unset)</td></tr>
+            <tr><td></td><td><xtt>0</xtt></td><td>Key phase bit, used to signal when key rotation occurs</td></tr>
+            <tr><td>LSB</td><td><xtt>00</xtt></td><td>Packet Number field length (indicates the "Packet Number"<br>
                 field below will have length of one byte)</td></tr>
             </table>
         </div>
@@ -4827,7 +4839,7 @@ f494fdfbb6
             must know the length, either by always using the same length,
             or by embedding its own length encoding in the ID.
             <ul>
-            <li><tt>63 5f 63 69 64</tt> - the connection ID "<tt>c_cid</tt>"
+            <li><xtt>63 5f 63 69 64</xtt> - the connection ID "<xtt>c_cid</xtt>"
             </ul>
         </div>
     </span>
@@ -4907,7 +4919,7 @@ f494fdfbb6
             data that must match for decryption to
             succeed.
             <br/><br/>
-            Because the <tt>openssl</tt> command line
+            Because the <xtt>openssl</xtt> command line
             tool does not yet support AEAD ciphers,
             I've written command line tools to both
             <a href="files/aes_128_gcm_decrypt.c" download="aes_128_gcm_decrypt.c">decrypt</a>
@@ -4942,11 +4954,11 @@ $ cat /tmp/msg1 \
         <div class="explanation">
             The server sends an indication to close the connection.
             <ul>
-            <li><tt>1c</tt> - frame type "CONNECTION_CLOSE"
-            <li><tt>00</tt> - error code: "No Error"
-            <li><tt>00</tt> - frame type which triggered this error (0 = unknown)
-            <li><tt>11</tt> - variable-length integer giving the length of the reason for shutdown
-            <li><tt>67 72 .. 77 6e</tt> - 0x11 (17) bytes giving the reason for shutdown: "graceful shutdown"
+            <li><xtt>1c</xtt> - frame type "CONNECTION_CLOSE"
+            <li><xtt>00</xtt> - error code: "No Error"
+            <li><xtt>00</xtt> - frame type which triggered this error (0 = unknown)
+            <li><xtt>11</xtt> - variable-length integer giving the length of the reason for shutdown
+            <li><xtt>67 72 .. 77 6e</xtt> - 0x11 (17) bytes giving the reason for shutdown: "graceful shutdown"
             </ul>
         </div>
     </span>
