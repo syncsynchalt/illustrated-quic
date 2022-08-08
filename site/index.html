@@ -1981,7 +1981,7 @@ $ cat /tmp/msg1 \
             <br><br>
             The following QUIC parameters are set in the data below:
             <ul>
-            <li>initial_destination_connection_id: 0001020304050607
+            <li>original_destination_connection_id: 0001020304050607
             <li>max_idle_timeout: 120000ms (2 minutes)
             <li>max_udp_payload_size: 65527
             <li>initial_max_data: 5242880
@@ -1997,8 +1997,8 @@ $ cat /tmp/msg1 \
             <li><xtt>00 39</xtt> - assigned value for extension "QUIC Transport Parameters"
             <li><xtt>00 41</xtt> - 0x41 (65) bytes of "QUIC Transport Parameters" extension data follows
 
-            <li><xtt>00</xtt> - assigned value for "initial_destination_connection_id"
-            <li><xtt>08</xtt> - 8 bytes of "initial_destination_connection_id" data follows
+            <li><xtt>00</xtt> - assigned value for "original_destination_connection_id"
+            <li><xtt>08</xtt> - 8 bytes of "original_destination_connection_id" data follows
             <li><xtt>00 01 ... 06 07</xtt> - the initial connection ID given by the client (used for Initial keys)
 
             <li><xtt>01</xtt> - assigned value for "max_idle_timeout"
