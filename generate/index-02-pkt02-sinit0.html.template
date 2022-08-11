@@ -359,7 +359,7 @@ $ cat /tmp/msg1 \
         </div>
     </span>
     <span class="string decrypted">
-        <span class="label">ClientHello TLS Record</span>
+        <span class="label">ServerHello TLS Record</span>
         <span class="bytes">
 %next 90
 %bytes
