@@ -1,7 +1,9 @@
 (() => {
     "use strict";
 
-    let ill = {};
+    let ill = {
+        anchors: {}
+    };
 
     // viewports etc
 
@@ -31,8 +33,10 @@
         ill.unselectAllRecords();
         if (!selected) {
             element.classList.add("selected");
+            if (event) { ill.changeHash(element.dataset.anchor); }
         } else {
             ill.closeAllCode();
+            if (event) { ill.changeHash(""); }
         }
         ill.cancel(event);
         ill.ensureElementInView(element);
@@ -41,6 +45,7 @@
     ill.selectRecord = (element, event) => {
         ill.unselectAllRecords();
         element.classList.add("selected");
+        if (event) { ill.changeHash(element.dataset.anchor); }
         ill.cancel(event);
         ill.ensureElementInView(element);
     };
@@ -56,8 +61,20 @@
         });
     };
 
-    ill.toggleAnnotate = (el) => {
-        el.classList.toggle("annotate");
+    ill.getAncestorAnchor = (el) => {
+        while (el && !el.dataset.anchor) {
+            el = el.parentElement;
+        }
+        return el?.dataset?.anchor;
+    };
+
+    ill.toggleAnnotate = (el, event) => {
+        let anchor = ill.getAncestorAnchor(el);
+        if (el.classList.toggle("annotate")) {
+            anchor = `${anchor}/annotated`;
+        }
+        if (event) { ill.changeHash(anchor); }
+        ill.cancel(event);
     };
 
     ill.cancel = (event) => {
@@ -68,6 +85,45 @@
 
     ill.addShowCode = (el) => {
         el.innerHTML = document.getElementById("showCodeTmpl").innerHTML + el.innerHTML;
+    };
+
+    function htmlToElement(html) {
+        let outer = document.createElement("template");
+        outer.innerHTML = html.trim();
+        return outer.content.firstChild;
+    }
+    ill.addAnchors = (record) => {
+        let label = record.getElementsByClassName("rec-label");
+        label = label && label[0].textContent;
+        let count = 1;
+        if (label) {
+            label = label.toLowerCase().replaceAll(/[^a-z\d]/g, "-");
+            while (ill.anchors[label]) {
+                label = label.replaceAll(/-\d+$/g, "");
+                label = `${label}-${++count}`;
+            }
+            record.dataset.anchor = label;
+            ill.anchors[label] = record;
+            ill.anchors[`${label}/annotated`] = record;
+            record.insertBefore(
+                htmlToElement(`<a class="no-show" href="#${label}/annotated"></a>`), record.firstChild);
+            record.insertBefore(
+                htmlToElement(`<a class="no-show" href="#${label}"></a>`), record.firstChild);
+        }
+    };
+    ill.resolveHash = () => {
+        let hash = window.location.hash.replace(/^#/, "");
+        const rec = ill.anchors[hash];
+        if (!rec) {
+            return;
+        }
+        ill.selectRecord(rec, null);
+        if (hash.endsWith("/annotated")) {
+            const b = rec.getElementsByClassName("annotate-toggle");
+            if (b && b.length) {
+                ill.toggleAnnotate(b[0].parentElement);
+            }
+        }
     };
 
     ill.addToggleAnnotations = (record) => {
@@ -108,7 +164,7 @@
         els = document.querySelectorAll(".bytes.unprotected");
         [].forEach.call(els, (el) => { el.classList.toggle("hp-disabled"); });
         let btns = document.querySelectorAll("button.hp-toggle");
-        if (btns[0].textContent == "Disable header protection") {
+        if (btns[0].textContent === "Disable header protection") {
             [].forEach.call(btns, (el) => { el.textContent = "Enable header protection"; });
         } else {
             [].forEach.call(btns, (el) => { el.textContent = "Disable header protection"; });
@@ -126,11 +182,6 @@
             el.classList.add("selected");
             el.classList.add("annotate");
         });
-/*
-        [].forEach.call(document.querySelectorAll("processblock"), (el) => {
-            el.classList.add("notrunc");
-        });
-*/
         [].forEach.call(document.querySelectorAll("codesample"), (el) => {
             el.classList.add("show");
         });
@@ -139,9 +190,19 @@
         });
     };
 
+    ill.changeHash = (hash) => {
+        let href = window.location.href.replace(/#.*/, "");
+        if (hash) {
+            window.history.replaceState({}, "", `${href}#${hash}`);
+        } else {
+            window.history.replaceState({}, "", `${href}`);
+        }
+    };
+
 
     window.onload = () => {
         [].forEach.call(document.querySelectorAll(".record, .calculation"), (el) => {
+            ill.addAnchors(el);
             el.onclick = (event) => {
                 if (el === event.target && event.offsetY < 60) {
                     ill.toggleRecord(el, event);
@@ -155,14 +216,6 @@
                 ill.toggleRecord(el.parentNode, event);
             };
         });
-        /*
-        [].forEach.call(document.querySelectorAll("processblock"), (el) => {
-            el.onclick = (event) => {
-                el.classList.add("clicked");
-                ill.cancel(event);
-            };
-        });
-        */
         [].forEach.call(document.querySelectorAll("button.hp-toggle"), (el) => {
             el.onclick = (event) => {
                 ill.toggleHeaderProtection();
@@ -179,6 +232,7 @@
             el.setAttribute("title", "modified by header protection");
         });
         ill.injectLabels();
+        ill.resolveHash();
         ill.injectEmbedArrows();
     };
 
@@ -187,9 +241,12 @@
         if (e.keyCode === 27) {
             els = document.querySelectorAll(".record.annotate");
             if (els.length) {
-                [].forEach.call(els, (rec) => { rec.classList.remove("annotate"); });
+                [].forEach.call(els, (rec) => {
+                    ill.toggleAnnotate(rec, e);
+                });
             } else {
                 ill.unselectAllRecords();
+                ill.changeHash("");
             }
         }
     };

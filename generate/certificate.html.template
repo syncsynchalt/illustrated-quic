@@ -8,9 +8,9 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="title" content="The Illustrated Certificate"/>
     <meta name="description" content="Every byte of a certificate explained"/>
-    <link rel="stylesheet" href="frombootstrap.css?b">
-    <link rel="stylesheet" href="illustrated.css?b">
-    <script src="illustrated.js?b"></script>
+    <link rel="stylesheet" href="frombootstrap.css?bust">
+    <link rel="stylesheet" href="illustrated.css?bust">
+    <script src="illustrated.js?bust"></script>
 </head>
 
 <body class="certificate">
