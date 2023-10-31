@@ -2543,10 +2543,9 @@ $ cat /tmp/msg1 \
             that the server owns the server certificate
             (giving the certificate validity in this
             TLS session), it signs a hash of the handshake
-            messages using the certificate's private
-            key.  The signature can be proven valid by
-            the client by using the certificate's public
-            key.
+            messages using the private key associated with the certificate.
+            The signature can be proven valid by
+            the client by using the public key included in the certificate.
             <br><br>
             The signing process can't be reproduced byte-for-byte
             at the command line because the signing tool introduces
