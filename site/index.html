@@ -9,16 +9,16 @@
     <meta name="format-detection" content="telephone=no"/>
     <meta name="title" content="The Illustrated QUIC Connection"/>
     <meta name="description" content="Every byte of a QUIC connection explained and reproduced"/>
-    <link rel="stylesheet" href="frombootstrap.css?bust"/>
-    <link rel="stylesheet" href="illustrated.css?bust"/>
-    <script src="illustrated.js?bust"></script>
+    <link rel="stylesheet" href="frombootstrap.css?b1"/>
+    <link rel="stylesheet" href="illustrated.css?b1"/>
+    <script src="illustrated.js?b1"></script>
 
     <!-- Facebook Meta Tags -->
     <meta property="og:url" content="https://quic.xargs.org/">
     <meta property="og:type" content="website">
     <meta property="og:title" content="The Illustrated QUIC Connection: Every Byte Explained">
     <meta property="og:description" content="Every byte of a QUIC connection explained and reproduced">
-    <meta property="og:image" content="https://quic.xargs.org/images/og.png#b2">
+    <meta property="og:image" content="https://quic.xargs.org/images/og.png">
 
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
@@ -66,6 +66,12 @@
     <div class="outerblock">
     <p>Also available in <a href="https://cangsdarm.github.io/illustrate/quic" title="translation by cangSDARM@github">中文</a></p>
     </div>
+
+<div class="open-close-all rec-outer">
+    <button id="openCloseAll" class="annotate-toggle"
+        data-lbl-state="open" data-lbl-toggle="Close All"
+        onclick="ill.openCloseAll(this, event)">Open All</button>
+</div>
 <div class="rec-outer">
 <div class="calculation client">
 <div class="rec-label">Client Key Exchange Generation</div>

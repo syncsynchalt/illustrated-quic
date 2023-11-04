@@ -133,6 +133,7 @@ xtt {
     padding: 1em;
     border-radius: 1em;
     border: 2px solid transparent;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.3);
 }
 
 .record.embedded {
@@ -174,7 +175,7 @@ xtt {
 .record.selected,
 .calculation.selected {
     cursor: inherit;
-    box-shadow: rgba(0, 0, 0, 0.3) 2px 2px 2px;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.3);
 }
 
 .record.selected .rec-label,
@@ -263,7 +264,7 @@ xtt {
     -webkit-user-select: none;
     user-select: none;
     top: -28px;
-    box-shadow: rgba(0, 0, 0, 0.3) 2px 2px 2px;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.3);
 }
 .record-data .string:hover > .label {
     display: inline;
@@ -272,7 +273,7 @@ xtt {
 .record-data .string .label:after {
     content: "";
     position: absolute;
-    box-shadow: rgba(0, 0, 0, 0.3) 2px 2px 2px;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.3);
     transform: rotate(45deg);
     bottom: -3px;
     left: 10px;
@@ -293,7 +294,7 @@ xtt {
     border: 2px solid #e0d998;
     border-radius: 1em;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    box-shadow: rgba(0, 0, 0, 0.3) 2px 2px 2px;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.3);
 }
 
 .record.annotate .string > .explanation:before {
@@ -451,7 +452,7 @@ button.annotate-toggle {
     padding: .4em 1.7em .45em;
     text-shadow: 0 1px 0 var(--act-btn-shadow);
     border-radius: .5em;
-    box-shadow: 1px 1px 1px rgba(0,0,0,.3);
+    box-shadow: 1px 1px 1px rgba(0,0,0,0.3);
 
     color: #fff;
     border: solid 1px var(--act-btn-border);
@@ -482,7 +483,7 @@ button.hp-toggle {
     padding: .4em 1.7em .45em;
     text-shadow: 0 1px 0 var(--act-btn-shadow);
     border-radius: .5em;
-    box-shadow: 1px 1px 1px rgba(0,0,0,.3);
+    box-shadow: 1px 1px 1px rgba(0,0,0,0.3);
 
     color: #fff;
     border: solid 1px var(--act-btn-border);
@@ -510,6 +511,11 @@ button.hp-toggle:active {
 .datagram > .label {
     font-size: 0.8em;
     font-weight: bold;
+}
+
+button#openCloseAll {
+    margin-bottom: 0;
+    min-width: 8em;
 }
 
 /***** print mode *****/
