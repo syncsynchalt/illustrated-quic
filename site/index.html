@@ -1303,7 +1303,7 @@ $ cat /tmp/msg1 \
             <li><xtt>06</xtt> - frame type "CRYPTO"
             <li><xtt>00</xtt> - variable-length integer, offset of the crypto stream data being provided (0 bytes)
             <li><xtt>40 5a</xtt> - variable length integer (first two bits indicate 2-byte integer)
-                                 showing crypto stream data length of 238 bytes
+                                 showing crypto stream data length of 0x5A (90) bytes
             </ul>
         </div>
     </span>
@@ -1857,7 +1857,7 @@ $ cat /tmp/msg1 \
             <li><xtt>06</xtt> - frame type "CRYPTO"
             <li><xtt>00</xtt> - variable length integer, offset of the crypto stream data being provided (0 bytes)
             <li><xtt>43 ff</xtt> - variable length integer (first two bits indicate 2-byte integer)
-                                 showing crypto stream data length of 0x3ff (1023) bytes
+                                 showing crypto stream data length of 0x3FF (1023) bytes
             </ul>
         </div>
     </span>
@@ -2447,7 +2447,7 @@ $ cat /tmp/msg1 \
             <li><xtt>43 ff</xtt> - variable length integer (first two bits indicate 2-byte integer)
                                  showing crypto stream data offset of 0x3ff (1023) bytes
             <li><xtt>40 b9</xtt> - variable length integer (first two bits indicate 2-byte integer)
-                                 showing crypto stream data length of 0xb9 (185) bytes
+                                 showing crypto stream data length of 0xB9 (185) bytes
             </ul>
         </div>
     </span>

@@ -357,7 +357,7 @@ $ cat /tmp/msg1 \
             <li><xtt>%0</xtt> - frame type "CRYPTO"
             <li><xtt>%1</xtt> - variable length integer, offset of the crypto stream data being provided (%d1 bytes)
             <li><xtt>%2 %3</xtt> - variable length integer (first two bits indicate 2-byte integer)
-                                 showing crypto stream data length of 0x3ff (1023) bytes
+                                 showing crypto stream data length of 0x3FF (1023) bytes
             </ul>
         </div>
     </span>
