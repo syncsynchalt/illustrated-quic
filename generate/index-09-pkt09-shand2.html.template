@@ -115,8 +115,8 @@ a5a6f88ece
 %bytes
         </span>
         <div class="explanation">
-            The server indicates how many bytes of encrypted payload
-            are in the packet.  This field is a variable length
+            The server indicates how many bytes of packet data follow.
+            This field is a variable length
             integer - the first two bits of the first byte
             indicate how many total bytes are in the integer.
 

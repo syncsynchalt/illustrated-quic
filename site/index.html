@@ -1154,8 +1154,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
  40 75
         </span>
         <div class="explanation">
-            The server indicates how many bytes of encrypted payload
-            are in the packet.  This field is a variable length
+            The server indicates how many bytes of packet data follow.
+            This field is a variable length
             integer - the first two bits of the first byte
             indicate how many total bytes are in the integer.
             <br><br>
@@ -1696,8 +1696,8 @@ ddb7ce7613
  44 14
         </span>
         <div class="explanation">
-            The server indicates how many bytes of encrypted payload
-            are in the packet.  This field is a variable length
+            The server indicates how many bytes of packet data follow.
+            This field is a variable length
             integer - the first two bits of the first byte
             indicate how many total bytes are in the integer.
             <br><br>
@@ -2311,8 +2311,8 @@ e54e8fcd38
  40 cf
         </span>
         <div class="explanation">
-            The server indicates how many bytes of encrypted payload
-            are in the packet.  This field is a variable length
+            The server indicates how many bytes of packet data follow.
+            This field is a variable length
             integer - the first two bits of the first byte
             indicate how many total bytes are in the integer.
             <br><br>
@@ -4111,8 +4111,8 @@ a5a6f88ece
  40 16
         </span>
         <div class="explanation">
-            The server indicates how many bytes of encrypted payload
-            are in the packet.  This field is a variable length
+            The server indicates how many bytes of packet data follow.
+            This field is a variable length
             integer - the first two bits of the first byte
             indicate how many total bytes are in the integer.
 
