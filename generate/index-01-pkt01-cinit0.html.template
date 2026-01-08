@@ -288,8 +288,8 @@ ed9895bb15
 %bytes
         </span>
         <div class="explanation">
-            The client indicates how many bytes of encrypted payload
-            are in the packet.  This field is a variable length
+            The client indicates how many bytes of packet data follow.
+            This field is a variable length
             integer - the first two bits of the first byte
             indicate how many total bytes are in the integer.
 
@@ -371,8 +371,7 @@ ed9895bb15
             "Initial" traffic key and IV that were
             generated during the "Initial Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 0.  The process
             also takes as input the 24 bytes of header
             at the beginning of this packet, as authenticated

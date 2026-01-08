@@ -113,8 +113,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
 %bytes
         </span>
         <div class="explanation">
-            The client indicates how many bytes of encrypted payload
-            are in the packet.  This field is a variable length
+            The client indicates how many bytes of packet data follow.
+            This field is a variable length
             integer - the first two bits of the first byte
             indicate how many total bytes are in the integer.
 
@@ -196,8 +196,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             "Handshake" traffic key and IV that were
             generated during the "Handshake Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 0.  The process
             also takes as input the 20 bytes of header
             at the beginning of this packet, as authenticated

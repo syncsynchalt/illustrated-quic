@@ -355,8 +355,8 @@ ed9895bb15
  41 03
         </span>
         <div class="explanation">
-            The client indicates how many bytes of encrypted payload
-            are in the packet.  This field is a variable length
+            The client indicates how many bytes of packet data follow.
+            This field is a variable length
             integer - the first two bits of the first byte
             indicate how many total bytes are in the integer.
 
@@ -440,8 +440,7 @@ ed9895bb15
             "Initial" traffic key and IV that were
             generated during the "Initial Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 0.  The process
             also takes as input the 24 bytes of header
             at the beginning of this packet, as authenticated
@@ -1236,8 +1235,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             "Initial" traffic key and IV that were
             generated during the "Initial Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 0.  The process
             also takes as input the 21 bytes of header
             at the beginning of this packet, as authenticated
@@ -1808,8 +1806,7 @@ ddb7ce7613
             "Handshake" traffic key and IV that were
             generated during the "Handshake Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 0.  The process
             also takes as input the 20 bytes of header
             at the beginning of this packet, as authenticated
@@ -2397,8 +2394,7 @@ e54e8fcd38
             "handshake" traffic key and IV that were
             generated during the "Handshake Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 1.  The process
             also takes as input the 20 bytes of header
             at the beginning of this packet, as authenticated
@@ -2844,8 +2840,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
  40 17
         </span>
         <div class="explanation">
-            The client indicates how many bytes of encrypted payload
-            are in the packet.  This field is a variable length
+            The client indicates how many bytes of packet data follow.
+            This field is a variable length
             integer - the first two bits of the first byte
             indicate how many total bytes are in the integer.
 
@@ -2922,8 +2918,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             "Initial" traffic key and IV that were
             generated during the "Initial Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 1.  The process
             also takes as input the 21 bytes of header
             at the beginning of this packet, as authenticated
@@ -3086,8 +3081,8 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
  40 16
         </span>
         <div class="explanation">
-            The client indicates how many bytes of encrypted payload
-            are in the packet.  This field is a variable length
+            The client indicates how many bytes of packet data follow.
+            This field is a variable length
             integer - the first two bits of the first byte
             indicate how many total bytes are in the integer.
 
@@ -3164,8 +3159,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             "Handshake" traffic key and IV that were
             generated during the "Handshake Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 0.  The process
             also takes as input the 20 bytes of header
             at the beginning of this packet, as authenticated
@@ -3502,8 +3496,8 @@ b0b3b06690
  40 3f
         </span>
         <div class="explanation">
-            The client indicates how many bytes of encrypted payload
-            are in the packet.  This field is a variable length
+            The client indicates how many bytes of packet data follow.
+            This field is a variable length
             integer - the first two bits of the first byte
             indicate how many total bytes are in the integer.
 
@@ -3581,8 +3575,7 @@ b0b3b06690
             "Handshake" traffic key and IV that were
             generated during the "Handshake Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 0.  The process
             also takes as input the 20 bytes of header
             at the beginning of this packet, as authenticated
@@ -3884,8 +3877,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             key and IV that were
             generated during the "Application Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 0.  The process
             also takes as input the 16 bytes of header
             at the beginning of this packet, as authenticated
@@ -4197,8 +4189,7 @@ a5a6f88ece
             "Handshake" traffic key and IV that were
             generated during the "Handshake Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 0.  The process
             also takes as input the 20 bytes of header
             at the beginning of this packet, as authenticated
@@ -4403,8 +4394,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             key and IV that were
             generated during the "Application Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 0.  The process
             also takes as input the 16 bytes of header
             at the beginning of this packet, as authenticated
@@ -4711,8 +4701,7 @@ $ echo $sample | xxd -r -p | openssl aes-128-ecb -K $key | head -c 5 | xxd -p
             key and IV that were
             generated during the "Application Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 0.  The process
             also takes as input the 16 bytes of header
             at the beginning of this packet, as authenticated
@@ -4920,8 +4909,7 @@ f494fdfbb6
             key and IV that were
             generated during the "Application Keys
             Calc" step.  The IV will be modified
-            by XOR'ing it by the count of records that
-            have already been encrypted with this key,
+            by XOR'ing it by the packet number,
             which in this case is 0.  The process
             also takes as input the 16 bytes of header
             at the beginning of this packet, as authenticated
